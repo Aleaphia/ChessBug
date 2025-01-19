@@ -1,0 +1,40 @@
+/*Background Sytles*/
+.background{
+    -fx-background-color: rgb(212, 215, 223);
+}
+
+
+/*Chess board styles*/
+.label{
+    -fx-text-alignment: center;
+    -fx-label-padding: 5;
+    -fx-wrap-text: true;
+}
+.chessBoard {
+    -fx-font: 30px Tahoma;
+    /*Alignment*/
+    -fx-padding: 20;
+    /*Child-Alignment*/
+    -fx-alignment: center;
+    
+}
+/*Square coloration*/
+.black { -fx-background-color: rgb(123, 147, 107);}
+.white{ -fx-background-color: rgb(223, 208, 174);}
+
+/*Message board styles*/
+.messageBoard{
+    -fx-font: 20px Tahoma;
+    -fx-padding: 20;
+}
+.radio-button{
+    -fx-padding: 3;
+}
+
+/*Classes to modify squares as user interacts*/
+.selected, .possibleMove{
+    -fx-border-width: 3;
+    -fx-border-insets: 0;
+}
+.selected{-fx-border-color: rgb(3, 255, 95); }
+.possibleMove{-fx-border-color: rgb(255, 238, 3);}
