@@ -16,6 +16,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.*;
 import javafx.scene.control.*;
 import javafx.scene.image.*;
+import javafx.scene.Node;
 /**
  *
  * @author shosh
@@ -31,17 +32,15 @@ public class ChessBug extends Application {
         //Create Menu
         MenuBar menuBar = new MenuBar();
         mainPane.getChildren().add(menuBar);
-        
-        //Create menuBar options
+        //TODO - Create menuBar options
         String[] menus = {"Home", "Games" , "Settings"};
         String[][] menuOptions = {
-            {"DashBoard"}, // Home
-            {}, // Games
+            {"Dash Board"}, // Home
+            {"New Game"}, // Games
             {}  // Setting
         };
-        fillMenuBar(menuBar, menus, menuOptions);
+        fillMenuBar(menuBar, menus, menuOptions); //Creates dashboard based on above arrays
         
-
         //Scene and Stage ------------------------------------------------------
         primaryStage.setTitle("ChessBug"); //Name for application stage
         Scene mainScene = new Scene(mainPane, 800, 600); //Add mainPane to the mainScene
@@ -67,10 +66,15 @@ public class ChessBug extends Application {
             for (int j = 0; j < menuOptions[i].length; j++){
                 MenuItem menuItem = new MenuItem(menuOptions[i][j]); //Create menuItem
                 menu.getItems().add(menuItem); //Add to container
-            }
-            
-            
+                menu.setOnAction(event -> changePage(((MenuItem)event.getTarget()).getText()));
+            }            
         }
+    }
+    
+
+    
+    private void changePage(String newPage){
+        System.out.println(newPage);
     }
     
     public static void main(String[] args) {
