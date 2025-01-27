@@ -1,0 +1,38 @@
+plugins {
+	id 'application'
+	id 'org.openjfx.javafxplugin' version '0.1.0'
+}
+
+javafx {
+    version = '22'
+    modules = [ 'javafx.controls', 'javafx.fxml' ]
+}
+
+repositories {
+    // Use Maven Central for resolving dependencies.
+    mavenCentral()
+}
+
+dependencies {
+    // This dependency is used by the application.
+    implementation 'org.json:json:20250107'
+}
+
+// Apply a specific Java toolchain to ease working on different environments.
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir "./src"
+        }
+    }
+}
+
+application {
+	mainClass = 'chessBug.network.Example'
+}
