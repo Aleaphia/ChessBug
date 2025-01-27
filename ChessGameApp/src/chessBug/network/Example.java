@@ -1,6 +1,7 @@
 package chessBug.network;
 
 import java.util.List;
+import java.util.Scanner;
 import java.util.stream.Stream;
 
 public class Example {
@@ -46,7 +47,9 @@ public class Example {
 
 		// User sends something in the chat
 		// ~~~~~~~~~~~~~~
-		chat.send(client, "Hello! Sent from the example code");
+		Scanner s = new Scanner(System.in);
+		System.out.print("Send Message > ");
+		chat.send(client, s.nextLine());
 
 		chat.poll(client).forEach((m) -> System.out.println("New message: " + m.getAuthor() + " (" + m.getTimestamp() + ") > " + m.getContent()));
 		// ~~~~~~~~~~~~~~

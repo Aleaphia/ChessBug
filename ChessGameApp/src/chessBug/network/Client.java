@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -82,7 +81,7 @@ public class Client {
 		byte[] data = message.getBytes(StandardCharsets.UTF_8);
 
 		// Set up a connection to the server
-		HttpURLConnection con = getConnection(function);
+		HttpsURLConnection con = getConnection(function);
 		if(con == null) {
 			System.err.println("Could not connect to server!");
 			JSONObject out = new JSONObject();
@@ -122,24 +121,22 @@ public class Client {
 			ioex2.printStackTrace();
 			return out;
 		}
-		
-		// TODO: Standardize output on server to always return a JSON Object
 
 		// Try to parse as straight JSON Object,
 		try {
 			return new JSONObject(input);
 		} catch (JSONException e) {
+			// If it's not a JSON Object, it probably contains error data
 			JSONObject jo = new JSONObject();
 			jo.put("error", true);
-			// If it's not a JSON Object, it probably contains error data
 			jo.put("response", input);
 			return jo;
 		}
 	}
 
-	private static HttpURLConnection getConnection(String function) {
+	private static HttpsURLConnection getConnection(String function) {
 		try {
-			HttpURLConnection con = (HttpURLConnection)new URI("http://localhost/chessbug-server/" + function + ".php").toURL().openConnection();
+			HttpsURLConnection con = (HttpsURLConnection)new URI("https://www.zandgall.com/chessbug/" + function + ".php").toURL().openConnection();
 			con.setRequestMethod("POST");
 			con.setDoOutput(true);
 			con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");

@@ -36,3 +36,7 @@ sourceSets {
 application {
 	mainClass = 'chessBug.network.Example'
 }
+
+run {
+    standardInput = System.in
+}
