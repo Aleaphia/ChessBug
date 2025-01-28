@@ -1,2 +1,8 @@
 /ChessGameApp/nbproject/private/
 /ChessGameApp/build/
+
+.gradle/
+.classpath
+.project
+.settings/
+bin
