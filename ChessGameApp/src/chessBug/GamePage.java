@@ -17,35 +17,41 @@ import javafx.scene.layout.*;
 import javafx.scene.control.*;
 import javafx.scene.image.*;
 import javafx.scene.Node;
-import javafx.event.ActionEvent;
+import javafx.event.Event;
 
 /**
  *
  * @author shosh
  */
 public class GamePage {
+
     //Attributes
     //Chess game state
     ChessGame game;
+    Boolean playerColor; //true is white; flase is black
     //Promotion variables
     char[] promotionChoice = new char[1]; //char reference that can be modified by event handling lambda functions
     PromotionSelection promotionLambda = (PromotionSelection & Serializable) pawn -> {
         return promotionChoice[0];
     };//Use promotionChoice to determine new piece
-    
+
     //Page state
-    String selectedSquareList;
+    String selectedSquare = null;
     GridPane gameBoard;
 
     //Constructors
     public GamePage() {
         game = new ChessGame(promotionLambda);
+        playerColor = true;
         gameBoard = createGameBoard(true);
+        updateGameDisplay();
     }
-    
+
     //Getter Methods
-    public GridPane getGameBoard(){return gameBoard;}
-    
+    public GridPane getGameBoard() {
+        return gameBoard;
+    }
+
     //Methods
     private GridPane createGameBoard(boolean isWhitePerspective) {
         //Start new game
@@ -94,25 +100,25 @@ public class GamePage {
                 GridPane.setValignment(square, VPos.CENTER);
                 GridPane.setHalignment(square, HPos.CENTER);
 
-                //TODO: Add functionality to pressing a square
-                //square.setOnMouseClicked(event -> boardInteraction(chessBoard, square));
+                //Add functionality to pressing a square
+                square.setOnMouseClicked(event -> boardInteraction((BorderPane) event.getSource()));
+
                 //Add square to chessBoard
                 chessBoard.add(square, (isWhitePerspective) ? col + 1 : 8 - col, (isWhitePerspective) ? 7 - row : row);
             }
         }
         //----------------------------------------------------------------------
-        updateGameDisplay(chessBoard);
-
         return chessBoard;
     }
-    public void updateGameDisplay(GridPane chessBoard) {
+
+    public void updateGameDisplay() {
         //Update each square in chessBoard to reflect game's condition
         /*
         Note: we only need to modify squares (not labels), and all squares are
         created from the BoarderPane class, so we can modify all BoarderPane
         children of chessBoard.
          */
-        chessBoard.getChildren().forEach(child -> {
+        gameBoard.getChildren().forEach(child -> {
             if (child instanceof BorderPane square) {
                 //System.out.println("Debug: Board id: " + board.getParent().getId() + ", game list size: " + gameList.size());
 
@@ -147,4 +153,145 @@ public class GamePage {
 
     }
 
+    private void boardInteraction(BorderPane square) {
+        if (!game.getGameComplete()
+                && game.getPlayerTurn() == playerColor //correct color turn
+                ) {
+            /*
+            One of two valid actions may occur when a user selects a square:
+                1) The user selects a peice to move
+                2) The user selects a square they want the selected peice to move to
+            
+            These different events have different qualifying features and need
+            different information. Path 1 needs to know the identity of the local
+            piece. Path 2 needs to know if the move is valid. We will start this
+            method my gathering these two information pieces.
+             */
+
+            //Option 1 info: Get the Piece on the selected square
+            /*(Note: if square is empty than the Piece will be null)*/
+            Piece localPiece = game.getLocalPiece(square.getId());
+            //Option 2 info: Check if the board interaction causes a valid move
+            /* Valid Move Note
+            When a piece is selected, all valid moves for a selected piece are
+            displayed to the user using the style class "possibleMove". We can
+            see if a move is valid by checking if the selected square has the
+            "possibleMove" style class.
+             */
+            boolean validMove = square.getStyleClass().contains("possibleMove");
+
+            //Remove special style classes from all grid elements
+            gameBoard.getChildren().forEach(gridContent -> {
+                gridContent.getStyleClass().remove("selected");
+                gridContent.getStyleClass().remove("possibleMove");
+            });
+
+            //Path 1: The user selects a piece to move =========================
+            /*Qualifications:
+                - a piece of the correct color has been selected
+             */
+            if (localPiece != null //A piece has been selected
+                    && localPiece.getColor() == game.getPlayerTurn() //Check that piece color matches players turn's color
+                    ) {
+                //Select Square
+                //Add square to selectedSquareList at the corresponding index
+                selectedSquare = square.getId();
+                //Signify selection with style class
+                square.getStyleClass().add("selected");
+
+                //Display all possible moves for the selected piece
+                //Get list of possible moves
+                ArrayList<String> possibleMoves = game.getMoveListForLocalPiece(square.getId());
+                //Add a style class to each valid move
+                gameBoard.getChildren().forEach(gridContent -> {
+                    if (possibleMoves.contains(gridContent.getId())) {
+                        gridContent.getStyleClass().add("possibleMove");
+                    }
+                });
+            } //==================================================================
+            //Path 2: The user selects a square to move to =====================
+            /*Qualifications:
+                - A 'mover' piece has been selected
+                    (i.e., the corresponding entry in selectedSquareList is set)
+             */ else if (selectedSquare != null) { //There is a selected piece
+                //Check for promotion move (promotions require an extra prompt for piece selection)
+                if (game.getLocalPiece(selectedSquare) instanceof Pawn pawn //'mover' piece is a pawn
+                        && (square.getId().contains("1") || square.getId().contains("8")) //pawn is moving to 1st or 8th rank
+                        && validMove //the move is valid (this prevents prompt display for illegal promotion moves)
+                        ) {
+                    //TODO: Handle promotion details
+                    /*Note: promote calls playerMove(gameIndex, chessBoard, messageBoard, square)
+                    just like the else's statement, but it first requires for the
+                    selection of a piece.*/
+                    //promote(pawn, gameIndex, chessBoard, messageBoard, square);
+                } else {
+                    playerMove(square);
+                }
+            }
+            //==================================================================
+        }
+    }
+    
+    public void playerMove(BorderPane square) {
+        //Preform gameTurn: gameTurn will return true if it is a valid move
+        //If the game move is valid
+        if (game.gameTurn(selectedSquare, square.getId())) {
+            //Update the board display
+            updateGameDisplay();
+            //Deselect square
+            selectedSquare = null;
+        }
+        else { //If the game move is Illegal, output error message
+            //TODO messageBoard.getChildren().add(new Label("Illegal move: try again."));
+        }
+        //Reset promotionChoice
+        promotionChoice[0] = '0';
+    }
+
+    //Handling Promotion Moves: Create form for promotion piece selection
+    public void promote(Pawn pawn, int gameIndex, GridPane chessBoard, VBox messageBoard, BorderPane square) {
+        //Clear messageBoard
+        messageBoard.getChildren().clear();
+
+        //Enter promotion prompt -----------------------------------------------
+        messageBoard.getChildren().add(new Label(
+                ((pawn.getColor()) ? "White" : "Black") + "'s pawn on "
+                + ChessGame.encodeNotation(pawn.getRow(), pawn.getCol()) + " has promoted."
+        ));
+        messageBoard.getChildren().add(new Label("Select a new piece: "));
+        // ---------------------------------------------------------------------
+
+        //Enter form input -----------------------------------------------------
+        //Create ToggleGroup for RadioButtons
+        ToggleGroup promotionOptions = new ToggleGroup();
+
+        //Create RadioButtons
+        RadioButton rbQueen = new RadioButton("Queen");
+        rbQueen.setOnAction(event -> promotionChoice[0] = 'Q');
+        rbQueen.setToggleGroup(promotionOptions);
+
+        RadioButton rbRook = new RadioButton("Rook");
+        rbRook.setOnAction(event -> promotionChoice[0] = 'R');
+        rbRook.setToggleGroup(promotionOptions);
+
+        RadioButton rbBishop = new RadioButton("Bishop");
+        rbBishop.setOnAction(event -> promotionChoice[0] = 'B');
+        rbBishop.setToggleGroup(promotionOptions);
+
+        RadioButton rbKnight = new RadioButton("Knight");
+        rbKnight.setOnAction(event -> promotionChoice[0] = 'N');
+        rbKnight.setToggleGroup(promotionOptions);
+
+        //Create Submit Button
+        Button btnSubmit = new Button("Submit");
+        btnSubmit.setOnAction(event -> {
+            if (promotionChoice[0] != '0') {
+                playerMove(square);
+            }
+        });
+
+        //Add form elements to messageBoard
+        messageBoard.getChildren().addAll(rbQueen, rbRook, rbBishop, rbKnight, btnSubmit);
+        // ---------------------------------------------------------------------
+    }
 }
