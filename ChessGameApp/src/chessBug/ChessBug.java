@@ -19,6 +19,7 @@ import javafx.scene.layout.*;
 import javafx.scene.control.*;
 import javafx.scene.image.*;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.event.Event;
 /**
  *
@@ -26,15 +27,7 @@ import javafx.event.Event;
  */
 public class ChessBug extends Application {
     //Global variables
-    VBox page = new VBox(); // space to change with page details
-    
-    /**Delete
-     * ChessGame game = null;
-    
-    //Promotion variables
-    char[] promotionChoice = new char[1]; //char reference that can be modified by event handling lambda functions
-    PromotionSelection promotionLambda = (PromotionSelection & Serializable) pawn -> {return promotionChoice[0];};//Use promotionChoice to determine new piece
-    */
+    Pane page = new VBox(); // space to change with page details
     
     @Override
     public void start(Stage primaryStage) {
@@ -88,9 +81,9 @@ public class ChessBug extends Application {
     
     private void changePage(String newPage){
         page.getChildren().clear();
-
+        
         switch (newPage){
-            case "New Game" -> openNewGame();
+            case "New Game" -> page.getChildren().add(new GamePage().getPage());
             case "Preferences" -> {
                 //Navigate to prefrences
                 System.out.println("Navigating to Prefrences...");}
@@ -107,12 +100,7 @@ public class ChessBug extends Application {
             default -> page.getChildren().add(new Label("Debug: " + newPage));
         }
     }
-    
-    private void openNewGame(){
-        GamePage gamePage = new GamePage();
-        page.getChildren().add(gamePage.getGameBoard());
-        
-    }
+   
     
     public static void main(String[] args) {
         Application.launch(args);

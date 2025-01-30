@@ -38,3 +38,10 @@
 }
 .selected{-fx-border-color: rgb(3, 255, 95); }
 .possibleMove{-fx-border-color: rgb(255, 238, 3);}
+
+
+.chatBox{
+    -fx-background-color: rgb(250, 249, 247);
+    -fx-font: 15px Tahoma;
+    -fx-padding: 20;
+}
