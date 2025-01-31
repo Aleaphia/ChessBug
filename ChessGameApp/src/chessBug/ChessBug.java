@@ -46,7 +46,7 @@ public class ChessBug extends Application {
         //Create Menu
         MenuBar menuBar = new MenuBar();
         mainPane.getChildren().addAll(menuBar, page);
-        //TODO - Create menuBar options
+        // TODO: Create menuBar options
         String[] menus = {"Home", "Games" , "Settings" , "Profile"};
         String[][] menuOptions = {
             {"Dash Board"}, // Home
@@ -102,9 +102,11 @@ public class ChessBug extends Application {
                 
                 // Navigate to User Profile page
                 System.out.println("Navigating to User Profile...");
+                // Implement ProfileControl usage here!
             }
             
             default -> page.getChildren().add(new Label("Debug: " + newPage));
+
         }
     }
     
