@@ -58,12 +58,12 @@ public class GamePage {
 
     //Constructors
     public GamePage() {
-        game = new ChessGame(promotionLambda);
         playerColor = true;
         try{
-        client = new Client("user", "p@ssw0rd!"); // (example user)
+            client = new Client("user", "p@ssw0rd!"); // (example user)
+            game = new ChessGame(client, client.getFriends().get(0), promotionLambda); // Start a game with first friend
         } catch( Exception e){
-        System.out.println("Error");
+            System.out.println("Error");
         }
         
         createGameBoard(true);
