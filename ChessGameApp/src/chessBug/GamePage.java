@@ -5,11 +5,11 @@
 package chessBug;
 
 import chessGame.*;
+import chessBug.network.*;
 import java.io.*;
 import java.util.*;
+import java.util.stream.Stream;
 
-import javafx.application.*;
-import javafx.stage.Stage;
 import javafx.geometry.*;
 
 import javafx.scene.Scene;
@@ -18,16 +18,23 @@ import javafx.scene.control.*;
 import javafx.scene.image.*;
 import javafx.scene.Node;
 import javafx.event.Event;
+import javafx.event.ActionEvent;
+import javafx.util.Duration;
+
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
+
 
 /**
  *
  * @author shosh
  */
 public class GamePage {
-
+    HBox page = new HBox();
     //Attributes
     //Chess game state
     ChessGame game;
+    int gameMove = 0;
     Boolean playerColor; //true is white; flase is black
     //Promotion variables
     char[] promotionChoice = new char[1]; //char reference that can be modified by event handling lambda functions
@@ -35,43 +42,67 @@ public class GamePage {
         return promotionChoice[0];
     };//Use promotionChoice to determine new piece
 
+    //Chat
+    Chat chat = new Chat(0);
+    Client client;
+    
+    
+    
     //Page state
+    GridPane gameBoard = new GridPane();
+    VBox msgBoard = new VBox();
+    GridPane notationScreen = new GridPane();
+    
     String selectedSquare = null;
-    GridPane gameBoard;
+    
 
     //Constructors
     public GamePage() {
         game = new ChessGame(promotionLambda);
         playerColor = true;
-        gameBoard = createGameBoard(true);
+        try{
+        client = new Client("user", "p@ssw0rd!"); // (example user)
+        } catch( Exception e){
+        System.out.println("Error");
+        }
+        
+        createGameBoard(true);
+        createMsgBoard();
+        createNotationBoard();
         updateGameDisplay();
+        
+        
+        
+        page.getChildren().addAll(msgBoard, gameBoard, notationScreen);
+        
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (ActionEvent event) -> {
+            updateMsgBoard();
+        }));
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
     }
 
     //Getter Methods
-    public GridPane getGameBoard() {
-        return gameBoard;
-    }
+    public Node getPage(){return page;}
+   
 
-    //Methods
-    private GridPane createGameBoard(boolean isWhitePerspective) {
-        //Start new game
-        game = new ChessGame(promotionLambda);
-
+    //Chess game methods
+    private void createGameBoard(boolean isWhitePerspective) {
         //Create chessBoard
-        GridPane chessBoard = new GridPane();
-        chessBoard.getStyleClass().add("chessBoard");
+        gameBoard = new GridPane();
+        gameBoard.getStyleClass().add("chessBoard");
 
         //Layout chess board within chessBoard =================================
         for (int row = 0; row < 8; row++) {
             //Create notation labels for the board -----------------------------
             //Collumn labels:   a, b, c, d, e, f, g, h
             Label colLabel = new Label(String.valueOf((char) ('a' + row))); //Create label
-            chessBoard.add(colLabel, (isWhitePerspective) ? row + 1 : 8 - row, 8); //Add label to chessBoard
+            gameBoard.add(colLabel, (isWhitePerspective) ? row + 1 : 8 - row, 8); //Add label to chessBoard
             GridPane.setHalignment(colLabel, HPos.CENTER); //specify label alignment
 
             //Row labels:       8, 7, 6, 5, 4, 3, 2, 1
             Label rowLabel = new Label(String.valueOf(8 - row)); //Create label
-            chessBoard.add(rowLabel, 0, (isWhitePerspective) ? row : 7 - row); //Add label to chessBoard
+            gameBoard.add(rowLabel, 0, (isWhitePerspective) ? row : 7 - row); //Add label to chessBoard
             //specify label alignment
             GridPane.setValignment(rowLabel, VPos.CENTER);
             GridPane.setHalignment(rowLabel, HPos.RIGHT);
@@ -104,11 +135,10 @@ public class GamePage {
                 square.setOnMouseClicked(event -> boardInteraction((BorderPane) event.getSource()));
 
                 //Add square to chessBoard
-                chessBoard.add(square, (isWhitePerspective) ? col + 1 : 8 - col, (isWhitePerspective) ? 7 - row : row);
+                gameBoard.add(square, (isWhitePerspective) ? col + 1 : 8 - col, (isWhitePerspective) ? 7 - row : row);
             }
         }
         //----------------------------------------------------------------------
-        return chessBoard;
     }
 
     public void updateGameDisplay() {
@@ -155,7 +185,7 @@ public class GamePage {
 
     private void boardInteraction(BorderPane square) {
         if (!game.getGameComplete()
-                && game.getPlayerTurn() == playerColor //correct color turn
+                //&& game.getPlayerTurn() == playerColor //correct color turn //ADD BACK LATER
                 ) {
             /*
             One of two valid actions may occur when a user selects a square:
@@ -238,6 +268,14 @@ public class GamePage {
         if (game.gameTurn(selectedSquare, square.getId())) {
             //Update the board display
             updateGameDisplay();
+            //Update Notation Board
+            if (!game.getPlayerTurn()){ //White just moved
+                notationScreen.add(new Label(Integer.toString(++gameMove)), 0 , gameMove);
+                notationScreen.add(new Label(selectedSquare + "-" + square.getId()), 1 , gameMove);
+            }
+            else{ //Black just moved
+                notationScreen.add(new Label(selectedSquare + "-" + square.getId()), 2 , gameMove);
+            }
             //Deselect square
             selectedSquare = null;
         }
@@ -294,4 +332,56 @@ public class GamePage {
         messageBoard.getChildren().addAll(rbQueen, rbRook, rbBishop, rbKnight, btnSubmit);
         // ---------------------------------------------------------------------
     }
+    
+    //MsgBoard Interactions
+    private void createMsgBoard(){
+        VBox msgScreen = new VBox();
+        TextField msgInput = new TextField();
+        
+        msgBoard.getChildren().addAll(msgScreen, msgInput);
+        msgBoard.getStyleClass().add("chatBox");
+        
+        chat.poll(client);
+        chat.getAllMessages().forEach(x -> {
+            String msg = x.getAuthor() + ": " + x.getContent();
+            System.out.println(msg);
+            msgScreen.getChildren().add(new Label(msg));
+        });
+        
+        msgInput.setOnAction(event -> {
+            //Formulate message
+            //TO-DO add real player names
+            String user = (playerColor)?"White" : "Black";
+            String msg = msgInput.getText();
+            
+            //Display msg on screen
+            msgScreen.getChildren().add(new Label(user + ": " + msg));
+            
+            chat.send(client, msg);
+            
+            //Clear input
+            msgInput.setText("");
+                });
+
+        msgBoard.setMinHeight(100);
+        msgBoard.setAlignment(Pos.BOTTOM_CENTER);
+    }
+    private void updateMsgBoard(){
+        Stream<Message> newPoll = chat.poll(client);
+        newPoll.forEach(x -> {
+            String msg = x.getAuthor() + ": " + x.getContent();
+            VBox msgScreen = (VBox)msgBoard.getChildren().get(0);            
+            msgScreen.getChildren().add(new Label(msg));
+        });
+    }
+    
+    private void createNotationBoard(){
+        
+        //gameBoard.add(square, (isWhitePerspective) ? col + 1 : 8 - col, (isWhitePerspective) ? 7 - row : row);
+        notationScreen.add(new Label("White"), 1, 0);
+        notationScreen.add(new Label("Black"), 2, 0);
+        
+    }
+    
+
 }
