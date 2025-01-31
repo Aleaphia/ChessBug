@@ -30,7 +30,7 @@ public class Client {
 
 	public Client(String username, String password) throws ClientAuthException {
 		// Call "login" function from the server
-		profile = new ProfileModel(username, password, "", "");
+		profile = new ProfileModel(0, username, password, "", "");
 		JSONObject loginMessage = post("login", new JSONObject());
 
 		// If the server returns an error, throw an exception
@@ -66,6 +66,24 @@ public class Client {
 		return c;
 	}
 
+	public User getOwnUser() {
+		return new ClientUser(this);
+	}
+
+	// Create a new match
+	public Match createMatch(User white, User black) throws NetworkException {
+		JSONObject matchMessage = new JSONObject();
+		matchMessage.put("white", white.getID());
+		matchMessage.put("black", black.getID());
+		JSONObject matchData = post("createMatch", matchMessage);
+
+		// If couldn't create match...
+		if(matchData.getBoolean("error"))
+			throw new NetworkException(matchData.opt("response").toString());
+
+		return new Match(matchData.getJSONObject("response").getInt("match"), matchData.getJSONObject("response").getInt("chat"), white, black);
+	}
+
 	// Update profile with server data
 	public ProfileModel syncProfile() throws NetworkException {
 		JSONObject profileData = post("getAccountData", new JSONObject());
@@ -75,6 +93,7 @@ public class Client {
 			throw new NetworkException(profileData.opt("response").toString());
 
 		profile.setEmail(profileData.getJSONObject("response").getString("Email"));
+		profile.setUserID(profileData.getJSONObject("response").getInt("UserID"));
 
 		return profile;
 	}
@@ -206,6 +225,12 @@ public class Client {
 			System.err.println("Could not make connection to function \"" + function + "\"!");
 			e3.printStackTrace();
 			return null;
+		}
+	}
+
+	public static class ClientUser extends User {
+		public ClientUser(Client client) {
+			super(client.getProfile().getUserID(), client.getProfile().getUsername());
 		}
 	}
 }

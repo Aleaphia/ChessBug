@@ -1,6 +1,12 @@
 package chessGame;
 
 import java.util.*;
+
+import chessBug.network.Client;
+import chessBug.network.Match;
+import chessBug.network.NetworkException;
+import chessBug.network.User;
+
 import java.io.Serializable;
 
 public class ChessGame implements Serializable{
@@ -21,10 +27,17 @@ public class ChessGame implements Serializable{
     
     //Track kings
     private final Piece[] kings = new Piece[2];
+
+    // Database connection
+    private Client client;
+    private Match databaseMatch;
     
     //Methods===================================================================
     //Constructors
-    public ChessGame(PromotionSelection promotionMethod){
+    public ChessGame(Client client, User challenger, PromotionSelection promotionMethod) throws NetworkException {
+        // Keep connection with database
+        this.client = client;
+        this.databaseMatch = client.createMatch(client.getOwnUser(), challenger);
         //Create Starting position
         this.setStartingState();
         //Set player turn to white
