@@ -46,12 +46,12 @@ public class ChessBug extends Application {
         //Create Menu
         MenuBar menuBar = new MenuBar();
         mainPane.getChildren().addAll(menuBar, page);
-        //TODO - Create menuBar options
+        // TODO: Create menuBar options
         String[] menus = {"Home", "Games" , "Settings" , "Profile"};
         String[][] menuOptions = {
             {"Dash Board"}, // Home
             {"New Game"}, // Games
-            {"Preferences", "About"}  // Setting
+            {"Preferences", "About"}, // Setting
             {"User Profile"} // Profile (added menu option)
         };
         fillMenuBar(menuBar, menus, menuOptions); //Creates dashboard based on above arrays
@@ -92,20 +92,13 @@ public class ChessBug extends Application {
         switch (newPage){
             case "New Game" -> openNewGame();
             default -> page.getChildren().add(new Label("Debug: " + newPage));
-            case "Preferences";
-            //Navigate to prefrences
-            System.out.println("Navigating to Prefrences...");
-            break;
-            case "About":
-                // Navigate to About page
-                System.out.println("Showing About page...");
-                break;
-            case "User Profile":
+            case "Preferences" -> System.out.println("Navigating to Prefrences...");
+            case "About" -> System.out.println("Showing About page...");
+            case "User Profile" -> {
                 // Navigate to User Profile page
                 System.out.println("Navigating to User Profile...");
-                break;
-            default:
-                System.out.println("Unknown option selected: " + selectedOption);
+                // Implement ProfileControl usage here!
+            } 
         }
     }
     

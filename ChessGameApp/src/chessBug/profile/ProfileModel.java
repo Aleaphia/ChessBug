@@ -1,13 +1,15 @@
-package userProfile;
+package chessBug.profile;
 
-public class UserProfileModel {
+public class ProfileModel {
     private String username;
+    private String password; // It's okay to keep this in memory
     private String email;
     private String profilePicPath; // Path to the profile picture (optional)
 
     // Constructor
-    public UserProfileModel(String username, String email, String profilePicPath) {
+    public ProfileModel(String username, String password, String email, String profilePicPath) {
         this.username = username;
+        this.password = password;
         this.email = email;
         this.profilePicPath = profilePicPath;
     }
@@ -19,6 +21,14 @@ public class UserProfileModel {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getEmail() {
