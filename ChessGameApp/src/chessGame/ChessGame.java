@@ -322,6 +322,10 @@ public class ChessGame implements Serializable{
         return gameComplete;
     }
     
+    public Match getMatch() {
+        return databaseMatch;
+    }
+
     //Set methods
     public void setPromotionMethod(PromotionSelection promotionMethod){
         this.promotionMethod = promotionMethod;
