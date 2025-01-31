@@ -14,39 +14,92 @@ import java.util.List;
 import javax.net.ssl.HttpsURLConnection;
 
 import org.json.JSONObject;
+
+import chessBug.profile.ProfileModel;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 
 public class Client {
 	// Store user information in order to log in
-	private String username, password;
+	private ProfileModel profile;
 
 	private Client() {
 
 	}
 
 	public Client(String username, String password) throws ClientAuthException {
-		this.username = username;
-		this.password = password;
+		// Call "login" function from the server
+		profile = new ProfileModel(username, password, "", "");
 		JSONObject loginMessage = post("login", new JSONObject());
+
+		// If the server returns an error, throw an exception
 		if(loginMessage.getBoolean("error")) {
 			throw new ClientAuthException(ClientAuthException.TYPE_LOGIN, loginMessage.opt("response").toString());
+		}
+
+		// Update profile data with email and any other data
+		try {
+			syncProfile();
+		} catch(NetworkException e) {
+			throw new ClientAuthException(ClientAuthException.TYPE_LOGIN, e.getMessage());
 		}
 	}
 
 	public static Client createAccount(String username, String password, String email) throws ClientAuthException {
+		// Create a new blank Client, setting profile data
 		Client c = new Client();
-		c.username = username;
-		c.password = password;
+		c.profile.setUsername(username);
+		c.profile.setEmail(email);
+		c.profile.setPassword(password);
+
+		// Create a message to send to the server's "createAccount" function
 		JSONObject accountData = new JSONObject();
-		accountData.put("email", email);
+		accountData.put("email", email); // Client automatically attaches username and password, we just need to also provide email
 		JSONObject createMessage = c.post("createAccount", accountData);
 
+		// If the server returns an error, throw an exception
 		if(createMessage.getBoolean("error")) {
 			throw new ClientAuthException(ClientAuthException.TYPE_CREATE_ACCOUNT, createMessage.opt("response").toString());
 		}
 
 		return c;
+	}
+
+	// Update profile with server data
+	public ProfileModel syncProfile() throws NetworkException {
+		JSONObject profileData = post("getAccountData", new JSONObject());
+		
+		// If couldn't retrieve profile data...
+		if(profileData.getBoolean("error"))
+			throw new NetworkException(profileData.opt("response").toString());
+
+		profile.setEmail(profileData.getJSONObject("response").getString("Email"));
+
+		return profile;
+	}
+
+	public ProfileModel getProfile() {
+		return profile;
+	}
+
+	// Update profile with new data
+	public void updateProfile(String newUsername, String newEmail, String newPassword) throws NetworkException {
+
+		// Create message to send to server
+		JSONObject profileData = new JSONObject();
+		profileData.put("newUsername", newUsername);
+		profileData.put("newPassword", newPassword);
+		profileData.put("newEmail", newEmail);
+		
+		// Send to server to update profile data
+		JSONObject response = post("updateProfile", profileData);
+		if(response.getBoolean("error"))
+			throw new NetworkException(response.opt("response").toString());
+
+		profile.setUsername(newUsername);
+		profile.setEmail(newEmail);
+		profile.setPassword(newPassword);
 	}
 
 	public List<Friend> getFriends() {
@@ -55,7 +108,7 @@ public class Client {
 
 		// Return none if error in response
 		if(friendsResponse.getBoolean("error")) {
-			System.err.println("Could not retrieve friends for \"" + username + "\"");
+			System.err.println("Could not retrieve friends for \"" + profile.getUsername() + "\"");
 			System.err.println(friendsResponse.opt("response"));
 			return List.of();
 		}
@@ -71,8 +124,8 @@ public class Client {
 
 	public JSONObject post(String function, JSONObject message) {
 		// Sent JSON Object to server and retrieve response
-		message.put("username", username);
-		message.put("password", password);
+		message.put("username", profile.getUsername());
+		message.put("password", profile.getPassword());
 		return post(function, message.toString());
 	}
 

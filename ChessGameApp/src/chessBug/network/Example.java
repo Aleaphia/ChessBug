@@ -52,11 +52,22 @@ public class Example {
 		chat.send(client, s.nextLine());
 
 		chat.poll(client).forEach((m) -> System.out.println("New message: " + m.getAuthor() + " (" + m.getTimestamp() + ") > " + m.getContent()));
+		s.close();
+		// ~~~~~~~~~~~~~~
+		
+		// User updates own information
+		// ~~~~~~~~~~~~~~
+		try {
+			client.updateProfile("newUsername", "newUserEmail@email.org", "newP@ssw0rd!");
+			client.updateProfile("user", "user@email.org", "p@ssw0rd!");
+		} catch (NetworkException e) {
+			System.err.println("Uh oh! Example profile update code failed!");
+			e.printStackTrace();
+		}
 		// ~~~~~~~~~~~~~~
 
 		// TODO:
 		// User challenges friend to match
 		// Application retrieves a Chat instance from a Match
-		// User updates own information (i.e. change username, password, email)
 	}
 }

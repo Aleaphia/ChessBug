@@ -1,17 +1,17 @@
-package userProfile;
+package chessBug.profile;
 
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
-public class UserProfileView extends VBox {
+public class ProfileView extends VBox {
 
     private Text usernameText;
     private Text emailText;
     private ImageView profileImageView;
 
-    public UserProfileView(UserProfileModel model) {
+    public ProfileView(ProfileModel model) {
         // Initialize UI components
         usernameText = new Text("Username: " + model.getUsername());
         emailText = new Text("Email: " + model.getEmail());
