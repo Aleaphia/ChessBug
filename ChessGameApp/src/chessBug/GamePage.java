@@ -76,7 +76,10 @@ public class GamePage {
         page.getChildren().addAll(msgBoard, gameBoard, notationScreen);
         
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (ActionEvent event) -> {
+            //Add repeated database checks here ================================
             updateMsgBoard();
+            
+            // =================================================================
         }));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
