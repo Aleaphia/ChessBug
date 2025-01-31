@@ -3,7 +3,18 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package chessBug;
+/*
 
+//Loop to recheck the database for updates
+Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (ActionEvent event) -> {
+            //Add repeated database checks here ================================
+            updateMsgBoard();
+            
+            // =================================================================
+        }));
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
+*/
 
 import listHelper.SavableList;
 import chessGame.*;
