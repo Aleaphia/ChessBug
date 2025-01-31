@@ -5,8 +5,10 @@
 package chessBug;
 
 import chessGame.*;
+import chessBug.network.*;
 import java.io.*;
 import java.util.*;
+import java.util.stream.Stream;
 
 import javafx.geometry.*;
 
@@ -16,6 +18,12 @@ import javafx.scene.control.*;
 import javafx.scene.image.*;
 import javafx.scene.Node;
 import javafx.event.Event;
+import javafx.event.ActionEvent;
+import javafx.util.Duration;
+
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
+
 
 /**
  *
@@ -34,6 +42,12 @@ public class GamePage {
         return promotionChoice[0];
     };//Use promotionChoice to determine new piece
 
+    //Chat
+    Chat chat = new Chat(0);
+    Client client;
+    
+    
+    
     //Page state
     GridPane gameBoard = new GridPane();
     VBox msgBoard = new VBox();
@@ -46,12 +60,26 @@ public class GamePage {
     public GamePage() {
         game = new ChessGame(promotionLambda);
         playerColor = true;
+        try{
+        client = new Client("user", "p@ssw0rd!"); // (example user)
+        } catch( Exception e){
+        System.out.println("Error");
+        }
+        
         createGameBoard(true);
         createMsgBoard();
         createNotationBoard();
         updateGameDisplay();
         
+        
+        
         page.getChildren().addAll(msgBoard, gameBoard, notationScreen);
+        
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (ActionEvent event) -> {
+            updateMsgBoard();
+        }));
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
     }
 
     //Getter Methods
@@ -313,25 +341,40 @@ public class GamePage {
         msgBoard.getChildren().addAll(msgScreen, msgInput);
         msgBoard.getStyleClass().add("chatBox");
         
+        chat.poll(client);
+        chat.getAllMessages().forEach(x -> {
+            String msg = x.getAuthor() + ": " + x.getContent();
+            System.out.println(msg);
+            msgScreen.getChildren().add(new Label(msg));
+        });
+        
         msgInput.setOnAction(event -> {
             //Formulate message
             //TO-DO add real player names
             String user = (playerColor)?"White" : "Black";
             String msg = msgInput.getText();
+            
             //Display msg on screen
             msgScreen.getChildren().add(new Label(user + ": " + msg));
+            
+            chat.send(client, msg);
             
             //Clear input
             msgInput.setText("");
                 });
-        
-        msgScreen.getChildren().add(new Label("test"));
-        
-        
-        
+
         msgBoard.setMinHeight(100);
         msgBoard.setAlignment(Pos.BOTTOM_CENTER);
     }
+    private void updateMsgBoard(){
+        Stream<Message> newPoll = chat.poll(client);
+        newPoll.forEach(x -> {
+            String msg = x.getAuthor() + ": " + x.getContent();
+            VBox msgScreen = (VBox)msgBoard.getChildren().get(0);            
+            msgScreen.getChildren().add(new Label(msg));
+        });
+    }
+    
     private void createNotationBoard(){
         
         //gameBoard.add(square, (isWhitePerspective) ? col + 1 : 8 - col, (isWhitePerspective) ? 7 - row : row);
