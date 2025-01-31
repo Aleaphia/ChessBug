@@ -43,7 +43,7 @@ public class GamePage {
     };//Use promotionChoice to determine new piece
 
     //Chat
-    Chat chat = new Chat(0);
+    Chat chat;
     Client client;
     
     
@@ -62,6 +62,7 @@ public class GamePage {
         try{
             client = new Client("user", "p@ssw0rd!"); // (example user)
             game = new ChessGame(client, client.getFriends().get(0), promotionLambda); // Start a game with first friend
+            chat = game.getMatch().getChat();
         } catch( Exception e){
             System.out.println("Error");
         }
