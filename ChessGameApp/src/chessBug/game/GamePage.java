@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package chessBug;
+package chessBug.game;
 
 import chessGame.*;
 import chessBug.network.*;
@@ -42,9 +42,12 @@ public class GamePage {
         return promotionChoice[0];
     };//Use promotionChoice to determine new piece
 
-    //Chat
-    Chat chat;
+    //Database connections
     Client client;
+    private Match databaseMatch;
+    Chat chat;
+    
+    
     
     
     
@@ -57,12 +60,15 @@ public class GamePage {
     
 
     //Constructors
-    public GamePage() {
+    public GamePage(User challenger) {
         playerColor = true;
         try{
+            // Connect to database
             client = new Client("user", "p@ssw0rd!"); // (example user)
-            game = new ChessGame(client, client.getFriends().get(0), promotionLambda); // Start a game with first friend
-            chat = game.getMatch().getChat();
+            
+            databaseMatch = client.createMatch(client.getOwnUser(), challenger);
+            game = new ChessGame(promotionLambda); // Start a game with first friend
+            chat = databaseMatch.getChat();
         } catch( Exception e){
             System.out.println("Error");
         }
