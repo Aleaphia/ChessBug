@@ -1,6 +1,8 @@
 /ChessGameApp/nbproject/private/
 /ChessGameApp/build/
 
+build.gradle
+settings.gradle
 .gradle/
 .classpath
 .project
