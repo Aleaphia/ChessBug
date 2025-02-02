@@ -89,6 +89,7 @@ public class Match {
 	}
 
 	public void makeMove(Client from, String move) {
+                movesNumber++; //Iterate move count
 		JSONObject message = new JSONObject();
 		message.put("match", matchID);
 		message.put("move", move);

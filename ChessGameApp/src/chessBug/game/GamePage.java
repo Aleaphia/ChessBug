@@ -6,7 +6,7 @@ package chessBug.game;
 
 import chessGame.*;
 import java.awt.Color;
-//import chessBug.network.*;
+import chessBug.network.*;
 import java.io.*;
 import java.util.*;
 import java.util.stream.Stream;
@@ -44,12 +44,9 @@ public class GamePage {
     ChessGame game = new ChessGame(promotionLambda);
 
     //Database Connection
-    Chat chat;
-    Match databaseMatch;
     Client client;
-
-    
-    
+    Match match;
+    Chat chat;
     
     //Page state
     GridPane gameBoard = new GridPane();
@@ -61,71 +58,74 @@ public class GamePage {
 
     //Constructors
     //
-    public GamePage() { //New game
+    public GamePage(Client player, User opponent, boolean playerColor) { //New game
         //Determine player color
-        playerColor = true; //todo
+        this.playerColor = playerColor;
 
+        //Connect to database
+        try{
+            //Save client
+            client = player;
+            //Create new match
+            if (playerColor)
+                match = client.createMatch(client.getOwnUser(), opponent);
+            else 
+                match = client.createMatch(opponent, client.getOwnUser());
+            //Get chat
+            chat = match.getChat();
+        }
+        catch( Exception e){
+            System.out.println("Error");
+        }  
+        
         //Create new match in database
+        
         
         //load match
         loadGame();
-
-//        try{
-//            // Connect to database
-////            client = new Client("user", "p@ssw0rd!"); // (example user)
-////            
-////            databaseMatch = client.createMatch(client.getOwnUser(), challenger);
-////            game = new ChessGame(promotionLambda); // Start a game with first friend
-////            chat = databaseMatch.getChat();
-//        } catch( Exception e){
-//            System.out.println("Error");
-//        }
-        
-                //page layout
-        createGameBoard(true);
-        createMsgBoard();
-        createNotationBoard();
-        
-        page.getChildren().addAll(msgBoard, gameBoard, notationScreen);
-        
-        //Update game state
-        updateGameDisplay();
-        
-        //Check database
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (ActionEvent event) -> {
-            //Add repeated database checks here ================================
-            databaseMatch.poll(client).forEach((move) -> {
-                // Handle every new move string
-            });
-            updateMsgBoard();
-            
-            // =================================================================
-        }));
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
-    }
-    
-    public GamePage(boolean idk){
-        //Get moves from database
-        ArrayList<String> testMoveList = new ArrayList<>();
-        testMoveList.add("e2e4");
-        testMoveList.add("e7e5");
-        
-        loadGame(testMoveList);
         
         //page layout
         createGameBoard(true);
         createMsgBoard();
         createNotationBoard();
-        
         page.getChildren().addAll(msgBoard, gameBoard, notationScreen);
         
         //Update game state
         updateGameDisplay();
         
         //Check database
+        continueDatabaseChecks();
+    }
+    
+    public GamePage(Client player, Match match){
+        //Get match info
+        client = player;
+        this.match = match;
+        chat = match.getChat();
+        playerColor = match.getWhite().equals(client.getOwnUser()); //Assumes player is valid player in match
+        
+        //Get moves from database
+        loadGame(match.getAllMoves());
+        
+        //page layout
+        createGameBoard(true);
+        createMsgBoard();
+        createNotationBoard();
+        page.getChildren().addAll(msgBoard, gameBoard, notationScreen);
+        
+        //Update game state
+        updateGameDisplay();
+        
+        //Check database
+        continueDatabaseChecks();
+    }
+    
+    //loop database check
+    private void continueDatabaseChecks(){
+        //Check database
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (ActionEvent event) -> {
             //Add repeated database checks here ================================
+            match.poll(client).forEach((move) -> playerMove(move));
             updateMsgBoard();
             
             // =================================================================
@@ -212,7 +212,7 @@ public class GamePage {
         //----------------------------------------------------------------------
     }
 
-    public void updateGameDisplay() {
+    private void updateGameDisplay() {
         //Update each square in chessBoard to reflect game's condition
         /*
         Note: we only need to modify squares (not labels), and all squares are
@@ -344,6 +344,12 @@ public class GamePage {
         }
     }
     
+    public void playerMove(String notation){
+        if (notation.length() == 5)
+            promotionChoice[0] = notation.charAt(4);
+        
+        playerMove(notation.substring(0,2), notation.substring(2,4));
+    }
     public void playerMove(BorderPane square) {
         playerMove(selectedSquare,square.getId());
     }
@@ -357,6 +363,7 @@ public class GamePage {
             String notationMove = fromSquare + toSquare;
             notationMove += (promotionChoice[0] == '0')? "" : promotionChoice[0]; //Add promotion choice if relevent
             updateNotationBoard(notationMove);
+            match.makeMove(client, notationMove);
             //Deselect square
             selectedSquare = null;
         }
