@@ -148,6 +148,7 @@ public class GamePage {
                 promotionChoice[0] = move.charAt(4); //promotion character located at 4th index
             }
             game.gameTurn(from, to);
+            updateNotationBoard(move);
         }
         promotionChoice[0] = '0';
         updateGameDisplay();
@@ -251,12 +252,14 @@ public class GamePage {
 
     }
     private void updateNotationBoard(String move){
+        String expandedMove = move.substring(0,2) + "-" + move.substring(2,4) +
+                ((move.length() == 4)? "":("=" + move.substring(4))); //add promotion info if needed
         if (!game.getPlayerTurn()){ //White just moved
                 notationScreen.add(new Label(Integer.toString(++gameMove)), 0 , gameMove);
-                notationScreen.add(new Label(move), 1 , gameMove);
+                notationScreen.add(new Label(expandedMove), 1 , gameMove);
             }
             else{ //Black just moved
-                notationScreen.add(new Label(move), 2 , gameMove);
+                notationScreen.add(new Label(expandedMove), 2 , gameMove);
             }
     }
 
@@ -326,8 +329,8 @@ public class GamePage {
                         && (square.getId().contains("1") || square.getId().contains("8")) //pawn is moving to 1st or 8th rank
                         && validMove //the move is valid (this prevents prompt display for illegal promotion moves)
                         ) {
-                    //TODO: Handle promotion details
-                    /*Note: promote calls playerMove(gameIndex, chessBoard, messageBoard, square)
+                    //Handle promotion details
+                    /*Note: promote calls playerMove(square)
                     just like the else's statement, but it first requires for the
                     selection of a piece.*/
                     promote(square);
