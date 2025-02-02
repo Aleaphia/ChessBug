@@ -30,7 +30,7 @@ public class ChessGame implements Serializable{
     
     //Methods===================================================================
     //Constructors
-    public ChessGame(PromotionSelection promotionMethod) throws NetworkException {
+    public ChessGame(PromotionSelection promotionMethod){
         //Create Starting position
         this.setStartingState();
         //Set player turn to white
