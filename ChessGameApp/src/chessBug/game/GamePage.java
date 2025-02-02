@@ -5,7 +5,7 @@
 package chessBug.game;
 
 import chessGame.*;
-import chessBug.network.*;
+//import chessBug.network.*;
 import java.io.*;
 import java.util.*;
 import java.util.stream.Stream;
@@ -43,9 +43,9 @@ public class GamePage {
     };//Use promotionChoice to determine new piece
 
     //Database connections
-    Client client;
-    private Match databaseMatch;
-    Chat chat;
+//    Client client;
+//    private Match databaseMatch;
+//    Chat chat;
     
     
     
@@ -60,19 +60,19 @@ public class GamePage {
     
 
     //Constructors
-    public GamePage(User challenger) {
+    public GamePage() { //public GamePage(User challenger) {
         playerColor = true;
         try{
             // Connect to database
-            client = new Client("user", "p@ssw0rd!"); // (example user)
-            
-            databaseMatch = client.createMatch(client.getOwnUser(), challenger);
-            game = new ChessGame(promotionLambda); // Start a game with first friend
-            chat = databaseMatch.getChat();
+//            client = new Client("user", "p@ssw0rd!"); // (example user)
+//            
+//            databaseMatch = client.createMatch(client.getOwnUser(), challenger);
+//            game = new ChessGame(promotionLambda); // Start a game with first friend
+//            chat = databaseMatch.getChat();
         } catch( Exception e){
             System.out.println("Error");
         }
-        
+        loadGame();
         createGameBoard(true);
         createMsgBoard();
         createNotationBoard();
@@ -95,6 +95,9 @@ public class GamePage {
     //Getter Methods
     public Node getPage(){return page;}
    
+    private void loadGame(){
+        game = new ChessGame(promotionLambda);
+    }
 
     //Chess game methods
     private void createGameBoard(boolean isWhitePerspective) {
@@ -351,12 +354,12 @@ public class GamePage {
         msgBoard.getChildren().addAll(msgScreen, msgInput);
         msgBoard.getStyleClass().add("chatBox");
         
-        chat.poll(client);
-        chat.getAllMessages().forEach(x -> {
-            String msg = x.getAuthor() + ": " + x.getContent();
-            System.out.println(msg);
-            msgScreen.getChildren().add(new Label(msg));
-        });
+//        chat.poll(client);
+//        chat.getAllMessages().forEach(x -> {
+//            String msg = x.getAuthor() + ": " + x.getContent();
+//            System.out.println(msg);
+//            msgScreen.getChildren().add(new Label(msg));
+//        });
         
         msgInput.setOnAction(event -> {
             //Formulate message
@@ -367,7 +370,7 @@ public class GamePage {
             //Display msg on screen
             msgScreen.getChildren().add(new Label(user + ": " + msg));
             
-            chat.send(client, msg);
+//            chat.send(client, msg);
             
             //Clear input
             msgInput.setText("");
@@ -377,12 +380,12 @@ public class GamePage {
         msgBoard.setAlignment(Pos.BOTTOM_CENTER);
     }
     private void updateMsgBoard(){
-        Stream<Message> newPoll = chat.poll(client);
-        newPoll.forEach(x -> {
-            String msg = x.getAuthor() + ": " + x.getContent();
-            VBox msgScreen = (VBox)msgBoard.getChildren().get(0);            
-            msgScreen.getChildren().add(new Label(msg));
-        });
+//        Stream<Message> newPoll = chat.poll(client);
+//        newPoll.forEach(x -> {
+//            String msg = x.getAuthor() + ": " + x.getContent();
+//            VBox msgScreen = (VBox)msgBoard.getChildren().get(0);            
+//            msgScreen.getChildren().add(new Label(msg));
+//        });
     }
     
     private void createNotationBoard(){

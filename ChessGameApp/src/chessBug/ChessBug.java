@@ -41,7 +41,7 @@ import javafx.event.Event;
 public class ChessBug extends Application {
     //Global variables
     Pane page = new VBox(); // space to change with page details
-    Client client;
+//    Client client;
     
     @Override
     public void start(Stage primaryStage) {
@@ -49,7 +49,7 @@ public class ChessBug extends Application {
         //Fake login TODO- make login page the first page pulled up
         try{
             // Connect to database
-            client = new Client("user", "p@ssw0rd!"); // (example user)
+//            client = new Client("user", "p@ssw0rd!"); // (example user)
         } catch (Exception e){}
         //Main pane
         VBox mainPane = new VBox();
@@ -102,7 +102,7 @@ public class ChessBug extends Application {
         page.getChildren().clear();
         
         switch (newPage){
-            case "New Game" -> page.getChildren().add(new GamePage(client.getFriends().get(0)).getPage()); //TODO Allow friend selection
+            case "New Game" -> page.getChildren().add(new GamePage().getPage());//client.getFriends().get(0)).getPage()); //TODO Allow friend selection
             case "Preferences" -> {
                 //Navigate to prefrences
                 System.out.println("Navigating to Prefrences...");}
