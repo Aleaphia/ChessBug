@@ -86,13 +86,14 @@ public class Client {
 
 	// Update profile with server data
 	public ProfileModel syncProfile() throws NetworkException {
-		JSONObject profileData = post("getAccountData", new JSONObject());
+		JSONObject profileData = post("getProfileData", new JSONObject());
 		
 		// If couldn't retrieve profile data...
 		if(profileData.getBoolean("error"))
 			throw new NetworkException(profileData.opt("response").toString());
 
-		profile.setEmail(profileData.getJSONObject("response").getString("Email"));
+		// We need to send correct username and password to retrieve information so no need to update those variables
+		profile.setEmail(profileData.getJSONObject("response").getString("EmailAddress"));
 		profile.setUserID(profileData.getJSONObject("response").getInt("UserID"));
 
 		return profile;
