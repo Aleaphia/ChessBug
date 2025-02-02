@@ -27,17 +27,10 @@ public class ChessGame implements Serializable{
     
     //Track kings
     private final Piece[] kings = new Piece[2];
-
-    // Database connection
-    private Client client;
-    private Match databaseMatch;
     
     //Methods===================================================================
     //Constructors
-    public ChessGame(Client client, User challenger, PromotionSelection promotionMethod) throws NetworkException {
-        // Keep connection with database
-        this.client = client;
-        this.databaseMatch = client.createMatch(client.getOwnUser(), challenger);
+    public ChessGame(PromotionSelection promotionMethod) throws NetworkException {
         //Create Starting position
         this.setStartingState();
         //Set player turn to white
@@ -320,11 +313,7 @@ public class ChessGame implements Serializable{
     }
     public boolean getGameComplete(){
         return gameComplete;
-    }
-    
-    public Match getMatch() {
-        return databaseMatch;
-    }
+    } 
 
     //Set methods
     public void setPromotionMethod(PromotionSelection promotionMethod){
