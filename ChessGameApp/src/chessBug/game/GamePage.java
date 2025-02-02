@@ -5,6 +5,7 @@
 package chessBug.game;
 
 import chessGame.*;
+import java.awt.Color;
 //import chessBug.network.*;
 import java.io.*;
 import java.util.*;
@@ -33,7 +34,6 @@ public class GamePage {
     HBox page = new HBox();
     //Attributes
     //Chess game state
-    ChessGame game;
     int gameMove = 0;
     Boolean playerColor; //true is white; flase is black
     //Promotion variables
@@ -41,6 +41,7 @@ public class GamePage {
     PromotionSelection promotionLambda = (PromotionSelection & Serializable) pawn -> {
         return promotionChoice[0];
     };//Use promotionChoice to determine new piece
+    ChessGame game = new ChessGame(promotionLambda);
 
     //Database connections
 //    Client client;
@@ -60,28 +61,38 @@ public class GamePage {
     
 
     //Constructors
-    public GamePage() { //public GamePage(User challenger) {
-        playerColor = true;
-        try{
-            // Connect to database
-//            client = new Client("user", "p@ssw0rd!"); // (example user)
-//            
-//            databaseMatch = client.createMatch(client.getOwnUser(), challenger);
-//            game = new ChessGame(promotionLambda); // Start a game with first friend
-//            chat = databaseMatch.getChat();
-        } catch( Exception e){
-            System.out.println("Error");
-        }
+    //
+    public GamePage() { //New game
+        //Determine player color
+        playerColor = true; //todo
+
+        //Create new match in database
+        
+        //load match
         loadGame();
+
+//        try{
+//            // Connect to database
+////            client = new Client("user", "p@ssw0rd!"); // (example user)
+////            
+////            databaseMatch = client.createMatch(client.getOwnUser(), challenger);
+////            game = new ChessGame(promotionLambda); // Start a game with first friend
+////            chat = databaseMatch.getChat();
+//        } catch( Exception e){
+//            System.out.println("Error");
+//        }
+        
+                //page layout
         createGameBoard(true);
         createMsgBoard();
         createNotationBoard();
-        updateGameDisplay();
-        
-        
         
         page.getChildren().addAll(msgBoard, gameBoard, notationScreen);
         
+        //Update game state
+        updateGameDisplay();
+        
+        //Check database
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (ActionEvent event) -> {
             //Add repeated database checks here ================================
             updateMsgBoard();
@@ -91,12 +102,56 @@ public class GamePage {
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
     }
-
+    
+    public GamePage(boolean idk){
+        //Get moves from database
+        ArrayList<String> testMoveList = new ArrayList<>();
+        testMoveList.add("e2e4");
+        testMoveList.add("e7e5");
+        
+        loadGame(testMoveList);
+        
+        //page layout
+        createGameBoard(true);
+        createMsgBoard();
+        createNotationBoard();
+        
+        page.getChildren().addAll(msgBoard, gameBoard, notationScreen);
+        
+        //Update game state
+        updateGameDisplay();
+        
+        //Check database
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (ActionEvent event) -> {
+            //Add repeated database checks here ================================
+            updateMsgBoard();
+            
+            // =================================================================
+        }));
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
+    }
+    
     //Getter Methods
     public Node getPage(){return page;}
    
     private void loadGame(){
-        game = new ChessGame(promotionLambda);
+        loadGame(new ArrayList<>());
+    }
+    private void loadGame(ArrayList<String> moveList){
+        //make previous moves
+        for(String move : moveList){
+            String from = move.substring(0,2);
+            String to = move.substring(2,4);
+            //System.out.println( "Debug: From: " + from + "\tTo: " + to);
+            if (move.length() == 5){ // promotion move
+                promotionChoice[0] = move.charAt(4); //promotion character located at 4th index
+            }
+            game.gameTurn(from, to);
+        }
+        promotionChoice[0] = '0';
+        updateGameDisplay();
+       
     }
 
     //Chess game methods
@@ -195,6 +250,15 @@ public class GamePage {
         //======================================================================
 
     }
+    private void updateNotationBoard(String move){
+        if (!game.getPlayerTurn()){ //White just moved
+                notationScreen.add(new Label(Integer.toString(++gameMove)), 0 , gameMove);
+                notationScreen.add(new Label(move), 1 , gameMove);
+            }
+            else{ //Black just moved
+                notationScreen.add(new Label(move), 2 , gameMove);
+            }
+    }
 
     private void boardInteraction(BorderPane square) {
         if (!game.getGameComplete()
@@ -266,7 +330,7 @@ public class GamePage {
                     /*Note: promote calls playerMove(gameIndex, chessBoard, messageBoard, square)
                     just like the else's statement, but it first requires for the
                     selection of a piece.*/
-                    //promote(pawn, gameIndex, chessBoard, messageBoard, square);
+                    promote(square);
                 } else {
                     playerMove(square);
                 }
@@ -276,19 +340,18 @@ public class GamePage {
     }
     
     public void playerMove(BorderPane square) {
+        playerMove(selectedSquare,square.getId());
+    }
+    private void playerMove(String fromSquare, String toSquare){
         //Preform gameTurn: gameTurn will return true if it is a valid move
         //If the game move is valid
-        if (game.gameTurn(selectedSquare, square.getId())) {
+        if (game.gameTurn(fromSquare, toSquare)) {
             //Update the board display
             updateGameDisplay();
             //Update Notation Board
-            if (!game.getPlayerTurn()){ //White just moved
-                notationScreen.add(new Label(Integer.toString(++gameMove)), 0 , gameMove);
-                notationScreen.add(new Label(selectedSquare + "-" + square.getId()), 1 , gameMove);
-            }
-            else{ //Black just moved
-                notationScreen.add(new Label(selectedSquare + "-" + square.getId()), 2 , gameMove);
-            }
+            String notationMove = fromSquare + toSquare;
+            notationMove += (promotionChoice[0] == '0')? "" : promotionChoice[0]; //Add promotion choice if relevent
+            updateNotationBoard(notationMove);
             //Deselect square
             selectedSquare = null;
         }
@@ -300,50 +363,48 @@ public class GamePage {
     }
 
     //Handling Promotion Moves: Create form for promotion piece selection
-    public void promote(Pawn pawn, int gameIndex, GridPane chessBoard, VBox messageBoard, BorderPane square) {
-        //Clear messageBoard
-        messageBoard.getChildren().clear();
-
-        //Enter promotion prompt -----------------------------------------------
-        messageBoard.getChildren().add(new Label(
-                ((pawn.getColor()) ? "White" : "Black") + "'s pawn on "
-                + ChessGame.encodeNotation(pawn.getRow(), pawn.getCol()) + " has promoted."
-        ));
-        messageBoard.getChildren().add(new Label("Select a new piece: "));
-        // ---------------------------------------------------------------------
-
-        //Enter form input -----------------------------------------------------
-        //Create ToggleGroup for RadioButtons
-        ToggleGroup promotionOptions = new ToggleGroup();
-
-        //Create RadioButtons
-        RadioButton rbQueen = new RadioButton("Queen");
-        rbQueen.setOnAction(event -> promotionChoice[0] = 'Q');
-        rbQueen.setToggleGroup(promotionOptions);
-
-        RadioButton rbRook = new RadioButton("Rook");
-        rbRook.setOnAction(event -> promotionChoice[0] = 'R');
-        rbRook.setToggleGroup(promotionOptions);
-
-        RadioButton rbBishop = new RadioButton("Bishop");
-        rbBishop.setOnAction(event -> promotionChoice[0] = 'B');
-        rbBishop.setToggleGroup(promotionOptions);
-
-        RadioButton rbKnight = new RadioButton("Knight");
-        rbKnight.setOnAction(event -> promotionChoice[0] = 'N');
-        rbKnight.setToggleGroup(promotionOptions);
-
-        //Create Submit Button
-        Button btnSubmit = new Button("Submit");
-        btnSubmit.setOnAction(event -> {
-            if (promotionChoice[0] != '0') {
-                playerMove(square);
+    public void promote(BorderPane square) {
+        try{
+            //Determine icons to display
+            String color = (game.getPlayerTurn()) ? "white" : "black";
+            String[] choices = {"Queen", "Rook", "Bishop", "Knight"};
+            //Determine location to display them
+            String locationName = square.getId();
+            char col = locationName.charAt(0);
+            int row = locationName.charAt(1) - '0';
+            int dir = (row == 1)? 1:-1;
+            for(String piece : choices){
+                ImageView icon = new ImageView(new Image(new FileInputStream("pieceImages/" + color + piece + ".png")));
+                icon.getStyleClass().add("promotionChoice");
+                //Style image
+                icon.setFitHeight(square.getMinHeight() - 6); //Set Height of image. Note x - 6 allows for insets of 3px
+                icon.setPreserveRatio(true); //Maintain ratio
+                //Add background
+                //Add function
+                icon.setOnMouseClicked(event -> {
+                    promotionChoice[0] = (piece.charAt(0)=='K')?'N' : piece.charAt(0); //user the first letter of each peice (but knights use N instead of K)
+                    playerMove(square);
+                });
+                
+                //Add to pane
+                getBorderPaneFromId("" + col + row).setCenter(icon);
+                row += dir;
+            }
+        }catch(Exception e){
+            
+        }
+    }
+    
+    private BorderPane getBorderPaneFromId(String id){
+        BorderPane[] squarePane = new BorderPane[1];
+        gameBoard.getChildren().forEach(child -> {
+            if (child instanceof BorderPane square){
+                if (square.getId().equals(id)){
+                    squarePane[0] = square;
+                }
             }
         });
-
-        //Add form elements to messageBoard
-        messageBoard.getChildren().addAll(rbQueen, rbRook, rbBishop, rbKnight, btnSubmit);
-        // ---------------------------------------------------------------------
+        return squarePane[0];
     }
     
     //MsgBoard Interactions

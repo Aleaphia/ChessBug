@@ -62,7 +62,7 @@ public class ChessBug extends Application {
         String[] menus = {"Home", "Games" , "Settings" , "Profile"};
         String[][] menuOptions = {
             {"Dash Board"}, // Home
-            {"New Game"}, // Games
+            {"New Game", "Load Game"}, // Games
             {"Preferences", "About"},  // Setting
             {"User Profile"} // Profile (added menu option)
         };
@@ -103,6 +103,7 @@ public class ChessBug extends Application {
         
         switch (newPage){
             case "New Game" -> page.getChildren().add(new GamePage().getPage());//client.getFriends().get(0)).getPage()); //TODO Allow friend selection
+            case "Load Game" -> page.getChildren().add(new GamePage(true).getPage());
             case "Preferences" -> {
                 //Navigate to prefrences
                 System.out.println("Navigating to Prefrences...");}

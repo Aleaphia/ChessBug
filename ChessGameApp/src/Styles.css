@@ -38,7 +38,7 @@
 }
 .selected{-fx-border-color: rgb(3, 255, 95); }
 .possibleMove{-fx-border-color: rgb(255, 238, 3);}
-
+.promotionChoice{-fx-background-color: rgb(0,0,0);}
 
 .chatBox{
     -fx-background-color: rgb(250, 249, 247);
