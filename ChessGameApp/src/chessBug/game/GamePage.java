@@ -44,6 +44,7 @@ public class GamePage {
 
     //Chat
     Chat chat;
+    Match databaseMatch;
     Client client;
     
     
@@ -61,10 +62,15 @@ public class GamePage {
         playerColor = true;
         try{
             client = new Client("user", "p@ssw0rd!"); // (example user)
-            game = new ChessGame(client, client.getFriends().get(0), promotionLambda); // Start a game with first friend
-            chat = game.getMatch().getChat();
+
+            // example: creates a match where this user is white and their first friend is black
+            databaseMatch = client.createMatch(client.getOwnUser(), client.getFriends().get(0));
+            game = new ChessGame(promotionLambda); // Start a game with first friend
+            chat = databaseMatch.getChat();
         } catch( Exception e){
             System.out.println("Error");
+            chat = new Chat(0);
+            databaseMatch = new Match(0, 0, client.getOwnUser(), client.getOwnUser());
         }
         
         createGameBoard(true);
@@ -78,6 +84,9 @@ public class GamePage {
         
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (ActionEvent event) -> {
             //Add repeated database checks here ================================
+            databaseMatch.poll(client).forEach((move) -> {
+                // Handle every new move string
+            });
             updateMsgBoard();
             
             // =================================================================
