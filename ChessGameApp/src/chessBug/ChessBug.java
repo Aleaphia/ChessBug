@@ -102,7 +102,7 @@ public class ChessBug extends Application {
         page.getChildren().clear();
         
         switch (newPage){
-            case "New Game" -> page.getChildren().add(new GamePage(client, client.getFriends().get(0), true).getPage());//client.getFriends().get(0)).getPage()); //TODO Allow friend selection
+            case "New Game" -> page.getChildren().add(new GameController(client, client.getFriends().get(0), true).getPage());//client.getFriends().get(0)).getPage()); //TODO Allow friend selection
             //case "Load Game" -> page.getChildren().add(new GamePage(client, /*Match*/).getPage());
             case "Preferences" -> {
                 //Navigate to prefrences

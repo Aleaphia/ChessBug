@@ -30,59 +30,21 @@ import javafx.animation.KeyFrame;
  *
  * @author shosh
  */
-public class GamePage {
-    HBox page = new HBox();
-    //Attributes
-    //Chess game state
-    int gameMove = 0;
-    Boolean playerColor; //true is white; flase is black
-    //Promotion variables
-    char[] promotionChoice = new char[1]; //char reference that can be modified by event handling lambda functions
-    PromotionSelection promotionLambda = (PromotionSelection & Serializable) pawn -> {
-        return promotionChoice[0];
-    };//Use promotionChoice to determine new piece
-    ChessGame game = new ChessGame(promotionLambda);
-
-    //Database Connection
-    Client client;
-    Match match;
-    Chat chat;
+public class GameView {
+    private GameController controller;
     
     //Page state
-    GridPane gameBoard = new GridPane();
-    VBox msgBoard = new VBox();
-    GridPane notationScreen = new GridPane();
+    private HBox page = new HBox();
+    private GridPane gameBoard = new GridPane();
+    private VBox msgBoard = new VBox();
+    private GridPane notationScreen = new GridPane();
     
-    String selectedSquare = null;
+    private String selectedSquare = null;
     
-
     //Constructors
-    //
-    public GamePage(Client player, User opponent, boolean playerColor) { //New game
-        //Determine player color
-        this.playerColor = playerColor;
-
-        //Connect to database
-        try{
-            //Save client
-            client = player;
-            //Create new match
-            if (playerColor)
-                match = client.createMatch(client.getOwnUser(), opponent);
-            else 
-                match = client.createMatch(opponent, client.getOwnUser());
-            //Get chat
-            chat = match.getChat();
-        }
-        catch( Exception e){
-            System.out.println("Error");
-        }  
-        
-        //Create new match in database
-        
-        
-        //load match
-        loadGame();
+    public GameView(boolean playerColor, GameController controller) {
+        //Connect to controller
+        this.controller = controller;
         
         //page layout
         createGameBoard(true);
@@ -91,71 +53,13 @@ public class GamePage {
         page.getChildren().addAll(msgBoard, gameBoard, notationScreen);
         
         //Update game state
-        updateGameDisplay();
-        
-        //Check database
-        continueDatabaseChecks();
+        refreshGameDisplay();
+        refreshMsgBoard();
     }
     
-    public GamePage(Client player, Match match){
-        //Get match info
-        client = player;
-        this.match = match;
-        chat = match.getChat();
-        playerColor = match.getWhite().equals(client.getOwnUser()); //Assumes player is valid player in match
-        
-        //Get moves from database
-        loadGame(match.getAllMoves());
-        
-        //page layout
-        createGameBoard(true);
-        createMsgBoard();
-        createNotationBoard();
-        page.getChildren().addAll(msgBoard, gameBoard, notationScreen);
-        
-        //Update game state
-        updateGameDisplay();
-        
-        //Check database
-        continueDatabaseChecks();
-    }
-    
-    //loop database check
-    private void continueDatabaseChecks(){
-        //Check database
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (ActionEvent event) -> {
-            //Add repeated database checks here ================================
-            match.poll(client).forEach((move) -> playerMove(move));
-            updateMsgBoard();
-            
-            // =================================================================
-        }));
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
-    }
-    
-    //Getter Methods
+    //Getter/Setter Methods
     public Node getPage(){return page;}
-   
-    private void loadGame(){
-        loadGame(new ArrayList<>());
-    }
-    private void loadGame(ArrayList<String> moveList){
-        //make previous moves
-        for(String move : moveList){
-            String from = move.substring(0,2);
-            String to = move.substring(2,4);
-            //System.out.println( "Debug: From: " + from + "\tTo: " + to);
-            if (move.length() == 5){ // promotion move
-                promotionChoice[0] = move.charAt(4); //promotion character located at 4th index
-            }
-            game.gameTurn(from, to);
-            updateNotationBoard(move);
-        }
-        promotionChoice[0] = '0';
-        updateGameDisplay();
-       
-    }
+    public void deselectSquare(){selectedSquare = null;}
 
     //Chess game methods
     private void createGameBoard(boolean isWhitePerspective) {
@@ -212,7 +116,14 @@ public class GamePage {
         //----------------------------------------------------------------------
     }
 
-    private void updateGameDisplay() {
+    public void refresh(){
+        refreshGameDisplay();
+        refreshMsgBoard();
+    }
+    public void refreshMessageBoard(){
+        refreshMsgBoard();
+    }
+    private void refreshGameDisplay() {
         //Update each square in chessBoard to reflect game's condition
         /*
         Note: we only need to modify squares (not labels), and all squares are
@@ -227,7 +138,7 @@ public class GamePage {
                 square.getChildren().clear();
 
                 //Get the piece inhabiting the corresponding location in the game
-                Piece piece = game.getLocalPiece(square.getId());
+                Piece piece = controller.getLocalPiece(square.getId());
                 //If the piece is not null, load the correct image representation of the piece
                 if (piece != null) {
                     //Determine imageFileName for based on the piece
@@ -253,20 +164,29 @@ public class GamePage {
         //======================================================================
 
     }
-    private void updateNotationBoard(String move){
+    private void refreshMsgBoard() {
+        ArrayList<Message> newPoll = controller.getChatMessages();
+        newPoll.forEach(x -> {
+            String msg = x.getAuthor() + ": " + x.getContent();
+            VBox msgScreen = (VBox) msgBoard.getChildren().get(0);
+            msgScreen.getChildren().add(new Label(msg));
+        });
+    }
+    public void addToNotationBoard(String move, Boolean playerTurn, int gameMove){
         String expandedMove = move.substring(0,2) + "-" + move.substring(2,4) +
                 ((move.length() == 4)? "":("=" + move.substring(4))); //add promotion info if needed
-        if (!game.getPlayerTurn()){ //White just moved
-                notationScreen.add(new Label(Integer.toString(++gameMove)), 0 , gameMove);
+        if (playerTurn){ //White just moved
+                notationScreen.add(new Label(Integer.toString(gameMove)), 0 , gameMove);
                 notationScreen.add(new Label(expandedMove), 1 , gameMove);
             }
             else{ //Black just moved
                 notationScreen.add(new Label(expandedMove), 2 , gameMove);
             }
     }
+    
 
     private void boardInteraction(BorderPane square) {
-        if (!game.getGameComplete()
+        if (!controller.getGameComplete()
                 //&& game.getPlayerTurn() == playerColor //correct color turn //ADD BACK LATER
                 ) {
             /*
@@ -282,7 +202,7 @@ public class GamePage {
 
             //Option 1 info: Get the Piece on the selected square
             /*(Note: if square is empty than the Piece will be null)*/
-            Piece localPiece = game.getLocalPiece(square.getId());
+            Piece localPiece = controller.getLocalPiece(square.getId());
             //Option 2 info: Check if the board interaction causes a valid move
             /* Valid Move Note
             When a piece is selected, all valid moves for a selected piece are
@@ -303,7 +223,7 @@ public class GamePage {
                 - a piece of the correct color has been selected
              */
             if (localPiece != null //A piece has been selected
-                    && localPiece.getColor() == game.getPlayerTurn() //Check that piece color matches players turn's color
+                    && localPiece.getColor() == controller.getPlayerTurn() //Check that piece color matches players turn's color
                     ) {
                 //Select Square
                 //Add square to selectedSquareList at the corresponding index
@@ -313,7 +233,7 @@ public class GamePage {
 
                 //Display all possible moves for the selected piece
                 //Get list of possible moves
-                ArrayList<String> possibleMoves = game.getMoveListForLocalPiece(square.getId());
+                ArrayList<String> possibleMoves = controller.getMoveListForLocalPiece(square.getId());
                 //Add a style class to each valid move
                 gameBoard.getChildren().forEach(gridContent -> {
                     if (possibleMoves.contains(gridContent.getId())) {
@@ -326,8 +246,9 @@ public class GamePage {
                 - A 'mover' piece has been selected
                     (i.e., the corresponding entry in selectedSquareList is set)
              */ else if (selectedSquare != null) { //There is a selected piece
+                 String potentialMove = selectedSquare + square.getId();
                 //Check for promotion move (promotions require an extra prompt for piece selection)
-                if (game.getLocalPiece(selectedSquare) instanceof Pawn pawn //'mover' piece is a pawn
+                if (controller.getLocalPiece(selectedSquare) instanceof Pawn pawn //'mover' piece is a pawn
                         && (square.getId().contains("1") || square.getId().contains("8")) //pawn is moving to 1st or 8th rank
                         && validMove //the move is valid (this prevents prompt display for illegal promotion moves)
                         ) {
@@ -335,67 +256,36 @@ public class GamePage {
                     /*Note: promote calls playerMove(square)
                     just like the else's statement, but it first requires for the
                     selection of a piece.*/
-                    promote(square);
+                    promote(square, potentialMove);
                 } else {
-                    playerMove(square);
+                    controller.playerMove(potentialMove);
                 }
             }
             //==================================================================
         }
     }
-    
-    public void playerMove(String notation){
-        if (notation.length() == 5)
-            promotionChoice[0] = notation.charAt(4);
-        
-        playerMove(notation.substring(0,2), notation.substring(2,4));
-    }
-    public void playerMove(BorderPane square) {
-        playerMove(selectedSquare,square.getId());
-    }
-    private void playerMove(String fromSquare, String toSquare){
-        //Preform gameTurn: gameTurn will return true if it is a valid move
-        //If the game move is valid
-        if (game.gameTurn(fromSquare, toSquare)) {
-            //Update the board display
-            updateGameDisplay();
-            //Update Notation Board
-            String notationMove = fromSquare + toSquare;
-            notationMove += (promotionChoice[0] == '0')? "" : promotionChoice[0]; //Add promotion choice if relevent
-            updateNotationBoard(notationMove);
-            match.makeMove(client, notationMove);
-            //Deselect square
-            selectedSquare = null;
-        }
-        else { //If the game move is Illegal, output error message
-            //TODO messageBoard.getChildren().add(new Label("Illegal move: try again."));
-        }
-        //Reset promotionChoice
-        promotionChoice[0] = '0';
-    }
-
     //Handling Promotion Moves: Create form for promotion piece selection
-    public void promote(BorderPane square) {
+    public void promote(BorderPane square, String potentialMove) {
+        //Determine icons to display
+        String color = (controller.getPlayerTurn()) ? "white" : "black";
+        String[] choices = {"Queen", "Rook", "Bishop", "Knight"};
+        //Determine location to display them
+        String locationName = square.getId();
+        char col = locationName.charAt(0);
+        int row = locationName.charAt(1) - '0';
+        int dir = (row == 1)? 1:-1;
+        //Display promotion prompt
         try{
-            //Determine icons to display
-            String color = (game.getPlayerTurn()) ? "white" : "black";
-            String[] choices = {"Queen", "Rook", "Bishop", "Knight"};
-            //Determine location to display them
-            String locationName = square.getId();
-            char col = locationName.charAt(0);
-            int row = locationName.charAt(1) - '0';
-            int dir = (row == 1)? 1:-1;
             for(String piece : choices){
                 ImageView icon = new ImageView(new Image(new FileInputStream("pieceImages/" + color + piece + ".png")));
                 icon.getStyleClass().add("promotionChoice");
                 //Style image
                 icon.setFitHeight(square.getMinHeight() - 6); //Set Height of image. Note x - 6 allows for insets of 3px
                 icon.setPreserveRatio(true); //Maintain ratio
-                //Add background
                 //Add function
                 icon.setOnMouseClicked(event -> {
-                    promotionChoice[0] = (piece.charAt(0)=='K')?'N' : piece.charAt(0); //user the first letter of each peice (but knights use N instead of K)
-                    playerMove(square);
+                    char promotionChoice = (piece.charAt(0)=='K')?'N' : piece.charAt(0); //user the first letter of each peice (but knights use N instead of K)
+                    controller.playerMove(potentialMove + promotionChoice);
                 });
                 
                 //Add to pane
@@ -403,7 +293,7 @@ public class GamePage {
                 row += dir;
             }
         }catch(Exception e){
-            
+            System.out.println("Error loading promotion prompt images");
         }
     }
     
@@ -419,7 +309,7 @@ public class GamePage {
         return squarePane[0];
     }
     
-    //MsgBoard Interactions
+    //Page space creation
     private void createMsgBoard(){
         VBox msgScreen = new VBox();
         TextField msgInput = new TextField();
@@ -437,7 +327,7 @@ public class GamePage {
         msgInput.setOnAction(event -> {
             //Formulate message
             //TO-DO add real player names
-            String user = (playerColor)?"White" : "Black";
+            String user = controller.getUserName();
             String msg = msgInput.getText();
             
             //Display msg on screen
@@ -452,17 +342,7 @@ public class GamePage {
         msgBoard.setMinHeight(100);
         msgBoard.setAlignment(Pos.BOTTOM_CENTER);
     }
-    private void updateMsgBoard(){
-//        Stream<Message> newPoll = chat.poll(client);
-//        newPoll.forEach(x -> {
-//            String msg = x.getAuthor() + ": " + x.getContent();
-//            VBox msgScreen = (VBox)msgBoard.getChildren().get(0);            
-//            msgScreen.getChildren().add(new Label(msg));
-//        });
-    }
-    
     private void createNotationBoard(){
-        
         //gameBoard.add(square, (isWhitePerspective) ? col + 1 : 8 - col, (isWhitePerspective) ? 7 - row : row);
         notationScreen.add(new Label("White"), 1, 0);
         notationScreen.add(new Label("Black"), 2, 0);
