@@ -47,12 +47,20 @@ public class Example {
 
 		// User sends something in the chat
 		// ~~~~~~~~~~~~~~
-		Scanner s = new Scanner(System.in);
+		// Scanner s = new Scanner(System.in);
 		System.out.print("Send Message > ");
-		chat.send(client, s.nextLine());
+		// chat.send(client, s.nextLine());
+		chat.send(client, "Example message!");
 
 		chat.poll(client).forEach((m) -> System.out.println("New message: " + m.getAuthor() + " (" + m.getTimestamp() + ") > " + m.getContent()));
-		s.close();
+		// s.close();
+		// ~~~~~~~~~~~~~~
+		
+		// User lists all matches they are part of
+		// ~~~~~~~~~~~~~~
+		List<Match> matches = client.getMatches();
+		for(Match m : matches)
+			System.out.printf("Match %s -> (%d) %s vs (%d) %s%n", m, m.getWhite().getID(), m.getWhite().getUsername(), m.getBlack().getID(), m.getBlack().getUsername());
 		// ~~~~~~~~~~~~~~
 		
 		// User updates own information
