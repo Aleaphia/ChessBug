@@ -5,31 +5,17 @@
 package chessBug.game;
 
 import chessGame.*;
-import java.awt.Color;
 import chessBug.network.*;
 import java.io.*;
 import java.util.*;
-import java.util.stream.Stream;
 
 import javafx.geometry.*;
 
-import javafx.scene.Scene;
 import javafx.scene.layout.*;
 import javafx.scene.control.*;
 import javafx.scene.image.*;
 import javafx.scene.Node;
-import javafx.event.Event;
-import javafx.event.ActionEvent;
-import javafx.util.Duration;
 
-import javafx.animation.Timeline;
-import javafx.animation.KeyFrame;
-
-
-/**
- *
- * @author shosh
- */
 public class GameView {
     private GameController controller;
     
@@ -61,61 +47,7 @@ public class GameView {
     public Node getPage(){return page;}
     public void deselectSquare(){selectedSquare = null;}
 
-    //Chess game methods
-    private void createGameBoard(boolean isWhitePerspective) {
-        //Create chessBoard
-        gameBoard = new GridPane();
-        gameBoard.getStyleClass().add("chessBoard");
-
-        //Layout chess board within chessBoard =================================
-        for (int row = 0; row < 8; row++) {
-            //Create notation labels for the board -----------------------------
-            //Collumn labels:   a, b, c, d, e, f, g, h
-            Label colLabel = new Label(String.valueOf((char) ('a' + row))); //Create label
-            gameBoard.add(colLabel, (isWhitePerspective) ? row + 1 : 8 - row, 8); //Add label to chessBoard
-            GridPane.setHalignment(colLabel, HPos.CENTER); //specify label alignment
-
-            //Row labels:       8, 7, 6, 5, 4, 3, 2, 1
-            Label rowLabel = new Label(String.valueOf(8 - row)); //Create label
-            gameBoard.add(rowLabel, 0, (isWhitePerspective) ? row : 7 - row); //Add label to chessBoard
-            //specify label alignment
-            GridPane.setValignment(rowLabel, VPos.CENTER);
-            GridPane.setHalignment(rowLabel, HPos.RIGHT);
-            //------------------------------------------------------------------
-
-            //Create each board square in the row ------------------------------
-            for (int col = 0; col < 8; col++) {
-                //Create new pane to represent square
-                BorderPane square = new BorderPane();
-                //Set square ID to notational square name (e.g., b4, c6, h1, etc.)
-                square.setId("" + (char) ('a' + col) + (row + 1));
-
-                //Give squares a class based on color to create checkered pattern
-                if ((row + col) % 2 != 0) {
-                    square.getStyleClass().add("white");
-                } else {
-                    square.getStyleClass().add("black");
-                }
-
-                //Square styles
-                //Specify size for square
-                int squareSize = 50;
-                square.setMinHeight(squareSize);
-                square.setMinWidth(squareSize);
-                //Align square
-                GridPane.setValignment(square, VPos.CENTER);
-                GridPane.setHalignment(square, HPos.CENTER);
-
-                //Add functionality to pressing a square
-                square.setOnMouseClicked(event -> boardInteraction((BorderPane) event.getSource()));
-
-                //Add square to chessBoard
-                gameBoard.add(square, (isWhitePerspective) ? col + 1 : 8 - col, (isWhitePerspective) ? 7 - row : row);
-            }
-        }
-        //----------------------------------------------------------------------
-    }
-
+    //Refresher methods
     public void refresh(){
         refreshGameDisplay();
         refreshMsgBoard();
@@ -123,6 +55,7 @@ public class GameView {
     public void refreshMessageBoard(){
         refreshMsgBoard();
     }
+    
     private void refreshGameDisplay() {
         //Update each square in chessBoard to reflect game's condition
         /*
@@ -165,7 +98,10 @@ public class GameView {
 
     }
     private void refreshMsgBoard() {
+        //Get any new messages
         ArrayList<Message> newPoll = controller.getChatMessages();
+        
+        //Add each message to the chat
         newPoll.forEach(x -> {
             String msg = x.getAuthor() + ": " + x.getContent();
             VBox msgScreen = (VBox) msgBoard.getChildren().get(0);
@@ -173,17 +109,18 @@ public class GameView {
         });
     }
     public void addToNotationBoard(String move, Boolean playerTurn, int gameMove){
+        //Expanded notation string
         String expandedMove = move.substring(0,2) + "-" + move.substring(2,4) +
                 ((move.length() == 4)? "":("=" + move.substring(4))); //add promotion info if needed
+        //Place notation one the notation board
         if (playerTurn){ //White just moved
-                notationScreen.add(new Label(Integer.toString(gameMove)), 0 , gameMove);
-                notationScreen.add(new Label(expandedMove), 1 , gameMove);
+                notationScreen.add(new Label(Integer.toString(gameMove)), 0 , gameMove); //Add new turn label
+                notationScreen.add(new Label(expandedMove), 1 , gameMove); //Add white move
             }
             else{ //Black just moved
-                notationScreen.add(new Label(expandedMove), 2 , gameMove);
+                notationScreen.add(new Label(expandedMove), 2 , gameMove); //Add black move
             }
-    }
-    
+    } 
 
     private void boardInteraction(BorderPane square) {
         if (!controller.getGameComplete()
@@ -310,30 +247,77 @@ public class GameView {
     }
     
     //Page space creation
+    private void createGameBoard(boolean isWhitePerspective) {
+        //Create chessBoard
+        gameBoard = new GridPane();
+        gameBoard.getStyleClass().add("chessBoard");
+
+        //Layout chess board within chessBoard =================================
+        for (int row = 0; row < 8; row++) {
+            //Create notation labels for the board -----------------------------
+            //Collumn labels:   a, b, c, d, e, f, g, h
+            Label colLabel = new Label(String.valueOf((char) ('a' + row))); //Create label
+            gameBoard.add(colLabel, (isWhitePerspective) ? row + 1 : 8 - row, 8); //Add label to chessBoard
+            GridPane.setHalignment(colLabel, HPos.CENTER); //specify label alignment
+
+            //Row labels:       8, 7, 6, 5, 4, 3, 2, 1
+            Label rowLabel = new Label(String.valueOf(8 - row)); //Create label
+            gameBoard.add(rowLabel, 0, (isWhitePerspective) ? row : 7 - row); //Add label to chessBoard
+            //specify label alignment
+            GridPane.setValignment(rowLabel, VPos.CENTER);
+            GridPane.setHalignment(rowLabel, HPos.RIGHT);
+            //------------------------------------------------------------------
+
+            //Create each board square in the row ------------------------------
+            for (int col = 0; col < 8; col++) {
+                //Create new pane to represent square
+                BorderPane square = new BorderPane();
+                //Set square ID to notational square name (e.g., b4, c6, h1, etc.)
+                square.setId("" + (char) ('a' + col) + (row + 1));
+
+                //Give squares a class based on color to create checkered pattern
+                if ((row + col) % 2 != 0) {
+                    square.getStyleClass().add("white");
+                } else {
+                    square.getStyleClass().add("black");
+                }
+
+                //Square styles
+                //Specify size for square
+                int squareSize = 50;
+                square.setMinHeight(squareSize);
+                square.setMinWidth(squareSize);
+                //Align square
+                GridPane.setValignment(square, VPos.CENTER);
+                GridPane.setHalignment(square, HPos.CENTER);
+
+                //Add functionality to pressing a square
+                square.setOnMouseClicked(event -> boardInteraction((BorderPane) event.getSource()));
+
+                //Add square to chessBoard
+                gameBoard.add(square, (isWhitePerspective) ? col + 1 : 8 - col, (isWhitePerspective) ? 7 - row : row);
+            }
+        }
+        //----------------------------------------------------------------------
+    }
     private void createMsgBoard(){
+        //MsgBoard components
         VBox msgScreen = new VBox();
         TextField msgInput = new TextField();
-        
         msgBoard.getChildren().addAll(msgScreen, msgInput);
+        //Style
         msgBoard.getStyleClass().add("chatBox");
-        
-//        chat.poll(client);
-//        chat.getAllMessages().forEach(x -> {
-//            String msg = x.getAuthor() + ": " + x.getContent();
-//            System.out.println(msg);
-//            msgScreen.getChildren().add(new Label(msg));
-//        });
         
         msgInput.setOnAction(event -> {
             //Formulate message
-            //TO-DO add real player names
             String user = controller.getUserName();
             String msg = msgInput.getText();
             
             //Display msg on screen
             msgScreen.getChildren().add(new Label(user + ": " + msg));
             
-//            chat.send(client, msg);
+            //Send msg to database
+            controller.sendChatMessage(msg);
             
             //Clear input
             msgInput.setText("");
@@ -348,6 +332,4 @@ public class GameView {
         notationScreen.add(new Label("Black"), 2, 0);
         
     }
-    
-
 }

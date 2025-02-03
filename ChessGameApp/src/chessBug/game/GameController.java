@@ -6,31 +6,16 @@
 package chessBug.game;
 
 import chessGame.*;
-import java.awt.Color;
 import chessBug.network.*;
-import java.io.*;
 import java.util.*;
-import java.util.stream.Stream;
 
-import javafx.geometry.*;
-
-import javafx.scene.Scene;
-import javafx.scene.layout.*;
-import javafx.scene.control.*;
-import javafx.scene.image.*;
 import javafx.scene.Node;
-import javafx.event.Event;
 import javafx.event.ActionEvent;
 import javafx.util.Duration;
 
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 
-
-/**
- *
- * @author shosh
- */
 public class GameController {
     //Database Connection
     private Client client;
@@ -64,7 +49,7 @@ public class GameController {
         //Update game state
         view.refresh();
         
-        //Check database
+        //Start recuring database checks
         continueDatabaseChecks();
     }
     public GameController(Client player, Match match){
@@ -87,6 +72,7 @@ public class GameController {
     
     //Getter/Setter Methods
     public ArrayList<Message> getChatMessages(){return chat.getAllMessages();}
+    public void sendChatMessage(String msg){chat.send(client, msg);}
     public Boolean getGameComplete(){return model.getGameComplete();}
     public Piece getLocalPiece(String square){return model.getLocalPiece(square);}
     public ArrayList<String> getMatchMoves(){return match.getAllMoves();}
@@ -94,17 +80,18 @@ public class GameController {
     public Node getPage(){return view.getPage();}
     public Boolean getPlayerTurn(){return model.getPlayerTurn();}
     public String getUserName(){return client.getOwnUser().getUsername();}
+    
     //Other Methods
     //loop database check
     private void continueDatabaseChecks(){
         //Check database
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (ActionEvent event) -> {
             //Add repeated database checks here ================================
-            if(model.getPlayerColor() == model.getPlayerTurn()){
+            if(!model.isPlayerTurn()){ //While waiting for other player's move check database and update boardstate
                 match.poll(client).forEach((move) -> playerMove(move));
                 view.refresh();
             }
-            else // just refresh chat
+            else // during this player's turn just refresh chat
                 view.refreshMessageBoard();
             
             // =================================================================
@@ -114,7 +101,7 @@ public class GameController {
     }
 
     public void playerMove(String notation){
-        //attempt to make player move, will return true on success
+        //Attempt to make player move, will return true on success
         if (model.makePlayerMove(notation)){
             //Update the board display
             view.refresh();
@@ -124,7 +111,7 @@ public class GameController {
             match.makeMove(client, notation);
         }
         else { //If the game move is Illegal, output error message
-            //TODO messageBoard.getChildren().add(new Label("Illegal move: try again."));
+            //TODO
         }
     }
 

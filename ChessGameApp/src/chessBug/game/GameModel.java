@@ -6,31 +6,10 @@
 package chessBug.game;
 
 import chessGame.*;
-import java.awt.Color;
-import chessBug.network.*;
+
 import java.io.*;
 import java.util.*;
-import java.util.stream.Stream;
 
-import javafx.geometry.*;
-
-import javafx.scene.Scene;
-import javafx.scene.layout.*;
-import javafx.scene.control.*;
-import javafx.scene.image.*;
-import javafx.scene.Node;
-import javafx.event.Event;
-import javafx.event.ActionEvent;
-import javafx.util.Duration;
-
-import javafx.animation.Timeline;
-import javafx.animation.KeyFrame;
-
-
-/**
- *
- * @author shosh
- */
 public class GameModel {
     //Chess game state
     private int turnNum = 0;
@@ -45,7 +24,6 @@ public class GameModel {
     //Constructors
     public GameModel(boolean playerColor) { //New game
         this.playerColor = playerColor; //Determine player color
-        promotionChoice[0] = '0'; //Set promotionChoice to null value ('0')
     }
     public GameModel(boolean playerColor, ArrayList<String> moveList){
         this(playerColor);
@@ -58,7 +36,7 @@ public class GameModel {
     public Piece getLocalPiece(String square){return game.getLocalPiece(square);}
     public int getTurnNumber(){return turnNum;}
     public ArrayList<String> getMoveListForLocalPiece(String square){return game.getMoveListForLocalPiece(square);}
-    public Boolean getPlayerColor(){return playerColor;}
+    public Boolean isPlayerTurn(){return (playerColor && game.getPlayerTurn()) || (!playerColor && !game.getPlayerTurn());}
     public Boolean getPlayerTurn(){return game.getPlayerTurn();}
    
     //Other Methods
@@ -81,6 +59,11 @@ public class GameModel {
         }
     }
     
+    /**MakePlayerMove  - updates chess game and model information in response to a move
+     * 
+     * @param notation - Coordinate notation in the format e2e4 or e2e1Q (promotion)
+     * @return - return true when a valid move in input and the game state is updated
+     */
     public Boolean makePlayerMove(String notation){
         //Parse notation move
         String startSquare = notation.substring(0,2);
