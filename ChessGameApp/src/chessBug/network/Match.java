@@ -7,6 +7,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class Match {
+	// Although not very distinct, gives definitive list of possible results
+	public static final String WHITE_WIN = "WhiteWin";
+	public static final String BLACK_WIN = "WhiteWin";
+	public static final String DRAW = "Draw";
+	public static final String IN_PROGRESS = null;
+
 	private int matchID;
 	private Chat chat;
 
@@ -70,6 +76,35 @@ public class Match {
 		Stream<String> out = moves.stream().skip(movesNumber);
 		movesNumber = currentNumber;
 		return out;
+	}
+
+	public void setResult(Client client, String result) {
+		JSONObject sendData = new JSONObject();
+		sendData.put("match", matchID);
+		sendData.put("result", result);
+		
+		JSONObject response = client.post("setMatchResult", sendData);
+		if(response.getBoolean("error")) {
+			System.err.println("Could not set match result!");
+			System.err.println(response.opt("response").toString());
+		}
+	}
+
+	public String getResult(Client client) {
+		JSONObject sendData = new JSONObject();
+		sendData.put("match", matchID);
+
+		JSONObject response = client.post("getMatchResult", sendData);
+		if(response.getBoolean("error")) {
+			System.err.println("Could not get match result!");
+			System.err.println(response.opt("response").toString());
+			return IN_PROGRESS;
+		}
+
+		if(response.opt("response")==null)
+			return null;
+
+		return response.getString("response");
 	}
 
 	public ArrayList<String> getAllMoves() {
