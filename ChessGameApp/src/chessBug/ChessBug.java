@@ -20,6 +20,8 @@ import listHelper.SavableList;
 import chessGame.*;
 import chessBug.game.*;
 import chessBug.network.Client;
+
+import java.beans.EventHandler;
 import java.io.*;
 import java.util.*;
 
@@ -82,6 +84,61 @@ public class ChessBug extends Application {
 
         //======================================================================
     }
+
+    private VBox createSidebar () {
+        Vbox sidebar = new VBox (10); // Vertical layour for sidebar
+        sidebar.setPadding(new Insets(20, 10, 20, 10));
+        sidebar.setStyle("-fx-background-color: #2f3136; -fx-text-fill: white:");
+
+        //Add logo or image to the sidebar
+        ImageView logo = nnew ImageView(new Image("file:logo.png")); //Will need to be replaced
+        logo.setFitHeight(50);
+        logo.setFitWidth(50);
+
+        // Sidebar buttons 
+        Button homeButton = createSidebarButton("Home", event -> changePage("Dash Board!"));
+        Button gamesButton = createSidebarButton("Game", event -> changePage("New Game"));
+        Button settingsButton = createSidebarButton("Settings", event -> changePage("Preferences"));
+        Button profileButton = createSidebarButton("Profile", event -> changePage("User Profile"));
+
+         // Add items to the sidebar
+        sidebar.getChildren().addAll(logo, homeButton, gamesButton, settingsButton, profileButton);
+        
+        return sidebar;
+    }
+
+    private Button createSidebarButton(String text, EventHandler event) {
+        Button button = new Button(text);
+        button.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;");
+        button.setOnAction(event);
+        return button;
+    }
+
+    private MenuBar createMenuBar() {
+        MenuBar menuBar = new MenuBar();
+        
+        // Main menu options
+        String[] menus = {"Home", "Games", "Settings", "Profile"};
+        String[][] menuOptions = {
+            {"Dash Board"}, // Home
+            {"New Game", "Load Game", "DemoGame"}, // Games
+            {"Preferences", "About"},  // Settings
+            {"User Profile"} // Profile
+        };
+        
+        for (int i = 0; i < menus.length; i++) {
+            Menu menu = new Menu(menus[i]);
+            menuBar.getMenus().add(menu);
+            
+            for (int j = 0; j < menuOptions[i].length; j++) {
+                MenuItem menuItem = new MenuItem(menuOptions[i][j]);
+                menu.getItems().add(menuItem);
+                menuItem.setOnAction(event -> changePage(menuItem.getText()));
+            }
+        }
+        return menuBar;
+    }
+    }
     
     private void fillMenuBar(MenuBar menuBar, String[] menus, String[][] menuOptions){
         //Add each menu to the MenuBar
@@ -98,30 +155,28 @@ public class ChessBug extends Application {
         }
     }
     
-    private void changePage(String newPage){
-        page.getChildren().clear();
-        
-        switch (newPage){
-            case "New Game" -> page.getChildren().add(new GameController(client, client.getFriends().get(0), true).getPage());//client.getFriends().get(0)).getPage()); //TODO Allow friend selection
-            case "Load Game" -> {
-                page.getChildren().add(new GameController(client).getPage());
-            }
-            case "Preferences" -> {
-                //Navigate to prefrences
-                System.out.println("Navigating to Prefrences...");}
-            case "About" -> {
-                // Navigate to About page
-                System.out.println("Showing About page...");
-                }
-            case "User Profile" -> {
-                
-                // Navigate to User Profile page
-                System.out.println("Navigating to User Profile...");
-                // Implement ProfileControl usage here!
-            }
-            
-            default -> page.getChildren().add(new Label("Debug: " + newPage));
+    private void changePage(String newPage) {
+        page.getChildren().clear(); // Clear the current page content
 
+        // Change the content based on the menu item clicked
+        switch (newPage) {
+            case "New Game":
+                page.getChildren().add(new GameController(client).getPage()); // Load New Game Page
+                break;
+            case "Load Game":
+                page.getChildren().add(new GameController(client).getPage()); // Load Game Page
+                break;
+            case "Preferences":
+                page.getChildren().add(new PreferencesController().getPage()); // Load Preferences Page
+                break;
+            case "About":
+                page.getChildren().add(new Label("ChessBug - About Page"));
+                break;
+            case "User Profile":
+                page.getChildren().add(new ProfileController().getPage()); // Load User Profile Page
+                break;
+            default:
+                page.getChildren().add(new Label("Welcome to ChessBug!"));
         }
     }
    
