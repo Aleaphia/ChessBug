@@ -19,7 +19,7 @@ import javafx.animation.KeyFrame;
 public class GameController {
     //Database Connection
     private Client client;
-    private Match match;
+    private Match match = null;
     private Chat chat;
     
     //Model
@@ -69,12 +69,20 @@ public class GameController {
         //Check database
         continueDatabaseChecks();
     }
+    public GameController(Client player){
+        //Connect to database
+        client = player;
+        
+        //Create view
+        view = new GameView(this);
+    }
     
     //Getter/Setter Methods
     public ArrayList<Message> getChatMessages(){return chat.getAllMessages();}
     public void sendChatMessage(String msg){chat.send(client, msg);}
     public Boolean getGameComplete(){return model.getGameComplete();}
     public Piece getLocalPiece(String square){return model.getLocalPiece(square);}
+    public List<Match> getMatchList(){return client.getMatches();}
     public ArrayList<String> getMatchMoves(){return match.getAllMoves();}
     public ArrayList<String> getMoveListForLocalPiece(String square){return model.getMoveListForLocalPiece(square);}
     public Node getPage(){return view.getPage();}
@@ -113,6 +121,19 @@ public class GameController {
         else { //If the game move is Illegal, output error message
             //TODO
         }
+    }
+    
+    public void matchSelection(Match match){
+        this.match = match;
+        chat = match.getChat();
+        
+        //Create model and view
+        boolean playerColor = match.getWhite().equals(client.getOwnUser()); //Assumes player is valid player in match
+        model = new GameModel(playerColor, match.getAllMoves());
+        view.reBuildPage();
+        
+        //Check database
+        continueDatabaseChecks();
     }
 
 }

@@ -5,7 +5,6 @@
 package chessBug.game;
 
 import chessGame.*;
-import java.awt.Color;
 import chessBug.network.*;
 import java.io.*;
 import java.util.*;
@@ -42,6 +41,11 @@ public class GameView {
         //Update game state
         refreshGameDisplay();
         refreshMsgBoard();
+    }
+    public GameView(GameController controller) {
+        this.controller = controller;
+        
+        page.getChildren().add(new MatchListView(controller).getPage());
     }
     
     //Getter/Setter Methods
@@ -122,6 +126,21 @@ public class GameView {
                 notationScreen.add(new Label(expandedMove), 2 , gameMove); //Add black move
             }
     } 
+    
+    public void reBuildPage(){
+        //Clear page
+        page.getChildren().clear();
+        
+        //page layout
+        createGameBoard(true);
+        createMsgBoard();
+        createNotationBoard();
+        page.getChildren().addAll(msgBoard, gameBoard, notationScreen);
+        
+        //Update game state
+        refreshGameDisplay();
+        refreshMsgBoard();
+    }
 
     private void boardInteraction(BorderPane square) {
         if (!controller.getGameComplete()

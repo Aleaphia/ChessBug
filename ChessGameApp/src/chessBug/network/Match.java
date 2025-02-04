@@ -130,4 +130,9 @@ public class Match {
 		message.put("move", move);
 		from.post("makeMove", message);
 	}
+        
+        @Override
+        public String toString(){
+            return white.getUsername() + " vs. " + black.getUsername();
+        }
 }
