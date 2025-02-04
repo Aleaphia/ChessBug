@@ -16,4 +16,11 @@ public class User {
 	public int getID() {
 		return id;
 	}
+        @Override
+        public boolean equals(Object o){
+            if (o instanceof User user2){
+                return user2.getID() == id;
+            }
+            return false;
+        }
 }
