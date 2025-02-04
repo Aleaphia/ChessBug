@@ -5,6 +5,7 @@
 package chessBug.game;
 
 import chessGame.*;
+import java.awt.Color;
 import chessBug.network.*;
 import java.io.*;
 import java.util.*;

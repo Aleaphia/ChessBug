@@ -67,7 +67,7 @@ public class Client {
 	}
 
 	public User getOwnUser() {
-		return new ClientUser(this);
+		return new User(profile.getUserID(), profile.getUsername());
 	}
 
 	// Create a new match
@@ -120,6 +120,25 @@ public class Client {
 		profile.setUsername(newUsername);
 		profile.setEmail(newEmail);
 		profile.setPassword(newPassword);
+	}
+
+	public List<Match> getMatches() {
+		ArrayList<Match> matches = new ArrayList<>();
+		JSONObject matchesResponse = post("getMatches", new JSONObject());
+
+		// Return none if error in response
+		if(matchesResponse.getBoolean("error")) {
+			System.err.println("Could not retrieve friends for \"" + profile.getUsername() + "\"");
+			System.err.println(matchesResponse.opt("response"));
+			return List.of();
+		}
+
+		JSONArray matchesReceived = matchesResponse.getJSONArray("response");
+		for(int i = 0; i < matchesReceived.length(); i++) {
+			JSONObject o = matchesReceived.getJSONObject(i);
+			matches.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), new User(o.getInt("WhitePlayer"), o.getString("WhiteName")), new User(o.getInt("BlackPlayer"), o.getString("BlackName"))));
+		}
+		return matches;
 	}
 
 	public List<Friend> getFriends() {
@@ -226,12 +245,6 @@ public class Client {
 			System.err.println("Could not make connection to function \"" + function + "\"!");
 			e3.printStackTrace();
 			return null;
-		}
-	}
-
-	public static class ClientUser extends User {
-		public ClientUser(Client client) {
-			super(client.getProfile().getUserID(), client.getProfile().getUsername());
 		}
 	}
 }
