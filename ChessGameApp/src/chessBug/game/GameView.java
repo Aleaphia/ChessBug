@@ -20,7 +20,7 @@ public class GameView {
     private GameController controller;
     
     //Page state
-    private HBox page = new HBox();
+    private BorderPane page = new BorderPane();
     private GridPane gameBoard = new GridPane();
     private VBox msgBoard = new VBox();
     private GridPane notationScreen = new GridPane();
@@ -28,24 +28,10 @@ public class GameView {
     private String selectedSquare = null;
     
     //Constructors
-    public GameView(boolean playerColor, GameController controller) {
-        //Connect to controller
-        this.controller = controller;
-        
-        //page layout
-        createGameBoard(true);
-        createMsgBoard();
-        createNotationBoard();
-        page.getChildren().addAll(msgBoard, gameBoard, notationScreen);
-        
-        //Update game state
-        refreshGameDisplay();
-        refreshMsgBoard();
-    }
     public GameView(GameController controller) {
         this.controller = controller;
         
-        page.getChildren().add(new MatchListView(controller).getPage());
+        buildGameSelectionPrompt();
     }
     
     //Getter/Setter Methods
@@ -127,20 +113,6 @@ public class GameView {
             }
     } 
     
-    public void reBuildPage(){
-        //Clear page
-        page.getChildren().clear();
-        
-        //page layout
-        createGameBoard(true);
-        createMsgBoard();
-        createNotationBoard();
-        page.getChildren().addAll(msgBoard, gameBoard, notationScreen);
-        
-        //Update game state
-        refreshGameDisplay();
-        refreshMsgBoard();
-    }
 
     private void boardInteraction(BorderPane square) {
         if (!controller.getGameComplete()
@@ -267,6 +239,93 @@ public class GameView {
     }
     
     //Page space creation
+    private void buildGameSelectionPrompt(){
+        //Clear page
+        page.getChildren().clear();
+        
+        //Game Prompt Panel
+        VBox promptSelectionPanel = new VBox();
+        page.setCenter(promptSelectionPanel);
+        
+        //New game button
+        Button newGame = new Button("New Game");
+        newGame.setOnMouseClicked(event -> {
+               buildGameBuildPrompt();
+           });
+        
+        //List out games
+        controller.getMatchList().forEach(match ->{
+           Button currMatch = new Button(match.toString());
+           
+           currMatch.setOnMouseClicked(event -> {
+               //Update controller
+               controller.matchSelection(match);
+               buildGamePage();
+           });
+           
+           promptSelectionPanel.getChildren().add(currMatch);
+       });
+    }
+    private void buildGameBuildPrompt(){
+        //Clear page
+        page.getChildren().clear();
+        
+        //Game Prompt Panel
+        VBox promptSelectionPanel = new VBox();
+        page.setCenter(promptSelectionPanel);
+        
+        //Select Color
+        char[] colorSelection = new char[1];
+        colorSelection[0] = 'w'; //w for white, b for black, r for random
+        ToggleGroup colorOptions = new ToggleGroup();
+        String[] colorOptionList = {"white", "black", "random"};
+        
+        for (String option : colorOptionList){
+            RadioButton curr = new RadioButton(option);
+            curr.setOnAction(event -> colorSelection[0] = option.charAt(0));
+            curr.setToggleGroup(colorOptions);
+        }
+        
+        //New game button
+        Button newGame = new Button("New Game");
+        newGame.setOnMouseClicked(event -> {
+               buildGameBuildPrompt();
+           });
+        
+        //List out games
+        controller.getMatchList().forEach(match ->{
+           Button currMatch = new Button(match.toString());
+           
+           currMatch.setOnMouseClicked(event -> {
+               //Update controller
+               controller.matchSelection(match);
+               buildGamePage();
+           });
+           
+           promptSelectionPanel.getChildren().add(currMatch);
+       });
+        
+        //Select color
+        
+        //Select Friend
+        
+    }
+    private void buildGamePage(){
+        //Clear page
+        page.getChildren().clear();
+        
+        //page layout
+        createGameBoard(true);
+        createMsgBoard();
+        createNotationBoard();
+        page.setCenter(gameBoard);
+        page.setLeft(msgBoard);
+        page.setRight(notationScreen);
+        
+        //Update game state
+        refreshGameDisplay();
+        refreshMsgBoard();
+    }
     private void createGameBoard(boolean isWhitePerspective) {
         //Create chessBoard
         gameBoard = new GridPane();

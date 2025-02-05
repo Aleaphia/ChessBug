@@ -28,47 +28,6 @@ public class GameController {
     private GameView view;
     
     //Constructors
-    public GameController(Client player, User opponent, boolean playerColor) { //New game
-        //Connect to database
-        client = player;//Save client
-        //Create new database
-        try{
-            match =  (playerColor)?
-                    client.createMatch(client.getOwnUser(), opponent) :
-                    client.createMatch(opponent, client.getOwnUser());
-        }catch( Exception e){
-            System.out.println("Error: Unable to create new match");
-        }  
-        //Get chat
-        chat = match.getChat();
-        
-        //Create model and view
-        model = new GameModel(playerColor);
-        view = new GameView(playerColor, this);
-        
-        //Update game state
-        view.refresh();
-        
-        //Start recuring database checks
-        continueDatabaseChecks();
-    }
-    public GameController(Client player, Match match){
-        //Connect to database
-        client = player;
-        this.match = match;
-        chat = match.getChat();
-        
-        //Create model and view
-        boolean playerColor = match.getWhite().equals(client.getOwnUser()); //Assumes player is valid player in match
-        model = new GameModel(playerColor, match.getAllMoves());
-        view = new GameView(playerColor, this);
-        
-        //Update game state
-        view.refresh();
-        
-        //Check database
-        continueDatabaseChecks();
-    }
     public GameController(Client player){
         //Connect to database
         client = player;
@@ -124,15 +83,34 @@ public class GameController {
     }
     
     public void matchSelection(Match match){
+        //Cache match and chat
         this.match = match;
         chat = match.getChat();
         
-        //Create model and view
+        //Create model
         boolean playerColor = match.getWhite().equals(client.getOwnUser()); //Assumes player is valid player in match
         model = new GameModel(playerColor, match.getAllMoves());
-        view.reBuildPage();
         
         //Check database
+        continueDatabaseChecks();
+    }
+    public void createNewGame(Boolean playerColor, User opponent){
+        //Create new matchin database
+        try{
+            match =  (playerColor)?
+                    client.createMatch(client.getOwnUser(), opponent) :
+                    client.createMatch(opponent, client.getOwnUser());
+        }catch( Exception e){
+            System.out.println("Error: Unable to create new match");
+        }
+        
+        //Get chat
+        chat = match.getChat();
+        
+        //Create model
+        model = new GameModel(playerColor);
+        
+        //Start recuring database checks
         continueDatabaseChecks();
     }
 
