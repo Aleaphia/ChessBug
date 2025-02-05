@@ -20,8 +20,9 @@ import listHelper.SavableList;
 import chessGame.*;
 import chessBug.game.*;
 import chessBug.network.Client;
+import chessBug.preferences.PreferencesController;
+import chessBug.profile.ProfileController;
 
-import java.beans.EventHandler;
 import java.io.*;
 import java.util.*;
 
@@ -36,6 +37,7 @@ import javafx.scene.image.*;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.event.Event;
+import javafx.event.EventHandler;
 /**
  *
  * @author shosh
@@ -86,12 +88,12 @@ public class ChessBug extends Application {
     }
 
     private VBox createSidebar () {
-        Vbox sidebar = new VBox (10); // Vertical layour for sidebar
+        VBox sidebar = new VBox (10); // Vertical layour for sidebar
         sidebar.setPadding(new Insets(20, 10, 20, 10));
         sidebar.setStyle("-fx-background-color: #2f3136; -fx-text-fill: white:");
 
         //Add logo or image to the sidebar
-        ImageView logo = nnew ImageView(new Image("file:logo.png")); //Will need to be replaced
+        ImageView logo = new ImageView(new Image("file:logo.png")); //Will need to be replaced
         logo.setFitHeight(50);
         logo.setFitWidth(50);
 
@@ -138,7 +140,6 @@ public class ChessBug extends Application {
         }
         return menuBar;
     }
-    }
     
     private void fillMenuBar(MenuBar menuBar, String[] menus, String[][] menuOptions){
         //Add each menu to the MenuBar
@@ -173,7 +174,7 @@ public class ChessBug extends Application {
                 page.getChildren().add(new Label("ChessBug - About Page"));
                 break;
             case "User Profile":
-                page.getChildren().add(new ProfileController().getPage()); // Load User Profile Page
+                // page.getChildren().add(new ProfileController().getPage()); // Load User Profile Page
                 break;
             default:
                 page.getChildren().add(new Label("Welcome to ChessBug!"));

@@ -1,3 +1,5 @@
+package chessBug.preferences;
+
 import javafx.scene.layout.VBox;
 import javafx.scene.control.*;
 import javafx.geometry.Insets;
