@@ -16,28 +16,27 @@ Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (ActionEvent 
         timeline.play();
 */
 
-import listHelper.SavableList;
-import chessGame.*;
-import chessBug.game.*;
+import chessBug.game.GameController;
 import chessBug.network.Client;
 import chessBug.preferences.PreferencesController;
 import chessBug.profile.ProfileController;
-
-import java.io.*;
-import java.util.*;
-
-import javafx.application.*;
-import javafx.stage.Stage;
-import javafx.geometry.*;
-
-import javafx.scene.Scene;
-import javafx.scene.layout.*;
-import javafx.scene.control.*;
-import javafx.scene.image.*;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.event.Event;
+import javafx.animation.ScaleTransition;
+import javafx.application.Application;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import javafx.util.Duration;
 /**
  *
  * @author shosh
@@ -89,31 +88,98 @@ public class ChessBug extends Application {
         //======================================================================
     }
 
-    private VBox createSidebar () {
-        VBox sidebar = new VBox (10); // Vertical layour for sidebar
+    private VBox createSidebar() {
+        VBox sidebar = new VBox(10); // Vertical layout for sidebar
         sidebar.setPadding(new Insets(20, 10, 20, 10));
         sidebar.setStyle("-fx-background-color: #2f3136; -fx-text-fill: white;");
-
-        //Add logo or image to the sidebar
-        ImageView logo = new ImageView(new Image("file:logo.png")); //Will need to be replaced
+    
+        // Add logo or image to the sidebar
+        ImageView logo = new ImageView(new Image("file:logo.png")); // Will need to be replaced
         logo.setFitHeight(50);
         logo.setFitWidth(50);
-
+    
         // Sidebar buttons 
         Button homeButton = createSidebarButton("Home", event -> changePage("Dash Board!"));
-        Button gamesButton = createSidebarButton("Game", event -> changePage("New Game"));
+        Button gamesButton = createGamesButton(); // Create Game button with dropdown menu
         Button settingsButton = createSidebarButton("Settings", event -> changePage("Preferences"));
         Button profileButton = createSidebarButton("Profile", event -> changePage("User Profile"));
-
-         // Add items to the sidebar
-        sidebar.getChildren().addAll(logo, homeButton, gamesButton, settingsButton, profileButton);
-        
+    
+        // Create VBox for game button and dropdown menu
+        VBox gameButtonContainer = new VBox();
+        gameButtonContainer.setSpacing(0);  // Remove extra spacing
+        gameButtonContainer.getChildren().addAll(gamesButton, createGameMenu()); // Add game button and menu
+    
+        // Add items to the sidebar
+        sidebar.getChildren().addAll(logo, homeButton, gameButtonContainer, settingsButton, profileButton);
+    
         return sidebar;
+    }
+    
+    private Button createGamesButton() {
+        Button gamesButton = createSidebarButton("Game", event -> {});  // Empty event, we'll handle hover for dropdown visibility
+    
+        // Game submenu (Initially hidden)
+        VBox gameMenu = createGameMenu();
+        gameMenu.setVisible(false);  // Hide the menu initially
+    
+        // Make sure gameMenu is interactable by mouse
+        gameMenu.setMouseTransparent(false);  // Allow interaction with the dropdown
+    
+        // Scale transition to expand the button on hover
+        ScaleTransition scaleTransition = new ScaleTransition(Duration.millis(200), gamesButton);
+        scaleTransition.setToX(1.2);  // Scale 1.2x horizontally (expand)
+        scaleTransition.setToY(1.2);  // Scale 1.2x vertically (expand)
+    
+        gamesButton.setOnMouseEntered(e -> {
+            gameMenu.setVisible(true);  // Show the dropdown when hovering over the "Game" button
+            scaleTransition.play();  // Start the animation to expand the button
+        });
+    
+        gamesButton.setOnMouseExited(e -> {
+            scaleTransition.setToX(1);  // Reset the scale back to 1 (normal size)
+            scaleTransition.setToY(1);  // Reset the scale back to 1 (normal size)
+            scaleTransition.play();  // Start the animation to shrink the button back
+            hideMenu(gameMenu);  // Hide the dropdown when the mouse exits
+        });
+    
+        // Show game menu when hovering over the "Game" button
+        gamesButton.setOnMouseEntered(e -> gameMenu.setVisible(true));
+        gamesButton.setOnMouseExited(e -> hideMenu(gameMenu));  // Hide menu when mouse leaves
+    
+        // Keep the menu visible when hovering over the game menu itself
+        gameMenu.setOnMouseEntered(e -> gameMenu.setVisible(true));
+        gameMenu.setOnMouseExited(e -> hideMenu(gameMenu));  // Hide when leaving both button and menu
+    
+        return gamesButton; // Return just the game button
+    }
+    
+    private VBox createGameMenu() {
+        VBox gameMenu = new VBox(10);
+        gameMenu.setStyle("-fx-background-color: #3a3f47; -fx-padding: 10px; -fx-border-radius: 5px;");
+    
+        Button newGameButton = createSidebarButton("New Game", event -> changePage("New Game"));
+        Button loadGameButton = createSidebarButton("Load Game", event -> changePage("Load Game"));
+        Button demoGameButton = createSidebarButton("Demo Game", event -> changePage("Demo Game"));
+    
+        gameMenu.getChildren().addAll(newGameButton, loadGameButton, demoGameButton);
+    
+        // Set consistent width for the dropdown menu (same as sidebar buttons)
+        gameMenu.setMaxWidth(200);  // Ensure the width is the same as the other buttons
+    
+        return gameMenu;
+    }
+    
+    private void hideMenu(VBox gameMenu) {
+        // Hide the dropdown if the mouse is not hovering over the button or the menu
+        if (!gameMenu.isHover()) {
+            gameMenu.setVisible(false);
+        }
     }
 
     private Button createSidebarButton(String text, EventHandler event) {
         Button button = new Button(text);
         button.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;");
+        button.setPrefWidth(200);
         button.setOnAction(event);
         return button;
     }
