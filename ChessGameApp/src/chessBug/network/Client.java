@@ -136,6 +136,7 @@ public class Client {
 		JSONArray matchesReceived = matchesResponse.getJSONArray("response");
 		for(int i = 0; i < matchesReceived.length(); i++) {
 			JSONObject o = matchesReceived.getJSONObject(i);
+			System.out.printf("Received match with data %d, %d, %d (%s), %d (%s)%n", o.getInt("MatchID"), o.getInt("Chat"), o.getInt("WhitePlayer"), o.getString("WhiteName"), o.getInt("BlackPlayer"), o.getString("BlackName"));
 			matches.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), new User(o.getInt("WhitePlayer"), o.getString("WhiteName")), new User(o.getInt("BlackPlayer"), o.getString("BlackName"))));
 		}
 		return matches;
