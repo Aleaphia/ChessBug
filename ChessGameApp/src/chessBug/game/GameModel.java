@@ -38,6 +38,7 @@ public class GameModel {
     public ArrayList<String> getMoveListForLocalPiece(String square){return game.getMoveListForLocalPiece(square);}
     public Boolean isPlayerTurn(){return (playerColor && game.getPlayerTurn()) || (!playerColor && !game.getPlayerTurn());}
     public Boolean getPlayerTurn(){return game.getPlayerTurn();}
+    public Boolean getPlayerColor(){return playerColor;}
    
     //Other Methods
     /** LoadGame - loads current game state

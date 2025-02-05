@@ -39,6 +39,7 @@ public class GameController {
     //Getter/Setter Methods
     public ArrayList<Message> getChatMessages(){return chat.getAllMessages();}
     public void sendChatMessage(String msg){chat.send(client, msg);}
+    public List<Friend> getFriendList(){return client.getFriends();}
     public Boolean getGameComplete(){return model.getGameComplete();}
     public Piece getLocalPiece(String square){return model.getLocalPiece(square);}
     public List<Match> getMatchList(){return client.getMatches();}
@@ -46,6 +47,7 @@ public class GameController {
     public ArrayList<String> getMoveListForLocalPiece(String square){return model.getMoveListForLocalPiece(square);}
     public Node getPage(){return view.getPage();}
     public Boolean getPlayerTurn(){return model.getPlayerTurn();}
+    public Boolean getPlayerColor(){return model.getPlayerColor();}
     public String getUserName(){return client.getOwnUser().getUsername();}
     
     //Other Methods
