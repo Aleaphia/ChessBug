@@ -45,3 +45,98 @@
     -fx-font: 15px Tahoma;
     -fx-padding: 20;
 }
+/* Button Styles for Settings and Profile Actions */
+.button {
+    -fx-font-size: 14px;
+    -fx-padding: 10px 20px;
+    -fx-background-color: #5c6bc0;
+    -fx-text-fill: white;
+    -fx-border-radius: 5px;
+    -fx-cursor: hand;
+    -fx-transition: background-color 0.3s ease;
+}
+
+.button:hover {
+    -fx-background-color: #3f51b5;
+}
+
+/* ComboBox and CheckBox Styles */
+.combo-box, .check-box {
+    -fx-font-size: 14px;
+    -fx-pref-width: 200px;
+    -fx-padding: 10px;
+}
+
+.check-box {
+    -fx-font-size: 14px;
+}
+
+.combo-box {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #ccc;
+    -fx-border-width: 1;
+    -fx-background-insets: 0;
+    -fx-text-fill: #333;
+}
+
+/* Profile Page Styles */
+.profilePage {
+    -fx-background-color: #f7f7f7;
+    -fx-padding: 20px;
+}
+
+/* Profile Picture */
+.profile-picture {
+    -fx-border-radius: 50%;
+    -fx-border-color: #b0bec5;
+    -fx-border-width: 2px;
+    -fx-padding: 10px;
+    -fx-background-color: #ffffff;
+}
+
+/* Username and Email Labels */
+.usernameLabel, .emailLabel {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333;
+    -fx-padding: 5px;
+}
+
+/* FileChooser Button Style */
+.file-chooser-button {
+    -fx-background-color: #5c6bc0;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 10px;
+    -fx-border-radius: 5px;
+}
+
+.file-chooser-button:hover {
+    -fx-background-color: #3f51b5;
+}
+
+/* Change Password Button */
+.change-password-button {
+    -fx-background-color: #f44336;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 10px;
+    -fx-border-radius: 5px;
+}
+
+.change-password-button:hover {
+    -fx-background-color: #d32f2f;
+}
+
+/* Horizontal Spacing for Profile Layout */
+.profile-layout {
+    -fx-spacing: 15px;
+    -fx-alignment: center;
+}
+
+/* General layout styling for the preference and profile pages */
+.layout {
+    -fx-spacing: 15px;
+    -fx-alignment: center;
+    -fx-padding: 10px;
+}
