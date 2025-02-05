@@ -30,6 +30,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Separator;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -181,9 +182,84 @@ public class ChessBug extends Application {
         button.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;");
         button.setPrefWidth(200);
         button.setOnAction(event);
+        button.setOnMouseEntered(e -> {
+            button.setStyle("-fx-background-color: #444750; -fx-text-fill: white; -fx-font-size: 16px;");
+        });
+        button.setOnMouseExited(e -> {
+            button.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px;");
+        });
+    
         return button;
     }
 
+    private VBox createHomePage() {
+        VBox homePage = new VBox(20); // Vertical layout with spacing between sections
+        homePage.setPadding(new Insets(20, 20, 20, 20));
+        homePage.setStyle("-fx-background-color: #36393f; -fx-text-fill: white;");  // Set text color to white for the entire homePage
+    
+        // Welcome message
+        Label welcomeMessage = new Label("Welcome to ChessBug!");
+        welcomeMessage.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;"); // Ensure text is white
+        
+        // User info (this could be dynamic)
+        Label userInfo = new Label("User: ChessMaster123");
+        userInfo.setStyle("-fx-font-size: 18px; -fx-text-fill: white;"); // Ensure text is white
+    
+        // Add a separator line
+        homePage.getChildren().addAll(welcomeMessage, userInfo, new Separator());
+    
+        // Recent game statistics
+        VBox statsSection = new VBox(10);
+        statsSection.setStyle("-fx-background-color: #2a2d34; -fx-padding: 10px; -fx-border-radius: 8px; -fx-text-fill: white;");
+        Label statsTitle = new Label("Recent Game Statistics");
+        statsTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;");
+        
+        Label gamesPlayed = new Label("Games Played: 15");
+        gamesPlayed.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");  // Ensure the text is white
+        Label wins = new Label("Wins: 10");
+        wins.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
+        Label losses = new Label("Losses: 5");
+        losses.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
+        
+        statsSection.getChildren().addAll(statsTitle, gamesPlayed, wins, losses);
+        homePage.getChildren().add(statsSection);
+        
+        // Recent activity feed (activity log)
+        VBox activityFeed = new VBox(10);
+        activityFeed.setStyle("-fx-background-color: #2a2d34; -fx-padding: 10px; -fx-border-radius: 8px; -fx-text-fill: white;");
+        Label activityFeedTitle = new Label("Recent Activity");
+        activityFeedTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;");
+        
+        Label activity1 = new Label("You played a match with User456.");
+        activity1.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
+        Label activity2 = new Label("You won against User789.");
+        activity2.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
+        Label activity3 = new Label("You started a new challenge with User321.");
+        activity3.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
+        
+        activityFeed.getChildren().addAll(activityFeedTitle, activity1, activity2, activity3);
+        homePage.getChildren().add(activityFeed);
+        
+        // Featured or Live Game section (Optional)
+        VBox liveGameSection = new VBox(10);
+        liveGameSection.setStyle("-fx-background-color: #2a2d34; -fx-padding: 10px; -fx-border-radius: 8px; -fx-text-fill: white;");
+        Label liveGameTitle = new Label("Featured Game");
+        liveGameTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;");
+        
+        Label liveGame = new Label("Live Game: ChessMaster123 vs. User456");
+        liveGame.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
+        Button joinGameButton = new Button("Join Game");
+        joinGameButton.setStyle("-fx-background-color: #4e8af3; -fx-text-fill: white;");
+        
+        liveGameSection.getChildren().addAll(liveGameTitle, liveGame, joinGameButton);
+        homePage.getChildren().add(liveGameSection);
+        
+        // Add a final separator for design clarity
+        homePage.getChildren().add(new Separator());
+        
+        return homePage;
+    }
+    
     private MenuBar createMenuBar() {
         MenuBar menuBar = new MenuBar();
         
@@ -244,6 +320,9 @@ public class ChessBug extends Application {
             case "User Profile":
                 page.getChildren().add(new ProfileController(client).getPage()); // Load User Profile Page
                 break;
+            case "Dash Board!":  // Home page
+                page.getChildren().add(createHomePage());
+                break;   
             default:
                 page.getChildren().add(new Label("Welcome to ChessBug!"));
         }
