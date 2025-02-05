@@ -34,14 +34,11 @@ public class MatchListView {
     public Node getPage(){return page;}
 
     
-    private void createPrompt(){
-        System.out.println(controller.getMatchList().size());
-        
+    private void createPrompt(){        
        controller.getMatchList().forEach(match ->{
            Label currMatch = new Label(match.toString());
            
            currMatch.setOnMouseClicked( event -> {
-               System.out.println("hi");
                controller.matchSelection(match);
            });
            
