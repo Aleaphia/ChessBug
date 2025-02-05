@@ -14,7 +14,7 @@ public class ProfileController {
         this.view = new ProfileView(client.getProfile());
     }
 
-    public ProfileView getView() {
+    public ProfileView getPage() {
         return view;
     }
 

@@ -56,11 +56,11 @@ public class ChessBug extends Application {
             client = new Client("user", "p@ssw0rd!"); // (example user)
         } catch (Exception e){}
         //Main pane
-        VBox mainPane = new VBox();
+        HBox mainPane = new HBox();
         mainPane.getStyleClass().add("background");
         
         //Create Menu
-        MenuBar menuBar = new MenuBar();
+        /*MenuBar menuBar = new MenuBar();
         mainPane.getChildren().addAll(menuBar, page);
         // TODO: Create menuBar options
         String[] menus = {"Home", "Games" , "Settings" , "Profile"};
@@ -70,8 +70,10 @@ public class ChessBug extends Application {
             {"Preferences", "About"},  // Setting
             {"User Profile"} // Profile (added menu option)
         };
-        fillMenuBar(menuBar, menus, menuOptions); //Creates dashboard based on above arrays
+        fillMenuBar(menuBar, menus, menuOptions); //Creates dashboard based on above arrays*/
         
+        mainPane.getChildren().addAll(createSidebar(), page);
+
         //Scene and Stage ------------------------------------------------------
         primaryStage.setTitle("ChessBug"); //Name for application stage
         Scene mainScene = new Scene(mainPane, 800, 600); //Add mainPane to the mainScene
@@ -90,7 +92,7 @@ public class ChessBug extends Application {
     private VBox createSidebar () {
         VBox sidebar = new VBox (10); // Vertical layour for sidebar
         sidebar.setPadding(new Insets(20, 10, 20, 10));
-        sidebar.setStyle("-fx-background-color: #2f3136; -fx-text-fill: white:");
+        sidebar.setStyle("-fx-background-color: #2f3136; -fx-text-fill: white;");
 
         //Add logo or image to the sidebar
         ImageView logo = new ImageView(new Image("file:logo.png")); //Will need to be replaced
@@ -174,7 +176,7 @@ public class ChessBug extends Application {
                 page.getChildren().add(new Label("ChessBug - About Page"));
                 break;
             case "User Profile":
-                // page.getChildren().add(new ProfileController().getPage()); // Load User Profile Page
+                page.getChildren().add(new ProfileController(client).getPage()); // Load User Profile Page
                 break;
             default:
                 page.getChildren().add(new Label("Welcome to ChessBug!"));
