@@ -8,6 +8,7 @@ package chessBug.game;
 import chessGame.*;
 import chessBug.network.*;
 import java.util.*;
+import java.util.stream.Stream;
 
 import javafx.scene.Node;
 import javafx.event.ActionEvent;
@@ -37,13 +38,13 @@ public class GameController {
     }
     
     //Getter/Setter Methods
-    public ArrayList<Message> getChatMessages(){return chat.getAllMessages();}
+    public Stream<Message> getChatMessages(){return chat.poll(client);}
     public void sendChatMessage(String msg){chat.send(client, msg);}
     public List<Friend> getFriendList(){return client.getFriends();}
     public Boolean getGameComplete(){return model.getGameComplete();}
     public Piece getLocalPiece(String square){return model.getLocalPiece(square);}
     public List<Match> getMatchList(){return client.getMatches();}
-    public ArrayList<String> getMatchMoves(){return match.getAllMoves();}
+    public Stream<String> getMatchMoves(){return match.poll(client);}
     public ArrayList<String> getMoveListForLocalPiece(String square){return model.getMoveListForLocalPiece(square);}
     public Node getPage(){return view.getPage();}
     public Boolean getPlayerTurn(){return model.getPlayerTurn();}
@@ -91,7 +92,7 @@ public class GameController {
         
         //Create model
         boolean playerColor = match.getWhite().equals(client.getOwnUser()); //Assumes player is valid player in match
-        model = new GameModel(playerColor, match.getAllMoves());
+        model = new GameModel(playerColor, match.poll(client));
         
         //Check database
         continueDatabaseChecks();

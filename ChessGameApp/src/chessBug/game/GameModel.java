@@ -9,6 +9,7 @@ import chessGame.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Stream;
 
 public class GameModel {
     //Chess game state
@@ -25,7 +26,7 @@ public class GameModel {
     public GameModel(boolean playerColor) { //New game
         this.playerColor = playerColor; //Determine player color
     }
-    public GameModel(boolean playerColor, ArrayList<String> moveList){
+    public GameModel(boolean playerColor, Stream<String> moveList){
         this(playerColor);
         //Get moves from database
         loadGame(moveList);
@@ -44,9 +45,9 @@ public class GameModel {
     /** LoadGame - loads current game state
      * @param moveList - list of previous moves in coordinate notation (e.g., e2e4 or e7e8Q)
      */
-    private void loadGame(ArrayList<String> moveList){
+    private void loadGame(Stream<String> moveList){
         //make previous moves
-        for(String move : moveList){
+        moveList.forEach(move -> {
             //Get starting and ending square
             String from = move.substring(0,2);
             String to = move.substring(2,4);
@@ -57,7 +58,7 @@ public class GameModel {
             
             //Make move
             game.gameTurn(from, to);
-        }
+        });
     }
     
     /**MakePlayerMove  - updates chess game and model information in response to a move

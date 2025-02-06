@@ -69,6 +69,10 @@ public class Chat {
 		return messages;
 	}
 
+	public int getID() {
+		return chatID;
+	}
+
 	public void send(Client from, String content) {
 		JSONObject message = new JSONObject();
 		message.put("chat", chatID);

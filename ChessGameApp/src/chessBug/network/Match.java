@@ -51,10 +51,10 @@ public class Match {
 
 		// Ask for all new moves
 		JSONObject getMovesPoll = new JSONObject();
-		getMovesPoll.put("chat", matchID);
+		getMovesPoll.put("match", matchID);
 		getMovesPoll.put("num", currentNumber - movesNumber); // getting current number of moves minus the previous count
 
-		JSONObject getMovesResponse = client.post("getNMessages", getMovesPoll);
+		JSONObject getMovesResponse = client.post("getNMatchMoves", getMovesPoll);
 
 		if(getMovesResponse.getBoolean("error")) {
 			System.err.println("Could not retrieve " + (currentNumber - movesNumber) + " moves from chess match: " + matchID);
@@ -66,10 +66,10 @@ public class Match {
 		JSONArray retrievedMoves = getMovesResponse.getJSONArray("response");
 		for(int i = 0; i < currentNumber - movesNumber; i++) {
 			JSONObject o = retrievedMoves.getJSONObject(i);
-			moves.add(o.getString("Move"));
 			// Ensure movenum is equivalent to index in moves
 			if(moves.size() != o.getInt("MoveNum"))
-				System.err.println("Moves may have been polled out of order!");
+				System.err.println("Moves may have been polled out of order! " + moves.size() + " " + o.getInt("MoveNum"));
+			moves.add(o.getString("Move"));
 		}
 
 		// Return a stream of all new moves
@@ -113,6 +113,10 @@ public class Match {
 
 	public Chat getChat() {
 		return chat;
+	}
+
+	public int getID() {
+		return matchID;
 	}
 
 	public User getWhite() {
