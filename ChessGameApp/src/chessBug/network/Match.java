@@ -66,10 +66,10 @@ public class Match {
 		JSONArray retrievedMoves = getMovesResponse.getJSONArray("response");
 		for(int i = 0; i < currentNumber - movesNumber; i++) {
 			JSONObject o = retrievedMoves.getJSONObject(i);
-			moves.add(o.getString("Move"));
 			// Ensure movenum is equivalent to index in moves
 			if(moves.size() != o.getInt("MoveNum"))
-				System.err.println("Moves may have been polled out of order!");
+				System.err.println("Moves may have been polled out of order! " + moves.size() + " " + o.getInt("MoveNum"));
+			moves.add(o.getString("Move"));
 		}
 
 		// Return a stream of all new moves

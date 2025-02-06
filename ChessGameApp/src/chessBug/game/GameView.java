@@ -98,10 +98,8 @@ public class GameView {
 
     private void refreshMsgBoard() {
         //Get any new messages
-        ArrayList<Message> newPoll = controller.getChatMessages();
-
         //Add each message to the chat
-        newPoll.forEach(x -> {
+        controller.getChatMessages().forEach(x -> {
             String msg = x.getAuthor() + ": " + x.getContent();
             VBox msgScreen = (VBox) msgBoard.getChildren().get(0);
             msgScreen.getChildren().add(new Label(msg));
