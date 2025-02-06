@@ -26,7 +26,7 @@ public class GameModel {
     public GameModel(boolean playerColor) { //New game
         this.playerColor = playerColor; //Determine player color
     }
-    public GameModel(boolean playerColor, Stream<String> moveList){
+    public GameModel(boolean playerColor, ArrayList<String> moveList){
         this(playerColor);
         //Get moves from database
         loadGame(moveList);
@@ -45,7 +45,7 @@ public class GameModel {
     /** LoadGame - loads current game state
      * @param moveList - list of previous moves in coordinate notation (e.g., e2e4 or e7e8Q)
      */
-    private void loadGame(Stream<String> moveList){
+    private void loadGame(ArrayList<String> moveList){
         //make previous moves
         moveList.forEach(move -> {
             //Get starting and ending square

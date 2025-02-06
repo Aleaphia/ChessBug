@@ -58,7 +58,7 @@ public class GameController {
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (ActionEvent event) -> {
             //Add repeated database checks here ================================
             if(!model.isPlayerTurn()){ //While waiting for other player's move check database and update boardstate
-                match.poll(client).forEach((move) -> playerMove(move));
+                match.poll(client).forEach((move) -> internalPlayerMove(move));
                 view.refresh();
             }
             else // during this player's turn just refresh chat
@@ -71,18 +71,23 @@ public class GameController {
     }
 
     public void playerMove(String notation){
+        if (internalPlayerMove(notation))
+            match.makeMove(client, notation);
+    }
+    private boolean internalPlayerMove(String notation){
         //Attempt to make player move, will return true on success
         if (model.makePlayerMove(notation)){
             //Update the board display
             view.refresh();
             view.addToNotationBoard(notation, !model.getPlayerTurn(), model.getTurnNumber());
             view.deselectSquare();
-            //Send move to database
-            match.makeMove(client, notation);
+            return true;
         }
         else { //If the game move is Illegal, output error message
             //TODO
+            
         }
+        return false;
     }
     
     public void matchSelection(Match match){
@@ -92,7 +97,17 @@ public class GameController {
         
         //Create model
         boolean playerColor = match.getWhite().equals(client.getOwnUser()); //Assumes player is valid player in match
-        model = new GameModel(playerColor, match.poll(client));
+        model = new GameModel(playerColor, match.getAllMoves());
+        //Update NotationBoard
+        boolean playerTurn = true;
+        int moveNum = 0;
+        for (String move : match.getAllMoves()){
+            view.addToNotationBoard(move, playerTurn, moveNum);
+            if (playerTurn)
+                moveNum++;
+            playerTurn = !playerTurn;
+        }
+        
         
         //Check database
         continueDatabaseChecks();
