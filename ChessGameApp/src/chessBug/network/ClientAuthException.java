@@ -10,6 +10,8 @@ public class ClientAuthException extends Exception {
 		this.type = type;
 	}
 
+	public String getServerResponse() { return response; }
+
 	public String getMessage() {
 		return "Failed to " + type + ". Received: \"" + response + "\"";
 	}
