@@ -16,8 +16,11 @@ Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (ActionEvent 
         timeline.play();
 */
 
+import org.json.JSONObject;
+
 import chessBug.game.GameController;
 import chessBug.network.Client;
+import chessBug.network.ClientAuthException;
 import chessBug.preferences.PreferencesController;
 import chessBug.profile.ProfileController;
 import javafx.animation.ScaleTransition;
@@ -50,29 +53,45 @@ public class ChessBug extends Application {
     @Override
     public void start(Stage primaryStage) {
     //Create stage layout ======================================================
-        //Fake login TODO- make login page the first page pulled up
-        try{
-            // Connect to database
-            client = new Client("user", "p@ssw0rd!"); // (example user)
-        } catch (Exception e){}
         //Main pane
         HBox mainPane = new HBox();
         mainPane.getStyleClass().add("background");
-        
-        //Create Menu
-        /*MenuBar menuBar = new MenuBar();
-        mainPane.getChildren().addAll(menuBar, page);
-        // TODO: Create menuBar options
-        String[] menus = {"Home", "Games" , "Settings" , "Profile"};
-        String[][] menuOptions = {
-            {"Dash Board"}, // Home
-            {"New Game", "Load Game", "DemoGame"}, // Games
-            {"Preferences", "About"},  // Setting
-            {"User Profile"} // Profile (added menu option)
-        };
-        fillMenuBar(menuBar, menus, menuOptions); //Creates dashboard based on above arrays*/
-        
-        mainPane.getChildren().addAll(createSidebar(), page);
+
+        LoginUI loginUI = new LoginUI(
+            (String username, String password) -> { // Handle login
+                JSONObject out = new JSONObject();
+                try {
+                    client = new Client(username, password);
+                    out.put("error", false);
+                    //Create Menu
+                    mainPane.getChildren().clear();
+                    mainPane.getChildren().addAll(createSidebar(), page);
+                } catch (ClientAuthException e) {
+                    e.printStackTrace();
+                    out.put("error", true);
+                    out.put("response", e.getServerResponse());
+                }
+                return out;
+            },
+            (String username, String password) -> { // Handle account creation
+                JSONObject out = new JSONObject();
+                try {
+                    client = Client.createAccount(username, password, "placeholder@email.com");
+                    out.put("error", false);
+                    //Create Menu
+                    mainPane.getChildren().clear();
+                    mainPane.getChildren().addAll(createSidebar(), page);
+                } catch(ClientAuthException e){
+                    e.printStackTrace();
+                    out.put("error", true);
+                    out.put("response", e.getServerResponse());
+                }
+
+                return out;
+            }
+        );
+
+        mainPane.getChildren().add(loginUI.getPage());
 
         //Scene and Stage ------------------------------------------------------
         primaryStage.setTitle("ChessBug"); //Name for application stage

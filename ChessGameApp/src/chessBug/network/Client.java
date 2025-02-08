@@ -24,9 +24,7 @@ public class Client {
 	// Store user information in order to log in
 	private ProfileModel profile;
 
-	private Client() {
-
-	}
+	private Client() {}
 
 	public Client(String username, String password) throws ClientAuthException {
 		// Call "login" function from the server
@@ -49,9 +47,7 @@ public class Client {
 	public static Client createAccount(String username, String password, String email) throws ClientAuthException {
 		// Create a new blank Client, setting profile data
 		Client c = new Client();
-		c.profile.setUsername(username);
-		c.profile.setEmail(email);
-		c.profile.setPassword(password);
+		c.profile = new ProfileModel(0, username, password, email, "");
 
 		// Create a message to send to the server's "createAccount" function
 		JSONObject accountData = new JSONObject();
