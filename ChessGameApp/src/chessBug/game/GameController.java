@@ -105,16 +105,11 @@ public class GameController {
         //Build game page
         view.buildGamePage();
         
-        final long time = System.currentTimeMillis();
-        
         //Update chat/match status
         match.poll(client).forEach((move) -> {
-            System.out.println(System.currentTimeMillis() - time);
             internalPlayerMove(move);
                 });
         view.refresh();
-        
-        System.out.println(System.currentTimeMillis() - time);
         
         //Check database
         continueDatabaseChecks();
@@ -137,6 +132,7 @@ public class GameController {
         
         //Build game page
         view.buildGamePage();
+        view.refresh();
         
         //Start recuring database checks
         continueDatabaseChecks();
