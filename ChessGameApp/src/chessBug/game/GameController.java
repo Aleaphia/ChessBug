@@ -9,6 +9,7 @@ import chessGame.*;
 import chessBug.network.*;
 import java.util.*;
 import java.util.stream.Stream;
+import java.util.concurrent.CompletableFuture;
 
 import javafx.scene.Node;
 import javafx.event.ActionEvent;
@@ -71,14 +72,16 @@ public class GameController {
     }
 
     public void playerMove(String notation){
-        if (internalPlayerMove(notation))
+        if (internalPlayerMove(notation)){
             match.makeMove(client, notation);
+            view.refresh();
+        }
     }
+    
     private boolean internalPlayerMove(String notation){
         //Attempt to make player move, will return true on success
         if (model.makePlayerMove(notation)){
-            //Update the board display
-            view.refresh();
+            //Update the display
             view.addToNotationBoard(notation, !model.getPlayerTurn(), model.getTurnNumber());
             view.deselectSquare();
             return true;
@@ -90,23 +93,28 @@ public class GameController {
         return false;
     }
     
-    public void matchSelection(Match match){
+    public void matchSelection(Match newMatch){
         //Cache match and chat
-        this.match = match;
+        match = newMatch;
         chat = match.getChat();
-        
+                
         //Create model
         boolean playerColor = match.getWhite().equals(client.getOwnUser()); //Assumes player is valid player in match
-        model = new GameModel(playerColor, match.getAllMoves());
-        //Update NotationBoard
-        boolean playerTurn = true;
-        int moveNum = 0;
-        for (String move : match.getAllMoves()){
-            view.addToNotationBoard(move, playerTurn, moveNum);
-            if (playerTurn)
-                moveNum++;
-            playerTurn = !playerTurn;
-        }
+        model = new GameModel(playerColor);
+        
+        //Build game page
+        view.buildGamePage();
+        
+        final long time = System.currentTimeMillis();
+        
+        //Update chat/match status
+        match.poll(client).forEach((move) -> {
+            System.out.println(System.currentTimeMillis() - time);
+            internalPlayerMove(move);
+                });
+        view.refresh();
+        
+        System.out.println(System.currentTimeMillis() - time);
         
         //Check database
         continueDatabaseChecks();
@@ -126,6 +134,9 @@ public class GameController {
         
         //Create model
         model = new GameModel(playerColor);
+        
+        //Build game page
+        view.buildGamePage();
         
         //Start recuring database checks
         continueDatabaseChecks();

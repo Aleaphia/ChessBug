@@ -26,11 +26,6 @@ public class GameModel {
     public GameModel(boolean playerColor) { //New game
         this.playerColor = playerColor; //Determine player color
     }
-    public GameModel(boolean playerColor, ArrayList<String> moveList){
-        this(playerColor);
-        //Get moves from database
-        loadGame(moveList);
-    }
     
     //Getter/Setter Methods
     public Boolean getGameComplete(){return game.getGameComplete();}
@@ -43,25 +38,6 @@ public class GameModel {
     public void printBoard(){game.printBoard();}
    
     //Other Methods
-    /** LoadGame - loads current game state
-     * @param moveList - list of previous moves in coordinate notation (e.g., e2e4 or e7e8Q)
-     */
-    private void loadGame(ArrayList<String> moveList){
-        //make previous moves
-        moveList.forEach(move -> {
-            //Get starting and ending square
-            String from = move.substring(0,2);
-            String to = move.substring(2,4);
-            //System.out.println( "Debug: From: " + from + "\tTo: " + to);
-            //Promotion moves
-            if (move.length() == 5) // Only promotion moves have a 5th character
-                promotionChoice[0] = move.charAt(4);
-            
-            //Make move
-            game.gameTurn(from, to);
-        });
-    }
-    
     /**MakePlayerMove  - updates chess game and model information in response to a move
      * 
      * @param notation - Coordinate notation in the format e2e4 or e2e1Q (promotion)

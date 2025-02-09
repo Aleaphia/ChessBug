@@ -28,6 +28,8 @@ public class Match {
 		this.chat = new Chat(chatID);
 		this.white = white;
 		this.black = black;
+                
+                //Load moves
 	}
 
 	public Stream<String> poll(Client client) {

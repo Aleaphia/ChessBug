@@ -264,9 +264,13 @@ public class GameView {
             Button currMatch = new Button(match.toString());
 
             currMatch.setOnMouseClicked(event -> {
+                //Create loading screen
+                //TODO
+                promptSelectionPanel.getChildren().clear();
+                promptSelectionPanel.getChildren().add(new Label("Loading..."));
                 //Update controller
                 controller.matchSelection(match);
-                buildGamePage();
+                
             });
 
             promptSelectionPanel.getChildren().add(currMatch);
@@ -322,7 +326,6 @@ public class GameView {
 
                 //Create new game
                 controller.createNewGame(playerColor, friendSelection[0]);
-                buildGamePage();
             }
             
         });
@@ -333,6 +336,8 @@ public class GameView {
     public void buildGamePage() {
         //Clear page
         page.getChildren().clear();
+                System.out.println("hi");
+
 
         //page layout
         createGameBoard(controller.getPlayerColor());
@@ -341,10 +346,6 @@ public class GameView {
         page.setCenter(gameBoard);
         page.setLeft(msgBoard);
         page.setRight(notationScreen);
-
-        //Update game state
-        refreshGameDisplay();
-        refreshMsgBoard();
     }
 
     private void createGameBoard(boolean isWhitePerspective) {
