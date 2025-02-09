@@ -330,7 +330,7 @@ public class GameView {
         
     }
 
-    private void buildGamePage() {
+    public void buildGamePage() {
         //Clear page
         page.getChildren().clear();
 

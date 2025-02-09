@@ -40,6 +40,7 @@ public class GameModel {
     public Boolean isPlayerTurn(){return (playerColor && game.getPlayerTurn()) || (!playerColor && !game.getPlayerTurn());}
     public Boolean getPlayerTurn(){return game.getPlayerTurn();}
     public Boolean getPlayerColor(){return playerColor;}
+    public void printBoard(){game.printBoard();}
    
     //Other Methods
     /** LoadGame - loads current game state

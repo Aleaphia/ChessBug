@@ -108,7 +108,6 @@ public class GameController {
             playerTurn = !playerTurn;
         }
         
-        
         //Check database
         continueDatabaseChecks();
     }
