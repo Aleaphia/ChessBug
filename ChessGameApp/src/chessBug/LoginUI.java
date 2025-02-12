@@ -5,7 +5,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Paint;
 
 import org.json.JSONObject;
 
@@ -42,6 +44,8 @@ public class LoginUI {
         loginButton.setOnAction(event -> {
             JSONObject response = handleLogin.handle(usernameField.getText(), passwordField.getText());
             if(response.getBoolean("error")) {
+                usernameField.getStyleClass().add("login-error");
+                passwordField.getStyleClass().add("login-error");
                 errorTitle.setText("Could not log in!");
                 errorDescription.setText(response.getString("response"));
                 if(!loginPage.getChildren().contains(errorTitle)) {
@@ -54,6 +58,8 @@ public class LoginUI {
         createAccountButton.setOnAction(event -> {
             JSONObject response = handleAccountCreation.handle(usernameField.getText(), passwordField.getText());
             if(response.getBoolean("error")) {
+                usernameField.getStyleClass().add("login-error");
+                passwordField.getStyleClass().add("login-error");
                 errorTitle.setText("Could not log in!");
                 errorDescription.setText(response.getString("response"));
                 if(!loginPage.getChildren().contains(errorTitle)) {

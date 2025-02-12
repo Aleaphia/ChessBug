@@ -173,3 +173,8 @@
     -fx-padding: 10px;
     -fx-border-radius: 8px;
 }
+
+/* Login page styling */
+.login-error { 
+    -fx-border-color: #ff0000;
+}
