@@ -37,6 +37,7 @@ public class LoginUI {
         passwordField.setStyle("-fx-background-color: #444750; -fx-text-fill: white;");
         // Buttons for login and account creation
         Button loginButton = new Button("Login");
+        loginButton.setDefaultButton(true);
         loginButton.setStyle("-fx-background-color: #4E8AF3; -fx-text-fill: white;");
         loginButton.setOnAction(event -> {
             JSONObject response = handleLogin.handle(usernameField.getText(), passwordField.getText());
