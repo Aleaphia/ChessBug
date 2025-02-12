@@ -50,6 +50,8 @@ public class GameController {
     public Node getPage(){return view.getPage();}
     public Boolean getPlayerTurn(){return model.getPlayerTurn();}
     public Boolean getPlayerColor(){return model.getPlayerColor();}
+    public Boolean isThisPlayersTurn(){return (model.getPlayerTurn() && model.getPlayerColor()) ||
+            (!model.getPlayerTurn() && !model.getPlayerColor());}
     public String getUserName(){return client.getOwnUser().getUsername();}
     
     //Other Methods
