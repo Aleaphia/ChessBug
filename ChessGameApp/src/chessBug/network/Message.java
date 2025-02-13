@@ -18,6 +18,9 @@ public class Message {
 		this.chat = chat;
 		this.author = author;
 	}
+        protected Message(String content){
+            this.content = content;
+        }
 
 	public String getContent() {
 		return content;
