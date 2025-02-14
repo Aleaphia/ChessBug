@@ -343,7 +343,7 @@ public class GameView {
         //Page layout
         page.setCenter(gameBoard);
         page.setLeft(createChatSpace());
-        page.setRight(createNotationSpace());        
+        page.setRight(createNotationSpace());    
     }
 
     private void createGameBoard(boolean isWhitePerspective) {
@@ -435,7 +435,8 @@ public class GameView {
             msgInput.setText("");
         });
 
-        chatContent.setMinHeight(100);
+        chatScroll.setPrefHeight(gameBoard.getHeight());
+        chatScroll.setMinHeight(100);
         chatContent.setAlignment(Pos.BOTTOM_CENTER);
         
         return chatSpace;
@@ -451,6 +452,8 @@ public class GameView {
         ScrollPane notationScroll = new ScrollPane(notationContent);
         notationScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         notationScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        notationScroll.setPrefHeight(gameBoard.getHeight());
+        
         
         //notation space components
         notationSpace.getChildren().addAll(notationLabel, notationScroll);
