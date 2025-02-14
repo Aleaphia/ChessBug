@@ -32,7 +32,6 @@ public class GameModel {
     public Piece getLocalPiece(String square){return game.getLocalPiece(square);}
     public int getTurnNumber(){return turnNum;}
     public ArrayList<String> getMoveListForLocalPiece(String square){return game.getMoveListForLocalPiece(square);}
-    public Boolean isPlayerTurn(){return (playerColor && game.getPlayerTurn()) || (!playerColor && !game.getPlayerTurn());}
     public Boolean getPlayerTurn(){return game.getPlayerTurn();}
     public Boolean getPlayerColor(){return playerColor;}
     public void printBoard(){game.printBoard();}
