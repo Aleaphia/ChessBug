@@ -60,8 +60,6 @@ public class GameController {
         //Check database
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (ActionEvent event) -> {
             //Add repeated database checks here ================================
-            System.out.println("model: " + model.getTurnNumber());
-            System.out.println("match: " + match.getMoveNumber());
             if(!isThisPlayersTurn()){ //While waiting for other player's move check database and update boardstate
                 match.poll(client).forEach((move) -> {
                     System.out.println(move);
