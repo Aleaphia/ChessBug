@@ -2,12 +2,13 @@
 package chessBug.home;
 
 import chessBug.network.*;
+import chessBug.game.*;
 import java.util.List;
 import javafx.scene.Node;
 
 
 
-public class HomeController {
+public class HomeController implements IGameSelectionController{
     //Database Connection
     private Client client;
     //MVC
@@ -23,6 +24,10 @@ public class HomeController {
     
     public Node getPage(){ return view.getPage();}
     public String getUserName(){return client.getOwnUser().getUsername();}
-    public List<Match> getOpenMatches(){return client.getMatches();} //TODO
+    public List<Match> getOpenMatchList(){return client.getOpenMatches();} //TODO
     public List<Friend> getFriends(){return client.getFriends();}
+    public boolean sendFriendRequest(String username){return client.sendFriendRequest(username);}
+    public void selectGame(Match match){
+        view.setPage(new GameController(client, match).getPage());
+    }
 }

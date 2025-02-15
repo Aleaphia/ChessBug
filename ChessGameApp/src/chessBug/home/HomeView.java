@@ -32,6 +32,7 @@ public class HomeView {
         page.setCenter(currGamesContent);
     }
     public BorderPane getPage(){return page;}
+    public void setPage(BorderPane page){this.page = page;}
     
     private VBox buildUserStats(){
         VBox userStatsSpace = new VBox(20); // Vertical layout with spacing between sections
@@ -55,7 +56,7 @@ public class HomeView {
         Label statsTitle = new Label("Recent Game Statistics");
         statsTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;");
         
-        Label gamesPlayed = new Label("Games Played: " + controller.getOpenMatches().size());
+        Label gamesPlayed = new Label("Games Played: " + controller.getOpenMatchList().size());
         gamesPlayed.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");  // Ensure the text is white
         Label wins = new Label("Wins: 10"); //TODO
         wins.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
@@ -130,13 +131,12 @@ public class HomeView {
     private void buildCurrGames(){
         currGamesContent = new VBox();
         
-        controller.getOpenMatches().forEach(match -> {
+        controller.getOpenMatchList().forEach(match -> {
             Label curr = new Label(match.toString());
             
             currGamesContent.getChildren().add(curr);
             
             curr.setOnMouseClicked(event ->{
-                //TODO
             });
         });
         

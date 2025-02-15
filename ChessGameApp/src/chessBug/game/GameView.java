@@ -37,7 +37,7 @@ public class GameView {
     }
 
     //Getter/Setter Methods
-    public Node getPage() {
+    public BorderPane getPage() {
         return page;
     }
 
@@ -260,7 +260,7 @@ public class GameView {
         promptSelectionPanel.getChildren().add(newGame);
 
         //List out games
-        controller.getMatchList().forEach(match -> {
+        controller.getOpenMatchList().forEach(match -> {
             Button currMatch = new Button(match.toString());
 
             currMatch.setOnMouseClicked(event -> {
@@ -269,7 +269,7 @@ public class GameView {
                 promptSelectionPanel.getChildren().clear();
                 promptSelectionPanel.getChildren().add(new Label("Loading..."));
                 //Update controller
-                controller.matchSelection(match);
+                controller.selectGame(match);
                 
             });
 

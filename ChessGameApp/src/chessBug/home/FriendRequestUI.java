@@ -39,14 +39,15 @@ public class FriendRequestUI {
         btnSearch.setOnAction(event -> sendFriendRequest(input.getText()));
     }
     private void sendFriendRequest(String friendUsername){
-        JSONObject out = new JSONObject();
-        out.put("user1", controller.getUserName());
-        out.put("user2", friendUsername);
+        if (!friendUsername.isEmpty()){
+            page.getChildren().clear();
         
-        //Output message
-        page.getChildren().clear();
-        page.getChildren().add(new Label("Request Sent"));
-        buildClosedRequestField();
+            boolean isRequestSent = controller.sendFriendRequest(friendUsername);
+            String msg = (isRequestSent)? "Request sent" : "Error: Request not sent";
+            page.getChildren().add(new Label(msg));
+
+            buildClosedRequestField();
+        }
     }
     
 }
