@@ -77,7 +77,7 @@ public class Client {
 		if(matchData.getBoolean("error"))
 			throw new NetworkException(matchData.opt("response").toString());
 
-		return new Match(matchData.getJSONObject("response").getInt("match"), matchData.getJSONObject("response").getInt("chat"), white, black);
+		return new Match(matchData.getJSONObject("response").getInt("match"), matchData.getJSONObject("response").getInt("chat"), white, black, Match.IN_PROGRESS);
 	}
 
 	// Update profile with server data
@@ -124,7 +124,7 @@ public class Client {
 
 		// Return none if error in response
 		if(matchesResponse.getBoolean("error")) {
-			System.err.println("Could not retrieve friends for \"" + profile.getUsername() + "\"");
+			System.err.println("Could not retrieve matches for \"" + profile.getUsername() + "\"");
 			System.err.println(matchesResponse.opt("response"));
 			return List.of();
 		}
@@ -133,9 +133,49 @@ public class Client {
 		for(int i = 0; i < matchesReceived.length(); i++) {
 			JSONObject o = matchesReceived.getJSONObject(i);
 			System.out.printf("Received match with data %d, %d, %d (%s), %d (%s)%n", o.getInt("MatchID"), o.getInt("Chat"), o.getInt("WhitePlayer"), o.getString("WhiteName"), o.getInt("BlackPlayer"), o.getString("BlackName"));
-			matches.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), new User(o.getInt("WhitePlayer"), o.getString("WhiteName")), new User(o.getInt("BlackPlayer"), o.getString("BlackName"))));
+			matches.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), new User(o.getInt("WhitePlayer"), o.getString("WhiteName")), new User(o.getInt("BlackPlayer"), o.getString("BlackName")), o.opt("Result") == null ? null : o.getString("Result")));
 		}
 		return matches;
+	}
+
+	public List<Match> getOpenMatches() {
+		ArrayList<Match> result = new ArrayList<>();
+		JSONObject received = post("getOpenMatches", new JSONObject());
+
+		// Return none if error in response
+		if(received.getBoolean("error")) {
+			System.err.println("Could not retrieve open matches for \"" + profile.getUsername() + "\"");
+			System.err.println(received.opt("response"));
+			return List.of();
+		}
+
+		JSONArray response = received.getJSONArray("response");
+		for(int i = 0; i < response.length(); i++) {
+			JSONObject o = response.getJSONObject(i);
+			System.out.printf("Received match with data %d, %d, %d (%s), %d (%s)%n", o.getInt("MatchID"), o.getInt("Chat"), o.getInt("WhitePlayer"), o.getString("WhiteName"), o.getInt("BlackPlayer"), o.getString("BlackName"));
+			result.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), new User(o.getInt("WhitePlayer"), o.getString("WhiteName")), new User(o.getInt("BlackPlayer"), o.getString("BlackName")), o.opt("Result") == null ? null : o.getString("Result")));
+		}
+		return result;
+	}
+
+	public List<Match> getClosedMatches() {
+		ArrayList<Match> result = new ArrayList<>();
+		JSONObject received = post("getOpenMatches", new JSONObject());
+
+		// Return none if error in response
+		if(received.getBoolean("error")) {
+			System.err.println("Could not retrieve open matches for \"" + profile.getUsername() + "\"");
+			System.err.println(received.opt("response"));
+			return List.of();
+		}
+
+		JSONArray response = received.getJSONArray("response");
+		for(int i = 0; i < response.length(); i++) {
+			JSONObject o = response.getJSONObject(i);
+			System.out.printf("Received match with data %d, %d, %d (%s), %d (%s)%n", o.getInt("MatchID"), o.getInt("Chat"), o.getInt("WhitePlayer"), o.getString("WhiteName"), o.getInt("BlackPlayer"), o.getString("BlackName"));
+			result.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), new User(o.getInt("WhitePlayer"), o.getString("WhiteName")), new User(o.getInt("BlackPlayer"), o.getString("BlackName")), o.opt("Result") == null ? null : o.getString("Result")));
+		}
+		return result;
 	}
 
 	public List<Friend> getFriends() {
@@ -156,6 +196,70 @@ public class Client {
 		}
 
 		return friends;
+	}
+
+	/* Returns true if successfully sent a friend request 
+	 * Prints error if received error
+	 * Prints nothing and returns false on no friend request for "normal" reasons (i.e. already friended or sent/received friend request)
+	 * TODO: Print more information regarding false returns
+	 */
+	public boolean sendFriendRequest(String username) {
+		JSONObject send = new JSONObject();
+		send.put("target", username);
+		JSONObject received = post("sendFriendRequest", send);
+
+		// Return none if error in response
+		if(received.getBoolean("error")) {
+			System.err.println("Could not send friend request from \"" + profile.getUsername() + "\" to \"" + username + "\"");
+			System.err.println(received.opt("response"));
+			return false;
+		}
+
+		return received.getBoolean("response");
+	}
+
+	public boolean sendFriendRequest(User user) { return sendFriendRequest(user.getUsername()); }
+
+	/* Returns true if successfully accepted a friend request 
+	 * Prints error if received error
+	 * Prints nothing and returns false on no friend request accepted for "normal" reasons (i.e. friend request doesn't exist or already friends with target)
+	 * TODO: Print more information regarding false returns
+	 */
+	public boolean acceptFriendRequest(String username) {
+		JSONObject send = new JSONObject();
+		send.put("target", username);
+		JSONObject received = post("acceptFriendRequest", send);
+
+		// Return none if error in response
+		if(received.getBoolean("error")) {
+			System.err.println("Could not accept friend request from \"" + username + "\" to \"" + profile.getUsername() + "\"");
+			System.err.println(received.opt("response"));
+			return false;
+		}
+
+		return received.getBoolean("response");
+	}
+
+	public boolean acceptFriendRequest(User user) { return acceptFriendRequest(user.getUsername()); }
+
+	public List<User> getFriendRequests() {
+		ArrayList<User> result = new ArrayList<>();
+		JSONObject received = post("getFriendRequests", new JSONObject());
+
+		// Return none if error in response
+		if(received.getBoolean("error")) {
+			System.err.println("Could not retrieve friend requests for \"" + profile.getUsername() + "\"");
+			System.err.println(received.opt("response"));
+			return List.of();
+		}
+
+		JSONArray response = received.getJSONArray("response");
+		for(int i = 0; i < response.length(); i++) {
+			JSONObject o = response.getJSONObject(i);
+			result.add(new User(o.getInt("UserID"), o.getString("Name")));
+		}
+
+		return result;
 	}
 
 	public JSONObject post(String function, JSONObject message) {
