@@ -19,6 +19,7 @@ Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (ActionEvent 
 import org.json.JSONObject;
 
 import chessBug.game.GameController;
+import chessBug.home.HomeController;
 import chessBug.network.Client;
 import chessBug.network.ClientAuthException;
 import chessBug.preferences.PreferencesController;
@@ -124,70 +125,11 @@ public class ChessBug extends Application {
         Button settingsButton = createSidebarButton("Settings", event -> changePage("Preferences"));
         Button profileButton = createSidebarButton("Profile", event -> changePage("User Profile"));
     
-//        // Create VBox for game button and dropdown menu
-//        VBox gameButtonContainer = new VBox();
-//        gameButtonContainer.setSpacing(0);  // Remove extra spacing
-//        gameButtonContainer.getChildren().addAll(gamesButton); // Add game button and menu
-    
         // Add items to the sidebar
         sidebar.getChildren().addAll(logo, homeButton, gamesButton, settingsButton, profileButton);
     
         return sidebar;
     }
-    
-//    private Button createGamesButton() {
-//        Button gamesButton = createSidebarButton("Game", event -> {});  // Empty event, we'll handle hover for dropdown visibility
-//    
-//        // Game submenu (Initially hidden)
-//        VBox gameMenu = createGameMenu();
-//        gameMenu.setVisible(false);  // Hide the menu initially
-//    
-//        // Make sure gameMenu is interactable by mouse
-//        gameMenu.setMouseTransparent(false);  // Allow interaction with the dropdown
-//    
-//        // Scale transition to expand the button on hover
-//        ScaleTransition scaleTransition = new ScaleTransition(Duration.millis(200), gamesButton);
-//        scaleTransition.setToX(1.2);  // Scale 1.2x horizontally (expand)
-//        scaleTransition.setToY(1.2);  // Scale 1.2x vertically (expand)
-//    
-//        gamesButton.setOnMouseEntered(e -> {
-//            gameMenu.setVisible(true);  // Show the dropdown when hovering over the "Game" button
-//            scaleTransition.play();  // Start the animation to expand the button
-//        });
-//    
-//        gamesButton.setOnMouseExited(e -> {
-//            scaleTransition.setToX(1);  // Reset the scale back to 1 (normal size)
-//            scaleTransition.setToY(1);  // Reset the scale back to 1 (normal size)
-//            scaleTransition.play();  // Start the animation to shrink the button back
-//            hideMenu(gameMenu);  // Hide the dropdown when the mouse exits
-//        });
-//    
-//        // Show game menu when hovering over the "Game" button
-//        gamesButton.setOnMouseEntered(e -> gameMenu.setVisible(true));
-//        gamesButton.setOnMouseExited(e -> hideMenu(gameMenu));  // Hide menu when mouse leaves
-//    
-//        // Keep the menu visible when hovering over the game menu itself
-//        gameMenu.setOnMouseEntered(e -> gameMenu.setVisible(true));
-//        gameMenu.setOnMouseExited(e -> hideMenu(gameMenu));  // Hide when leaving both button and menu
-//    
-//        return gamesButton; // Return just the game button
-//    }
-//    
-//    private VBox createGameMenu() {
-//        VBox gameMenu = new VBox(10);
-//        gameMenu.setStyle("-fx-background-color: #3a3f47; -fx-padding: 10px; -fx-border-radius: 5px;");
-//    
-//        Button newGameButton = createSidebarButton("New Game", event -> changePage("New Game"));
-//        Button loadGameButton = createSidebarButton("Load Game", event -> changePage("Load Game"));
-//        Button demoGameButton = createSidebarButton("Demo Game", event -> changePage("Demo Game"));
-//    
-//        gameMenu.getChildren().addAll(newGameButton, loadGameButton, demoGameButton);
-//    
-//        // Set consistent width for the dropdown menu (same as sidebar buttons)
-//        gameMenu.setMaxWidth(200);  // Ensure the width is the same as the other buttons
-//    
-//        return gameMenu;
-//    }
     
     private void hideMenu(VBox gameMenu) {
         // Hide the dropdown if the mouse is not hovering over the button or the menu
@@ -210,7 +152,7 @@ public class ChessBug extends Application {
     
         return button;
     }
-
+/*
     private VBox createHomePage() {
         VBox homePage = new VBox(20); // Vertical layout with spacing between sections
         homePage.setPadding(new Insets(20, 20, 20, 20));
@@ -278,46 +220,7 @@ public class ChessBug extends Application {
         
         return homePage;
     }
-    
-    private MenuBar createMenuBar() {
-        MenuBar menuBar = new MenuBar();
-        
-        // Main menu options
-        String[] menus = {"Home", "Games", "Settings", "Profile"};
-        String[][] menuOptions = {
-            {"Dash Board"}, // Home
-            {"New Game", "Load Game", "DemoGame"}, // Games
-            {"Preferences", "About"},  // Settings
-            {"User Profile"} // Profile
-        };
-        
-        for (int i = 0; i < menus.length; i++) {
-            Menu menu = new Menu(menus[i]);
-            menuBar.getMenus().add(menu);
-            
-            for (int j = 0; j < menuOptions[i].length; j++) {
-                MenuItem menuItem = new MenuItem(menuOptions[i][j]);
-                menu.getItems().add(menuItem);
-                menuItem.setOnAction(event -> changePage(menuItem.getText()));
-            }
-        }
-        return menuBar;
-    }
-    
-    private void fillMenuBar(MenuBar menuBar, String[] menus, String[][] menuOptions){
-        //Add each menu to the MenuBar
-        for (int i = 0; i < menus.length; i++){
-            Menu menu = new Menu(menus[i]); //Create menu
-            menuBar.getMenus().add(menu); //Add to container
-            
-            //Add each menu option to the menu
-            for (int j = 0; j < menuOptions[i].length; j++){
-                MenuItem menuItem = new MenuItem(menuOptions[i][j]); //Create menuItem
-                menu.getItems().add(menuItem); //Add to container
-                menu.setOnAction(event -> changePage(((MenuItem)event.getTarget()).getText()));
-            }            
-        }
-    }
+*/
     
     private void changePage(String newPage) {
         page.getChildren().clear(); // Clear the current page content
@@ -330,14 +233,11 @@ public class ChessBug extends Application {
             case "Preferences":
                 page.getChildren().add(new PreferencesController().getPage()); // Load Preferences Page
                 break;
-            case "About":
-                page.getChildren().add(new Label("ChessBug - About Page"));
-                break;
             case "User Profile":
                 page.getChildren().add(new ProfileController(client).getPage()); // Load User Profile Page
                 break;
             case "Dash Board!":  // Home page
-                page.getChildren().add(createHomePage());
+                page.getChildren().add(new HomeController(client).getPage());
                 break;   
             default:
                 page.getChildren().add(new Label("Welcome to ChessBug!"));

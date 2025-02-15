@@ -1,4 +1,4 @@
-package chessBug;
+package chessBug.home;
 
 import chessBug.network.*;
 
