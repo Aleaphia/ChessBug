@@ -17,28 +17,26 @@ public class HomeView {
 
     //Page state
     private BorderPane page = new BorderPane();
-    private VBox userStats;
-    private VBox currGames;
-    private VBox friends;
+    private VBox currGamesContent;
+    private VBox friendsListContent;
     
     protected HomeView(HomeController controller){
         this.controller = controller;
         
         buildUserStats();
-        buildFriends();
         buildCurrGames();
         
         //Place parts together
-        page.setLeft(userStats);
-        page.setRight(friends);
-        page.setCenter(currGames);
+        page.setLeft(buildUserStats());
+        page.setRight(buildFriends());
+        page.setCenter(currGamesContent);
     }
     public BorderPane getPage(){return page;}
     
-    private void buildUserStats(){
-        userStats = new VBox(20); // Vertical layout with spacing between sections
-        userStats.setPadding(new Insets(20, 20, 20, 20));
-        userStats.setStyle("-fx-background-color: #36393f; -fx-text-fill: white;");  // Set text color to white for the entire homePage
+    private VBox buildUserStats(){
+        VBox userStatsSpace = new VBox(20); // Vertical layout with spacing between sections
+        userStatsSpace.setPadding(new Insets(20, 20, 20, 20));
+        userStatsSpace.setStyle("-fx-background-color: #36393f; -fx-text-fill: white;");  // Set text color to white for the entire homePage
     
         // Welcome message
         Label welcomeMessage = new Label("Welcome to ChessBug!");
@@ -49,7 +47,7 @@ public class HomeView {
         userInfo.setStyle("-fx-font-size: 18px; -fx-text-fill: white;"); // Ensure text is white
     
         // Add a separator line
-        userStats.getChildren().addAll(welcomeMessage, userInfo, new Separator());
+        userStatsSpace.getChildren().addAll(welcomeMessage, userInfo, new Separator());
     
         // Recent game statistics
         VBox statsSection = new VBox(10);
@@ -65,7 +63,7 @@ public class HomeView {
         losses.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
         
         statsSection.getChildren().addAll(statsTitle, gamesPlayed, wins, losses);
-        userStats.getChildren().add(statsSection);
+        userStatsSpace.getChildren().add(statsSection);
         
         // Recent activity feed (activity log)
         VBox activityFeed = new VBox(10);
@@ -81,7 +79,7 @@ public class HomeView {
         activity3.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
         
         activityFeed.getChildren().addAll(activityFeedTitle, activity1, activity2, activity3);
-        userStats.getChildren().add(activityFeed);
+        userStatsSpace.getChildren().add(activityFeed);
         
         // Featured or Live Game section (Optional)
         VBox liveGameSection = new VBox(10);
@@ -95,38 +93,47 @@ public class HomeView {
         joinGameButton.setStyle("-fx-background-color: #4e8af3; -fx-text-fill: white;");
         
         liveGameSection.getChildren().addAll(liveGameTitle, liveGame, joinGameButton);
-        userStats.getChildren().add(liveGameSection);
+        userStatsSpace.getChildren().add(liveGameSection);
         
         // Add a final separator for design clarity
-        userStats.getChildren().add(new Separator());
+        userStatsSpace.getChildren().add(new Separator());
+        
+        return userStatsSpace;
     }
-    private void buildFriends(){
-        friends = new VBox();
-        //TODO add friend request section
-
+    private VBox buildFriends(){
+        VBox friendsSpace = new VBox();
+        
+        //Build content
+        //Header
+        Label header = new Label("Friends");
+        //Display friend info
+        friendsListContent = new VBox();
+        populateFriendsContent();
+        //Add new friend button
+        
+        friendsSpace.getChildren().addAll(header, friendsListContent, new FriendRequestUI(controller).getPage());
+        
+        
+        return friendsSpace;
+    }
+    private void populateFriendsContent(){
         controller.getFriends().forEach(friend -> {
             Label curr = new Label(friend.getUsername());
             
-            friends.getChildren().add(curr);
+            friendsListContent.getChildren().add(curr);
             
             curr.setOnMouseClicked(event ->{
                 //TODO
             });
         });
-        
-        Button newFriend = new Button("Add Friend");
-        newFriend.setOnAction(event ->{
-            //TODO
-        });
-        friends.getChildren().add(newFriend);
     }
     private void buildCurrGames(){
-        currGames = new VBox();
+        currGamesContent = new VBox();
         
         controller.getOpenMatches().forEach(match -> {
             Label curr = new Label(match.toString());
             
-            currGames.getChildren().add(curr);
+            currGamesContent.getChildren().add(curr);
             
             curr.setOnMouseClicked(event ->{
                 //TODO

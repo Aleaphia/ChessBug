@@ -13,11 +13,22 @@ import org.json.JSONObject;
 
 public class FriendRequestUI {
     private VBox page = new VBox();
-    Client client;
+    HomeController controller;
     
-    FriendRequestUI(Client client){
-        this.client = client;
+    FriendRequestUI(HomeController controller){
+        this.controller = controller;
         
+        buildClosedRequestField();
+    }
+    public VBox getPage(){return page;}
+    
+    private void buildClosedRequestField(){
+        Button newFriend = new Button("Add Friend");
+        newFriend.setOnAction(event -> buildFriendRequest());
+        page.getChildren().add(newFriend);
+    }
+    private void buildFriendRequest(){
+        page.getChildren().clear();
         //Create UI Layout
         TextField input = new TextField();
         Button btnSearch = new Button("Send");
@@ -27,11 +38,15 @@ public class FriendRequestUI {
         input.setOnAction(event -> sendFriendRequest(input.getText()));
         btnSearch.setOnAction(event -> sendFriendRequest(input.getText()));
     }
-    
     private void sendFriendRequest(String friendUsername){
         JSONObject out = new JSONObject();
-        out.put("user1", client.getOwnUser().getUsername());
+        out.put("user1", controller.getUserName());
         out.put("user2", friendUsername);
+        
+        //Output message
+        page.getChildren().clear();
+        page.getChildren().add(new Label("Request Sent"));
+        buildClosedRequestField();
     }
     
 }
