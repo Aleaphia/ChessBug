@@ -48,6 +48,7 @@ import javafx.util.Duration;
  */
 public class ChessBug extends Application {
     //Global variables
+    Scene mainScene;
     Pane page = new VBox(); // space to change with page details
     Client client;
     
@@ -96,7 +97,7 @@ public class ChessBug extends Application {
 
         //Scene and Stage ------------------------------------------------------
         primaryStage.setTitle("ChessBug"); //Name for application stage
-        Scene mainScene = new Scene(mainPane, 800, 600); //Add mainPane to the mainScene
+        mainScene = new Scene(mainPane, 800, 600); //Add mainPane to the mainScene
         primaryStage.setScene(mainScene);//Add mainScene to primaryStage
         
         //Style

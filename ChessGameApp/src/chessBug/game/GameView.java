@@ -24,9 +24,7 @@ public class GameView {
     //Page state
     private BorderPane page = new BorderPane();
     private GridPane gameBoard;
-    private ScrollPane chatScroll = new ScrollPane();
     private VBox chatContent;
-    private ScrollPane notationScroll = new ScrollPane();
     private GridPane notationContent;
 
     private String selectedSquare = null;
@@ -104,8 +102,7 @@ public class GameView {
         //Add each message to the chat
         controller.getChatMessages().forEach(x -> {
             String msg = x.getAuthor() + ": " + x.getContent();
-            VBox msgScreen = (VBox) chatContent.getChildren().get(0);
-            msgScreen.getChildren().add(new Label(msg));
+            chatContent.getChildren().add(new Label(msg));
         });
     }
 
@@ -342,16 +339,11 @@ public class GameView {
 
         //Create spaces
         createGameBoard(controller.getPlayerColor());
-        createChatSpace();
-        createNotationSpace();
-        chatScroll.setContent(chatContent);
-        notationScroll.setContent(notationContent);
         
         //Page layout
         page.setCenter(gameBoard);
-        page.setLeft(chatScroll);
-        page.setRight(notationScroll);
-        
+        page.setLeft(createChatSpace());
+        page.setRight(createNotationSpace());    
     }
 
     private void createGameBoard(boolean isWhitePerspective) {
@@ -408,23 +400,33 @@ public class GameView {
         //----------------------------------------------------------------------
     }
 
-    private void createChatSpace() {
+    private VBox createChatSpace() {
         //Create Chat space
-        chatContent = new VBox();
-        //MsgBoard components
-        VBox msgScreen = new VBox();
+        VBox chatSpace = new VBox();
+        chatContent = new VBox(); //global variable to allow direct and easy manipulation for new mgs
         TextField msgInput = new TextField();
-        chatContent.getChildren().addAll(msgScreen, msgInput);
-        //Style
-        chatContent.getStyleClass().add("chatBox");
+        
+        //Scroll pane containg chatContent
+        ScrollPane chatScroll = new ScrollPane(chatContent);
+        chatScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        chatScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
+        //chat space components
+        chatSpace.getChildren().addAll(chatScroll, msgInput);
+        
+        //Styles ---------------------------------------------------------------
+        chatContent.getStyleClass().add("chatBox");
+//        chatContent.setPrefHeight(2 * page.getHeight() -  msgInput.getHeight());
+
+        // ---------------------------------------------------------------------
+        //Function
         msgInput.setOnAction(event -> {
             //Formulate message
             String user = controller.getUserName();
             String msg = msgInput.getText();
 
             //Display msg on screen
-            msgScreen.getChildren().add(new Label(user + ": " + msg));
+            chatContent.getChildren().add(new Label(user + ": " + msg));
 
             //Send msg to database
             controller.sendChatMessage(msg);
@@ -433,16 +435,37 @@ public class GameView {
             msgInput.setText("");
         });
 
-        chatContent.setMinHeight(100);
+        chatScroll.setPrefHeight(gameBoard.getHeight());
+        chatScroll.setMinHeight(100);
         chatContent.setAlignment(Pos.BOTTOM_CENTER);
+        
+        return chatSpace;
     }
 
-    private void createNotationSpace() {
+    private VBox createNotationSpace() {
         //Create notation space
-        notationContent = new GridPane();
-        //gameBoard.add(square, (isWhitePerspective) ? col + 1 : 8 - col, (isWhitePerspective) ? 7 - row : row);
-        notationContent.add(new Label("White"), 1, 0);
-        notationContent.add(new Label("Black"), 2, 0);
+        VBox notationSpace = new VBox();
+        GridPane notationLabel = new GridPane();
+        notationContent = new GridPane(); //global variable to allow direct and easy manipulation
+        
+        //Scroll pane containg notation 
+        ScrollPane notationScroll = new ScrollPane(notationContent);
+        notationScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+        notationScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        notationScroll.setPrefHeight(gameBoard.getHeight());
+        
+        
+        //notation space components
+        notationSpace.getChildren().addAll(notationLabel, notationScroll);
+        
+        //Create notation space
+        notationLabel.add(new Label("White"), 1, 0);
+        notationLabel.add(new Label("Black"), 2, 0);
+        //Hold space 
+        Label newLabel = new Label();
+        newLabel.setMinWidth(25);
+        notationLabel.add(newLabel,0,0);
 
+        return notationSpace;
     }
 }
