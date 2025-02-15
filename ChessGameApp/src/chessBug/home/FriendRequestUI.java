@@ -30,6 +30,8 @@ public class FriendRequestUI {
     
     private void sendFriendRequest(String friendUsername){
         JSONObject out = new JSONObject();
+        out.put("user1", client.getOwnUser().getUsername());
+        out.put("user2", friendUsername);
     }
     
 }

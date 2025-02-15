@@ -4,7 +4,7 @@
 }
 
 
-/*Chess board styles*/
+/*Chess board styles =======================================================*/
 .label{
     -fx-text-alignment: center;
     -fx-label-padding: 5;
@@ -16,20 +16,11 @@
     -fx-padding: 20;
     /*Child-Alignment*/
     -fx-alignment: center;
-    
 }
+
 /*Square coloration*/
 .black { -fx-background-color: rgb(123, 147, 107);}
 .white{ -fx-background-color: rgb(223, 208, 174);}
-
-/*Message board styles*/
-.messageBoard{
-    -fx-font: 20px Tahoma;
-    -fx-padding: 20;
-}
-.radio-button{
-    -fx-padding: 3;
-}
 
 /*Classes to modify squares as user interacts*/
 .selected, .possibleMove{
@@ -45,6 +36,8 @@
     -fx-font: 15px Tahoma;
     -fx-padding: 20;
 }
+/*End chess board styles ===================================================*/
+
 /* Button Styles for Settings and Profile Actions */
 .button {
     -fx-font-size: 14px;

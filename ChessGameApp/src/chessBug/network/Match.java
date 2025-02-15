@@ -128,9 +128,14 @@ public class Match {
 	public User getBlack() {
 		return black;
 	}
+        
+        public int getMoveNumber(){
+            return movesNumber;
+        }
 
 	public void makeMove(Client from, String move) {
                 movesNumber++; //Iterate move count
+                moves.add(move); //Add new move to the list
 		JSONObject message = new JSONObject();
 		message.put("match", matchID);
 		message.put("move", move);
