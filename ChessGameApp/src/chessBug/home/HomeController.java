@@ -23,6 +23,6 @@ public class HomeController {
     
     public Node getPage(){ return view.getPage();}
     public String getUserName(){return client.getOwnUser().getUsername();}
-    public List<Match> getMatchList(){return client.getMatches();}
+    public List<Match> getOpenMatches(){return client.getMatches();} //TODO
     public List<Friend> getFriends(){return client.getFriends();}
 }

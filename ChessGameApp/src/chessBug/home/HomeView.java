@@ -57,7 +57,7 @@ public class HomeView {
         Label statsTitle = new Label("Recent Game Statistics");
         statsTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;");
         
-        Label gamesPlayed = new Label("Games Played: " + controller.getMatchList().size());
+        Label gamesPlayed = new Label("Games Played: " + controller.getOpenMatches().size());
         gamesPlayed.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");  // Ensure the text is white
         Label wins = new Label("Wins: 10"); //TODO
         wins.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
@@ -102,6 +102,8 @@ public class HomeView {
     }
     private void buildFriends(){
         friends = new VBox();
+        //TODO add friend request section
+
         controller.getFriends().forEach(friend -> {
             Label curr = new Label(friend.getUsername());
             
@@ -111,11 +113,17 @@ public class HomeView {
                 //TODO
             });
         });
+        
+        Button newFriend = new Button("Add Friend");
+        newFriend.setOnAction(event ->{
+            //TODO
+        });
+        friends.getChildren().add(newFriend);
     }
     private void buildCurrGames(){
         currGames = new VBox();
         
-        controller.getMatchList().forEach(match -> {
+        controller.getOpenMatches().forEach(match -> {
             Label curr = new Label(match.toString());
             
             currGames.getChildren().add(curr);
