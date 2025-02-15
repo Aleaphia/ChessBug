@@ -17,24 +17,28 @@ public class HomeView {
 
     //Page state
     private BorderPane page = new BorderPane();
-    private VBox homePage;
+    private VBox userStats;
     private VBox currGames;
     private VBox friends;
     
     protected HomeView(HomeController controller){
         this.controller = controller;
         
-        buildHomePage();
+        buildUserStats();
+        buildFriends();
+        buildCurrGames();
         
         //Place parts together
-        page.setLeft(homePage);
+        page.setLeft(userStats);
+        page.setRight(friends);
+        page.setCenter(currGames);
     }
     public BorderPane getPage(){return page;}
     
-    private void buildHomePage(){
-        homePage = new VBox(20); // Vertical layout with spacing between sections
-        homePage.setPadding(new Insets(20, 20, 20, 20));
-        homePage.setStyle("-fx-background-color: #36393f; -fx-text-fill: white;");  // Set text color to white for the entire homePage
+    private void buildUserStats(){
+        userStats = new VBox(20); // Vertical layout with spacing between sections
+        userStats.setPadding(new Insets(20, 20, 20, 20));
+        userStats.setStyle("-fx-background-color: #36393f; -fx-text-fill: white;");  // Set text color to white for the entire homePage
     
         // Welcome message
         Label welcomeMessage = new Label("Welcome to ChessBug!");
@@ -45,7 +49,7 @@ public class HomeView {
         userInfo.setStyle("-fx-font-size: 18px; -fx-text-fill: white;"); // Ensure text is white
     
         // Add a separator line
-        homePage.getChildren().addAll(welcomeMessage, userInfo, new Separator());
+        userStats.getChildren().addAll(welcomeMessage, userInfo, new Separator());
     
         // Recent game statistics
         VBox statsSection = new VBox(10);
@@ -61,7 +65,7 @@ public class HomeView {
         losses.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
         
         statsSection.getChildren().addAll(statsTitle, gamesPlayed, wins, losses);
-        homePage.getChildren().add(statsSection);
+        userStats.getChildren().add(statsSection);
         
         // Recent activity feed (activity log)
         VBox activityFeed = new VBox(10);
@@ -77,7 +81,7 @@ public class HomeView {
         activity3.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
         
         activityFeed.getChildren().addAll(activityFeedTitle, activity1, activity2, activity3);
-        homePage.getChildren().add(activityFeed);
+        userStats.getChildren().add(activityFeed);
         
         // Featured or Live Game section (Optional)
         VBox liveGameSection = new VBox(10);
@@ -91,10 +95,35 @@ public class HomeView {
         joinGameButton.setStyle("-fx-background-color: #4e8af3; -fx-text-fill: white;");
         
         liveGameSection.getChildren().addAll(liveGameTitle, liveGame, joinGameButton);
-        homePage.getChildren().add(liveGameSection);
+        userStats.getChildren().add(liveGameSection);
         
         // Add a final separator for design clarity
-        homePage.getChildren().add(new Separator());
+        userStats.getChildren().add(new Separator());
     }
-    
+    private void buildFriends(){
+        friends = new VBox();
+        controller.getFriends().forEach(friend -> {
+            Label curr = new Label(friend.getUsername());
+            
+            friends.getChildren().add(curr);
+            
+            curr.setOnMouseClicked(event ->{
+                //TODO
+            });
+        });
+    }
+    private void buildCurrGames(){
+        currGames = new VBox();
+        
+        controller.getMatchList().forEach(match -> {
+            Label curr = new Label(match.toString());
+            
+            currGames.getChildren().add(curr);
+            
+            curr.setOnMouseClicked(event ->{
+                //TODO
+            });
+        });
+        
+    }
 }
