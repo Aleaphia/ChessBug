@@ -309,8 +309,8 @@ public class Client {
 		} catch (IOException ioex2) {
 			System.err.println("Could not read server response!");
 			JSONObject out = new JSONObject();
-			out.put("response", "Error: Could not read server response!");
-			out.put("error", true);
+			out.put("response", "Unable to reach or communicate with the server!");
+			out.put("error", true);	
 			ioex2.printStackTrace();
 			return out;
 		}
