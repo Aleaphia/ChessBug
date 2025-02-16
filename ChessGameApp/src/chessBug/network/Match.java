@@ -82,7 +82,7 @@ public class Match {
 		return out;
 	}
 
-	public void setResult(Client client, String result) {
+	public void updateResultOnDatabase(Client client, String result) {
 		JSONObject sendData = new JSONObject();
 		this.result = result;
 		sendData.put("match", matchID);
@@ -95,7 +95,7 @@ public class Match {
 		}
 	}
 
-	public String getResult(Client client) {
+	public String getResultFromDatabase(Client client) {
 		JSONObject sendData = new JSONObject();
 		sendData.put("match", matchID);
 
@@ -111,6 +111,10 @@ public class Match {
 
 		this.result = response.getString("response");
 		return response.getString("response");
+	}
+
+	public String getResult() {
+		return result;
 	}
 
 	public ArrayList<String> getAllMoves() {
