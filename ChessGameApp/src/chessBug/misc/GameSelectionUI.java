@@ -20,6 +20,7 @@ public class GameSelectionUI {
     private void buildGameSelectionPrompt() {
         //Clear page
         page.getChildren().clear();
+        page.getChildren().add(new Label("Games"));
         
         //List out games
         controller.getOpenMatchList().forEach(match -> {

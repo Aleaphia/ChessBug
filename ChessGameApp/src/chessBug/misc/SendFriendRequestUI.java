@@ -1,22 +1,18 @@
 package chessBug.misc;
 
-import chessBug.home.HomeController;
-import chessBug.network.*;
-
 import javafx.scene.layout.VBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import org.json.JSONObject;
 
 
 
 
-public class FriendRequestUI {
+public class SendFriendRequestUI {
     private VBox page = new VBox();
     IFriendRequestController controller;
     
-    public FriendRequestUI(IFriendRequestController controller){
+    public SendFriendRequestUI(IFriendRequestController controller){
         this.controller = controller;
         
         buildClosedRequestField();

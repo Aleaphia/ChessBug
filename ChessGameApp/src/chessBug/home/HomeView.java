@@ -4,7 +4,9 @@
  */
 package chessBug.home;
 
-import chessBug.misc.FriendRequestUI;
+import chessBug.misc.*;
+import chessBug.network.User;
+import java.util.List;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -18,19 +20,19 @@ public class HomeView {
 
     //Page state
     private BorderPane page = new BorderPane();
-    private VBox currGamesContent;
+    private VBox currentContent;
     private VBox friendsListContent;
     
     protected HomeView(HomeController controller){
         this.controller = controller;
         
         buildUserStats();
-        buildCurrGames();
+        buildCurrentContent();
         
         //Place parts together
         page.setLeft(buildUserStats());
         page.setRight(buildFriends());
-        page.setCenter(currGamesContent);
+        page.setCenter(currentContent);
     }
     public BorderPane getPage(){return page;}
     public void setPage(BorderPane page){this.page = page;}
@@ -113,7 +115,7 @@ public class HomeView {
         populateFriendsContent();
         //Add new friend button
         
-        friendsSpace.getChildren().addAll(header, friendsListContent, new FriendRequestUI(controller).getPage());
+        friendsSpace.getChildren().addAll(header, friendsListContent, new SendFriendRequestUI(controller).getPage());
         
         
         return friendsSpace;
@@ -129,17 +131,12 @@ public class HomeView {
             });
         });
     }
-    private void buildCurrGames(){
-        currGamesContent = new VBox();
+    private void buildCurrentContent(){
+        currentContent = new VBox();
         
-        controller.getOpenMatchList().forEach(match -> {
-            Label curr = new Label(match.toString());
-            
-            currGamesContent.getChildren().add(curr);
-            
-            curr.setOnMouseClicked(event ->{
-            });
-        });
-        
+        currentContent.getChildren().addAll(
+                new ReceiveFriendRequestUI(controller).getPage(),
+                new GameSelectionUI(controller).getPage()
+        );
     }
 }
