@@ -11,7 +11,7 @@ public class Match {
 	public static final String WHITE_WIN = "WhiteWin";
 	public static final String BLACK_WIN = "WhiteWin";
 	public static final String DRAW = "Draw";
-	public static final String IN_PROGRESS = null;
+	public static final String IN_PROGRESS = "InProgress";
 
 	private int matchID;
 	private Chat chat;

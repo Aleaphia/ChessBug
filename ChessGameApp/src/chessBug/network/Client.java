@@ -133,7 +133,7 @@ public class Client {
 		for(int i = 0; i < matchesReceived.length(); i++) {
 			JSONObject o = matchesReceived.getJSONObject(i);
 			System.out.printf("Received match with data %d, %d, %d (%s), %d (%s)%n", o.getInt("MatchID"), o.getInt("Chat"), o.getInt("WhitePlayer"), o.getString("WhiteName"), o.getInt("BlackPlayer"), o.getString("BlackName"));
-			matches.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), new User(o.getInt("WhitePlayer"), o.getString("WhiteName")), new User(o.getInt("BlackPlayer"), o.getString("BlackName")), o.opt("Result") == null ? null : o.getString("Result")));
+			matches.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), new User(o.getInt("WhitePlayer"), o.getString("WhiteName")), new User(o.getInt("BlackPlayer"), o.getString("BlackName")), o.getString("Result")));
 		}
 		return matches;
 	}
@@ -153,7 +153,7 @@ public class Client {
 		for(int i = 0; i < response.length(); i++) {
 			JSONObject o = response.getJSONObject(i);
 			System.out.printf("Received match with data %d, %d, %d (%s), %d (%s)%n", o.getInt("MatchID"), o.getInt("Chat"), o.getInt("WhitePlayer"), o.getString("WhiteName"), o.getInt("BlackPlayer"), o.getString("BlackName"));
-			result.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), new User(o.getInt("WhitePlayer"), o.getString("WhiteName")), new User(o.getInt("BlackPlayer"), o.getString("BlackName")), o.opt("Result") == null ? null : o.getString("Result")));
+			result.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), new User(o.getInt("WhitePlayer"), o.getString("WhiteName")), new User(o.getInt("BlackPlayer"), o.getString("BlackName")), o.getString("Result")));
 		}
 		return result;
 	}
@@ -173,7 +173,7 @@ public class Client {
 		for(int i = 0; i < response.length(); i++) {
 			JSONObject o = response.getJSONObject(i);
 			System.out.printf("Received match with data %d, %d, %d (%s), %d (%s)%n", o.getInt("MatchID"), o.getInt("Chat"), o.getInt("WhitePlayer"), o.getString("WhiteName"), o.getInt("BlackPlayer"), o.getString("BlackName"));
-			result.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), new User(o.getInt("WhitePlayer"), o.getString("WhiteName")), new User(o.getInt("BlackPlayer"), o.getString("BlackName")), o.opt("Result") == null ? null : o.getString("Result")));
+			result.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), new User(o.getInt("WhitePlayer"), o.getString("WhiteName")), new User(o.getInt("BlackPlayer"), o.getString("BlackName")), o.getString("Result")));
 		}
 		return result;
 	}
