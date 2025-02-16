@@ -74,6 +74,8 @@ public class Chat {
 	}
 
 	public void send(Client from, String content) {
+                messageNumber++;
+                messages.add(new Message(content));
 		JSONObject message = new JSONObject();
 		message.put("chat", chatID);
 		message.put("content", content);

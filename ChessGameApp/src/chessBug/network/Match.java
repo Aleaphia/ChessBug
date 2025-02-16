@@ -11,7 +11,7 @@ public class Match {
 	public static final String WHITE_WIN = "WhiteWin";
 	public static final String BLACK_WIN = "WhiteWin";
 	public static final String DRAW = "Draw";
-	public static final String IN_PROGRESS = null;
+	public static final String IN_PROGRESS = "InProgress";
 
 	private int matchID;
 	private Chat chat;
@@ -20,16 +20,20 @@ public class Match {
 
 	private int movesNumber = 0;
 
+	private String result = IN_PROGRESS;
+
 	private ArrayList<String> moves;
 
-	public Match(int matchID, int chatID, User white, User black) {
+	public Match(int matchID, int chatID, User white, User black, String result) {
 		this.matchID = matchID;
 		moves = new ArrayList<>();
 		this.chat = new Chat(chatID);
 		this.white = white;
 		this.black = black;
+		this.result = result;
 	}
 
+	//Load moves
 	public Stream<String> poll(Client client) {
 		// Ask the server how many moves exist in the current match
 		JSONObject numMovesPoll = new JSONObject();
@@ -80,6 +84,7 @@ public class Match {
 
 	public void setResult(Client client, String result) {
 		JSONObject sendData = new JSONObject();
+		this.result = result;
 		sendData.put("match", matchID);
 		sendData.put("result", result);
 		
@@ -104,6 +109,7 @@ public class Match {
 		if(response.opt("response")==null)
 			return null;
 
+		this.result = response.getString("response");
 		return response.getString("response");
 	}
 
@@ -126,9 +132,14 @@ public class Match {
 	public User getBlack() {
 		return black;
 	}
+        
+        public int getMoveNumber(){
+            return movesNumber;
+        }
 
 	public void makeMove(Client from, String move) {
                 movesNumber++; //Iterate move count
+                moves.add(move); //Add new move to the list
 		JSONObject message = new JSONObject();
 		message.put("match", matchID);
 		message.put("move", move);
