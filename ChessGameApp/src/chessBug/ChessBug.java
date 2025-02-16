@@ -50,16 +50,19 @@ public class ChessBug extends Application {
     //Global variables
     Scene mainScene;
     Pane page = new VBox(); // space to change with page details
+    HBox mainPane;
     Client client;
+
+    LoginUI loginUI;
     
     @Override
     public void start(Stage primaryStage) {
     //Create stage layout ======================================================
         //Main pane
-        HBox mainPane = new HBox();
+        mainPane = new HBox();
         mainPane.getStyleClass().add("background");
 
-        LoginUI loginUI = new LoginUI(
+        loginUI = new LoginUI(
             (String username, String password) -> { // Handle login
                 JSONObject out = new JSONObject();
                 try {
@@ -125,9 +128,10 @@ public class ChessBug extends Application {
         Button gamesButton = createSidebarButton("Games", event -> changePage("Games"));
         Button settingsButton = createSidebarButton("Settings", event -> changePage("Preferences"));
         Button profileButton = createSidebarButton("Profile", event -> changePage("User Profile"));
+        Button logoutButton = createSidebarButton("Log Out", event -> changePage("Log Out"));
     
         // Add items to the sidebar
-        sidebar.getChildren().addAll(logo, homeButton, gamesButton, settingsButton, profileButton);
+        sidebar.getChildren().addAll(logo, homeButton, gamesButton, settingsButton, profileButton, logoutButton);
     
         return sidebar;
     }
@@ -239,7 +243,11 @@ public class ChessBug extends Application {
                 break;
             case "Dash Board!":  // Home page
                 page.getChildren().add(new HomeController(client).getPage());
-                break;   
+                break;
+            case "Log Out":
+                mainPane.getChildren().clear();
+                mainPane.getChildren().add(loginUI.getPage());
+                break;
             default:
                 page.getChildren().add(new Label("Welcome to ChessBug!"));
         }
