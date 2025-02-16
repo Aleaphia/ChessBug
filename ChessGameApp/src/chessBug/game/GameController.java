@@ -5,20 +5,21 @@
  */
 package chessBug.game;
 
+import chessBug.misc.IGameSelectionController;
 import chessGame.*;
 import chessBug.network.*;
 import java.util.*;
 import java.util.stream.Stream;
 import java.util.concurrent.CompletableFuture;
 
-import javafx.scene.Node;
 import javafx.event.ActionEvent;
 import javafx.util.Duration;
 
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
+import javafx.scene.layout.BorderPane;
 
-public class GameController {
+public class GameController implements IGameSelectionController{
     //Database Connection
     private Client client;
     private Match match = null;
@@ -37,6 +38,10 @@ public class GameController {
         //Create view
         view = new GameView(this);
     }
+    public GameController(Client player, Match match){
+        this(player);
+        internalSelectGame(match);
+    }
     
     //Getter/Setter Methods
     public Stream<Message> getChatMessages(){return chat.poll(client);}
@@ -44,10 +49,10 @@ public class GameController {
     public List<Friend> getFriendList(){return client.getFriends();}
     public Boolean getGameComplete(){return model.getGameComplete();}
     public Piece getLocalPiece(String square){return model.getLocalPiece(square);}
-    public List<Match> getMatchList(){return client.getMatches();}
+    @Override public List<Match> getOpenMatchList(){return client.getOpenMatches();}
     public Stream<String> getMatchMoves(){return match.poll(client);}
     public ArrayList<String> getMoveListForLocalPiece(String square){return model.getMoveListForLocalPiece(square);}
-    public Node getPage(){return view.getPage();}
+    public BorderPane getPage(){return view.getPage();}
     public Boolean getPlayerTurn(){return model.getPlayerTurn();}
     public Boolean getPlayerColor(){return model.getPlayerColor();}
     public Boolean isThisPlayersTurn(){return (model.getPlayerTurn() && model.getPlayerColor()) ||
@@ -101,7 +106,10 @@ public class GameController {
         return false;
     }
     
-    public void matchSelection(Match newMatch){
+    @Override public void selectGame(Match newMatch){
+        internalSelectGame(newMatch);
+    }
+    private void internalSelectGame(Match newMatch){
         //Cache match and chat
         match = newMatch;
         chat = match.getChat();
