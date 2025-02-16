@@ -87,16 +87,19 @@ public class GameController implements IGameSelectionController{
     public void playerMove(String notation){
         if (internalPlayerMove(notation)){
             match.makeMove(client, notation);
+            view.deselectSquare();
             view.refresh();
+            if (model.getGameComplete()){
+                view.displayMessage(model.getEndMessage());
+            }
         }
     }
     
     private boolean internalPlayerMove(String notation){
         //Attempt to make player move, will return true on success
         if (model.makePlayerMove(notation)){
-            //Update the display
+            //Add notation
             view.addToNotationBoard(notation, !model.getPlayerTurn(), model.getTurnNumber());
-            view.deselectSquare();
             return true;
         }
         else { //If the game move is Illegal, output error message
@@ -122,9 +125,7 @@ public class GameController implements IGameSelectionController{
         view.buildGamePage();
         
         //Update chat/match status
-        match.poll(client).forEach((move) -> {
-            internalPlayerMove(move);
-                });
+        match.poll(client).forEach((move) -> internalPlayerMove(move));
         view.refresh();
         
         //Check database

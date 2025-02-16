@@ -35,6 +35,7 @@ public class GameModel {
     public Boolean getPlayerTurn(){return game.getPlayerTurn();}
     public Boolean getPlayerColor(){return playerColor;}
     public void printBoard(){game.printBoard();}
+    public String getEndMessage(){return game.checkEnd();}
    
     //Other Methods
     /**MakePlayerMove  - updates chess game and model information in response to a move

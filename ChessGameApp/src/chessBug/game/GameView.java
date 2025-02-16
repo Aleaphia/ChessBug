@@ -41,6 +41,11 @@ public class GameView {
     public BorderPane getPage() {
         return page;
     }
+    public void displayMessage(String msg){
+        Label curr = new Label(msg);
+        curr.getStyleClass().add("botMsg");
+        chatContent.getChildren().add(curr);
+    }
 
     public void deselectSquare() {
         selectedSquare = null;
@@ -49,11 +54,11 @@ public class GameView {
     //Refresher methods
     public void refresh() {
         refreshGameDisplay();
-        refreshMsgBoard();
+        internalRefreshMessageBoard();
     }
 
     public void refreshMessageBoard() {
-        refreshMsgBoard();
+        internalRefreshMessageBoard();
     }
 
     private void refreshGameDisplay() {
@@ -98,7 +103,7 @@ public class GameView {
 
     }
 
-    private void refreshMsgBoard() {
+    private void internalRefreshMessageBoard() {
         //Get any new messages
         //Add each message to the chat
         controller.getChatMessages().forEach(x -> {
