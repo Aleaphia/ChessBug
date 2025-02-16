@@ -413,7 +413,7 @@ public class ChessGame implements Serializable{
                     + " wins!");
             }
             else{// Player is not in check -> stalemate
-                drawType = "stalemate";
+                drawType = "Stalemate";
             }
         }
         //Other draw conditions
