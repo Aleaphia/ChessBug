@@ -178,6 +178,76 @@ public class Client {
 		return result;
 	}
 
+	public List<Match> getMatchRequests() {
+		ArrayList<Match> result = new ArrayList<>();
+		JSONObject received = post("getMatchRequests", new JSONObject());
+
+		// Return none if error in response
+		if(received.getBoolean("error")) {
+			System.err.println("Could not retrieve match requests for \"" + profile.getUsername() + "\"");
+			System.err.println(received.opt("response"));
+			return List.of();
+		}
+
+		JSONArray response = received.getJSONArray("response");
+		for(int i = 0; i < response.length(); i++) {
+			JSONObject o = response.getJSONObject(i);
+			result.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), new User(o.getInt("WhitePlayer"), o.getString("WhiteName")), new User(o.getInt("BlackPlayer"), o.getString("BlackName")), o.getString("Status")));
+		}
+		return result;
+	}
+
+	/* Returns true if successfully sent a match request 
+	 * Prints error if received error
+	 */
+	public boolean sendMatchRequest(String username, boolean playingAsWhite) {
+		JSONObject send = new JSONObject();
+		send.put("target", username);
+		send.put("request", playingAsWhite ? Match.WHITE_REQUESTED : Match.BLACK_REQUESTED);
+		JSONObject received = post("sendMatchRequest", send);
+
+		// Return none if error in response
+		if(received.getBoolean("error")) {
+			System.err.println("Could not send match request from \"" + profile.getUsername() + "\" to \"" + username + "\"");
+			System.err.println(received.opt("response"));
+			return false;
+		}
+
+		return received.getBoolean("response");
+	}
+
+	public boolean acceptMatchRequest(Match match) {
+		JSONObject send = new JSONObject();
+		send.put("match", match.getID());
+		JSONObject received = post("acceptMatchRequest", send);
+
+		// Return none if error in response
+		if(received.getBoolean("error")) {
+			System.err.println("Could not accept match request for #" + match.getID() + " to \"" + profile.getUsername() + "\"");
+			System.err.println(received.opt("response"));
+			return false;
+		}
+
+		return received.getBoolean("response");
+	}
+
+	public boolean denyMatchRequest(Match match) {
+		JSONObject send = new JSONObject();
+		send.put("match", match.getID());
+		JSONObject received = post("denyMatchRequest", send);
+
+		// Return none if error in response
+		if(received.getBoolean("error")) {
+			System.err.println("Could not accept match request for #" + match.getID() + " to \"" + profile.getUsername() + "\"");
+			System.err.println(received.opt("response"));
+			return false;
+		}
+
+		return received.getBoolean("response");
+	}
+
+	public boolean sendMatchRequest(User user, boolean playingAsWhite) { return sendMatchRequest(user.getUsername(), playingAsWhite); }
+
 	public List<Friend> getFriends() {
 		ArrayList<Friend> friends = new ArrayList<>();
 		JSONObject friendsResponse = post("getFriends", new JSONObject());
