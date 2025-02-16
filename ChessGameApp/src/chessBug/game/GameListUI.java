@@ -7,6 +7,15 @@ import javafx.scene.layout.VBox;
 public class GameListUI {
     VBox page = new VBox();
     IGameSelectionController controller;
+    
+    GameListUI(IGameSelectionController controller){
+        this.controller = controller;
+        
+        buildGameSelectionPrompt();
+    }
+    
+    public VBox getPage(){return page;}
+    
     private void buildGameSelectionPrompt() {
         //Clear page
         page.getChildren().clear();
@@ -28,6 +37,7 @@ public class GameListUI {
                 page.getChildren().clear();
                 page.getChildren().add(new Label("Loading..."));
                 //Update controller
+                controller.selectGame(match);
                 
             });
 

@@ -24,10 +24,10 @@ public class HomeController implements IGameSelectionController{
     
     public Node getPage(){ return view.getPage();}
     public String getUserName(){return client.getOwnUser().getUsername();}
-    public List<Match> getOpenMatchList(){return client.getOpenMatches();} //TODO
+    @Override public List<Match> getOpenMatchList(){return client.getOpenMatches();} //TODO
     public List<Friend> getFriends(){return client.getFriends();}
     public boolean sendFriendRequest(String username){return client.sendFriendRequest(username);}
-    public void selectGame(Match match){
+    @Override public void selectGame(Match match){
         view.setPage(new GameController(client, match).getPage());
     }
 }

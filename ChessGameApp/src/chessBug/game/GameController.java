@@ -39,7 +39,7 @@ public class GameController implements IGameSelectionController{
     }
     public GameController(Client player, Match match){
         this(player);
-        selectGame(match);
+        internalSelectGame(match);
     }
     
     //Getter/Setter Methods
@@ -48,7 +48,7 @@ public class GameController implements IGameSelectionController{
     public List<Friend> getFriendList(){return client.getFriends();}
     public Boolean getGameComplete(){return model.getGameComplete();}
     public Piece getLocalPiece(String square){return model.getLocalPiece(square);}
-    public List<Match> getOpenMatchList(){return client.getOpenMatches();}
+    @Override public List<Match> getOpenMatchList(){return client.getOpenMatches();}
     public Stream<String> getMatchMoves(){return match.poll(client);}
     public ArrayList<String> getMoveListForLocalPiece(String square){return model.getMoveListForLocalPiece(square);}
     public BorderPane getPage(){return view.getPage();}
@@ -105,7 +105,10 @@ public class GameController implements IGameSelectionController{
         return false;
     }
     
-    public void selectGame(Match newMatch){
+    @Override public void selectGame(Match newMatch){
+        internalSelectGame(newMatch);
+    }
+    private void internalSelectGame(Match newMatch){
         //Cache match and chat
         match = newMatch;
         chat = match.getChat();

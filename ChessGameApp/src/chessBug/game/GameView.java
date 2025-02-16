@@ -257,24 +257,7 @@ public class GameView {
         newGame.setOnMouseClicked(event -> {
             buildGameBuildPrompt();
         });
-        promptSelectionPanel.getChildren().add(newGame);
-
-        //List out games
-        controller.getOpenMatchList().forEach(match -> {
-            Button currMatch = new Button(match.toString());
-
-            currMatch.setOnMouseClicked(event -> {
-                //Create loading screen
-                //TODO
-                promptSelectionPanel.getChildren().clear();
-                promptSelectionPanel.getChildren().add(new Label("Loading..."));
-                //Update controller
-                controller.selectGame(match);
-                
-            });
-
-            promptSelectionPanel.getChildren().add(currMatch);
-        });
+        promptSelectionPanel.getChildren().addAll(newGame, new GameListUI(controller).getPage());
     }
 
     private void buildGameBuildPrompt() {
