@@ -7,11 +7,13 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class Match {
-	// Although not very distinct, gives definitive list of possible results
+	// Although not very distinct, gives definitive list of possible statuses
 	public static final String WHITE_WIN = "WhiteWin";
 	public static final String BLACK_WIN = "WhiteWin";
 	public static final String DRAW = "Draw";
 	public static final String IN_PROGRESS = "InProgress";
+	public static final String WHITE_REQUESTED = "WhiteRequested";
+	public static final String BLACK_REQUESTED = "BlackRequested";
 
 	private int matchID;
 	private Chat chat;
@@ -20,17 +22,17 @@ public class Match {
 
 	private int movesNumber = 0;
 
-	private String result = IN_PROGRESS;
+	private String status = IN_PROGRESS;
 
 	private ArrayList<String> moves;
 
-	public Match(int matchID, int chatID, User white, User black, String result) {
+	public Match(int matchID, int chatID, User white, User black, String status) {
 		this.matchID = matchID;
 		moves = new ArrayList<>();
 		this.chat = new Chat(chatID);
 		this.white = white;
 		this.black = black;
-		this.result = result;
+		this.status = status;
 	}
 
 	//Load moves
@@ -82,26 +84,26 @@ public class Match {
 		return out;
 	}
 
-	public void updateResultOnDatabase(Client client, String result) {
+	public void updateStatusOnDatabase(Client client, String status) {
 		JSONObject sendData = new JSONObject();
-		this.result = result;
+		this.status = status;
 		sendData.put("match", matchID);
-		sendData.put("result", result);
+		sendData.put("status", status);
 		
-		JSONObject response = client.post("setMatchResult", sendData);
+		JSONObject response = client.post("setMatchStatus", sendData);
 		if(response.getBoolean("error")) {
-			System.err.println("Could not set match result!");
+			System.err.println("Could not set match status!");
 			System.err.println(response.opt("response").toString());
 		}
 	}
 
-	public String getResultFromDatabase(Client client) {
+	public String getStatusFromDatabase(Client client) {
 		JSONObject sendData = new JSONObject();
 		sendData.put("match", matchID);
 
-		JSONObject response = client.post("getMatchResult", sendData);
+		JSONObject response = client.post("getMatchStatus", sendData);
 		if(response.getBoolean("error")) {
-			System.err.println("Could not get match result!");
+			System.err.println("Could not get match status!");
 			System.err.println(response.opt("response").toString());
 			return IN_PROGRESS;
 		}
@@ -109,12 +111,12 @@ public class Match {
 		if(response.opt("response")==null)
 			return null;
 
-		this.result = response.getString("response");
+		this.status = response.getString("response");
 		return response.getString("response");
 	}
 
-	public String getResult() {
-		return result;
+	public String getStatus() {
+		return status;
 	}
 
 	public ArrayList<String> getAllMoves() {
