@@ -1,6 +1,7 @@
 
 package chessBug.home;
 
+import chessBug.misc.*;
 import chessBug.network.*;
 import chessBug.game.*;
 import java.util.List;
@@ -8,7 +9,7 @@ import javafx.scene.Node;
 
 
 
-public class HomeController implements IGameSelectionController{
+public class HomeController implements IGameSelectionController, IFriendRequestController{
     //Database Connection
     private Client client;
     //MVC

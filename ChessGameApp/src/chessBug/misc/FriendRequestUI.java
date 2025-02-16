@@ -1,5 +1,6 @@
-package chessBug.home;
+package chessBug.misc;
 
+import chessBug.home.HomeController;
 import chessBug.network.*;
 
 import javafx.scene.layout.VBox;
@@ -13,9 +14,9 @@ import org.json.JSONObject;
 
 public class FriendRequestUI {
     private VBox page = new VBox();
-    HomeController controller;
+    IFriendRequestController controller;
     
-    FriendRequestUI(HomeController controller){
+    public FriendRequestUI(IFriendRequestController controller){
         this.controller = controller;
         
         buildClosedRequestField();

@@ -4,6 +4,7 @@
  */
 package chessBug.home;
 
+import chessBug.misc.FriendRequestUI;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;

@@ -4,6 +4,7 @@
  */
 package chessBug.game;
 
+import chessBug.misc.GameSelectionUI;
 import chessGame.*;
 import chessBug.network.*;
 import java.io.*;
@@ -254,10 +255,8 @@ public class GameView {
 
         //New game button
         Button newGame = new Button("New Game");
-        newGame.setOnMouseClicked(event -> {
-            buildGameBuildPrompt();
-        });
-        promptSelectionPanel.getChildren().addAll(newGame, new GameListUI(controller).getPage());
+        newGame.setOnMouseClicked(event -> buildGameBuildPrompt());
+        promptSelectionPanel.getChildren().addAll(newGame, new GameSelectionUI(controller).getPage());
     }
 
     private void buildGameBuildPrompt() {

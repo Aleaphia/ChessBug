@@ -5,6 +5,7 @@
  */
 package chessBug.game;
 
+import chessBug.misc.IGameSelectionController;
 import chessGame.*;
 import chessBug.network.*;
 import java.util.*;

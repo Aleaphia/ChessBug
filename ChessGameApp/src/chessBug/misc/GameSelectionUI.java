@@ -1,14 +1,15 @@
-package chessBug.game;
+package chessBug.misc;
 
+import chessBug.misc.IGameSelectionController;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
-public class GameListUI {
-    VBox page = new VBox();
-    IGameSelectionController controller;
+public class GameSelectionUI {
+    private VBox page = new VBox();
+    private IGameSelectionController controller;
     
-    GameListUI(IGameSelectionController controller){
+    public GameSelectionUI(IGameSelectionController controller){
         this.controller = controller;
         
         buildGameSelectionPrompt();
@@ -19,14 +20,7 @@ public class GameListUI {
     private void buildGameSelectionPrompt() {
         //Clear page
         page.getChildren().clear();
-
-        //New game button
-        Button newGame = new Button("New Game");
-        newGame.setOnMouseClicked(event -> {
-            //TODO
-        });
-        page.getChildren().add(newGame);
-
+        
         //List out games
         controller.getOpenMatchList().forEach(match -> {
             Button currMatch = new Button(match.toString());

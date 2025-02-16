@@ -148,7 +148,7 @@ public class Client {
 			System.err.println(received.opt("response"));
 			return List.of();
 		}
-
+                
 		JSONArray response = received.getJSONArray("response");
 		for(int i = 0; i < response.length(); i++) {
 			JSONObject o = response.getJSONObject(i);
