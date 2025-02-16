@@ -242,6 +242,29 @@ public class Client {
 
 	public boolean acceptFriendRequest(User user) { return acceptFriendRequest(user.getUsername()); }
 
+	/* Returns true if successfully denied a friend request 
+	 * Prints error if received error
+	 * Prints nothing and returns false on no friend request denied for "normal" reasons (i.e. friend request doesn't exist or is friends with target)
+	 * TODO: Print more information regarding false returns
+	 */
+	public boolean denyFriendRequest(String username) {
+		JSONObject send = new JSONObject();
+		send.put("target", username);
+		JSONObject received = post("denyFriendRequest", send);
+
+		// Return none if error in response
+		if(received.getBoolean("error")) {
+			System.err.println("Could not deny friend request from \"" + username + "\" to \"" + profile.getUsername() + "\"");
+			System.err.println(received.opt("response"));
+			return false;
+		}
+
+		return received.getBoolean("response");
+	}
+
+	public boolean denyFriendRequest(User user) { return denyFriendRequest(user.getUsername()); }
+
+
 	public List<User> getFriendRequests() {
 		ArrayList<User> result = new ArrayList<>();
 		JSONObject received = post("getFriendRequests", new JSONObject());
