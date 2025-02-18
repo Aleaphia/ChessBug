@@ -4,15 +4,15 @@
  */
 package chessBug.home;
 
-import chessBug.misc.*;
-import chessBug.network.User;
-import java.util.List;
+import chessBug.misc.GameSelectionUI;
+import chessBug.misc.ReceiveFriendRequestUI;
+import chessBug.misc.SendFriendRequestUI;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
-import javafx.scene.layout.VBox;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 
 public class HomeView {
     

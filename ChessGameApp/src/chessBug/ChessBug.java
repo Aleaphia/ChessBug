@@ -24,24 +24,19 @@ import chessBug.network.Client;
 import chessBug.network.ClientAuthException;
 import chessBug.preferences.PreferencesController;
 import chessBug.profile.ProfileController;
-import javafx.animation.ScaleTransition;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.Separator;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 /**
  *
  * @author shosh
@@ -124,108 +119,45 @@ public class ChessBug extends Application {
         logo.setFitWidth(50);
     
         // Sidebar buttons 
-        Button homeButton = createSidebarButton("Home", event -> changePage("Dash Board!"));
-        Button gamesButton = createSidebarButton("Games", event -> changePage("Games"));
-        Button settingsButton = createSidebarButton("Settings", event -> changePage("Preferences"));
-        Button profileButton = createSidebarButton("Profile", event -> changePage("User Profile"));
-        Button logoutButton = createSidebarButton("Log Out", event -> changePage("Log Out"));
+        Button homeButton = createSideBarButton("Home.png", event -> changePage("Dash Board!"));
+        Button gamesButton = createSideBarButton("Chess.png", event -> changePage("Games"));
+        Button settingsButton = createSideBarButton("Gear.png", event -> changePage("Preferences"));
+        Button profileButton = createSideBarButton("User.png", event -> changePage("User Profile"));
+        Button logoutButton = createSideBarButton("Logout.png", event -> changePage("Log Out"));
     
         // Add items to the sidebar
         sidebar.getChildren().addAll(logo, homeButton, gamesButton, settingsButton, profileButton, logoutButton);
     
         return sidebar;
     }
-    
-    private void hideMenu(VBox gameMenu) {
-        // Hide the dropdown if the mouse is not hovering over the button or the menu
-        if (!gameMenu.isHover()) {
-            gameMenu.setVisible(false);
-        }
-    }
 
-    private Button createSidebarButton(String text, EventHandler event) {
-        Button button = new Button(text);
-        button.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;");
-        button.setPrefWidth(200);
-        button.setOnAction(event);
-        button.setOnMouseEntered(e -> {
-            button.setStyle("-fx-background-color: #444750; -fx-text-fill: white; -fx-font-size: 16px;");
-        });
-        button.setOnMouseExited(e -> {
-            button.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px;");
-        });
-    
+    private Button createSideBarButton(String imageFileName, EventHandler<ActionEvent> eventHandler) {
+        //Create button
+        Button button = new Button();
+
+        //Load the image based on the provided image file name
+        String imagePath = "file:/C:/Users/Ziost/Documents/GitHub/ChessBug/ChessGameApp/src/resources/images/" + imageFileName;
+        Image image = new Image(imagePath);
+
+        if (image.isError()) {
+            System.out.println("Error loading image:" + imagePath);
+        }
+
+        // Create ImageView for graphic
+        ImageView imageView = new ImageView(image);
+
+        imageView.setFitWidth(50);
+        imageView.setFitHeight(50);
+        imageView.setPreserveRatio(true);
+
+        button.setGraphic(imageView);
+
+        button.setOnAction(eventHandler);
+
+        button.setStyle("-fx-border-width: 0;");
+
         return button;
     }
-/*
-    private VBox createHomePage() {
-        VBox homePage = new VBox(20); // Vertical layout with spacing between sections
-        homePage.setPadding(new Insets(20, 20, 20, 20));
-        homePage.setStyle("-fx-background-color: #36393f; -fx-text-fill: white;");  // Set text color to white for the entire homePage
-    
-        // Welcome message
-        Label welcomeMessage = new Label("Welcome to ChessBug!");
-        welcomeMessage.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;"); // Ensure text is white
-        
-        // User info (this could be dynamic)
-        Label userInfo = new Label("User: ChessMaster123");
-        userInfo.setStyle("-fx-font-size: 18px; -fx-text-fill: white;"); // Ensure text is white
-    
-        // Add a separator line
-        homePage.getChildren().addAll(welcomeMessage, userInfo, new Separator());
-    
-        // Recent game statistics
-        VBox statsSection = new VBox(10);
-        statsSection.setStyle("-fx-background-color: #2a2d34; -fx-padding: 10px; -fx-border-radius: 8px; -fx-text-fill: white;");
-        Label statsTitle = new Label("Recent Game Statistics");
-        statsTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;");
-        
-        Label gamesPlayed = new Label("Games Played: 15");
-        gamesPlayed.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");  // Ensure the text is white
-        Label wins = new Label("Wins: 10");
-        wins.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
-        Label losses = new Label("Losses: 5");
-        losses.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
-        
-        statsSection.getChildren().addAll(statsTitle, gamesPlayed, wins, losses);
-        homePage.getChildren().add(statsSection);
-        
-        // Recent activity feed (activity log)
-        VBox activityFeed = new VBox(10);
-        activityFeed.setStyle("-fx-background-color: #2a2d34; -fx-padding: 10px; -fx-border-radius: 8px; -fx-text-fill: white;");
-        Label activityFeedTitle = new Label("Recent Activity");
-        activityFeedTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;");
-        
-        Label activity1 = new Label("You played a match with User456.");
-        activity1.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
-        Label activity2 = new Label("You won against User789.");
-        activity2.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
-        Label activity3 = new Label("You started a new challenge with User321.");
-        activity3.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
-        
-        activityFeed.getChildren().addAll(activityFeedTitle, activity1, activity2, activity3);
-        homePage.getChildren().add(activityFeed);
-        
-        // Featured or Live Game section (Optional)
-        VBox liveGameSection = new VBox(10);
-        liveGameSection.setStyle("-fx-background-color: #2a2d34; -fx-padding: 10px; -fx-border-radius: 8px; -fx-text-fill: white;");
-        Label liveGameTitle = new Label("Featured Game");
-        liveGameTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;");
-        
-        Label liveGame = new Label("Live Game: ChessMaster123 vs. User456");
-        liveGame.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
-        Button joinGameButton = new Button("Join Game");
-        joinGameButton.setStyle("-fx-background-color: #4e8af3; -fx-text-fill: white;");
-        
-        liveGameSection.getChildren().addAll(liveGameTitle, liveGame, joinGameButton);
-        homePage.getChildren().add(liveGameSection);
-        
-        // Add a final separator for design clarity
-        homePage.getChildren().add(new Separator());
-        
-        return homePage;
-    }
-*/
     
     private void changePage(String newPage) {
         page.getChildren().clear(); // Clear the current page content
