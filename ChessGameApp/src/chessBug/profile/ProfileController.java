@@ -18,11 +18,17 @@ public class ProfileController {
         return view;
     }
 
-    // Update user profile data (username, password, email, etc.)
+   // Update user profile data (username, password, email, etc.)
     public void updateProfile(String newUsername, String newPassword, String newEmail, String newProfilePicPath) {
         try {
+            // Update the profile on the server
             client.updateProfile(newUsername, newPassword, newEmail);
+            
+            // Set the new profile picture path
             client.getProfile().setProfilePicPath(newProfilePicPath);
+            
+            // After updating, refresh the view with the updated data (need to fix)
+           // view.updateProfileView(client.getProfile());  // This updates the profile UI
         } catch (NetworkException e) {
             System.err.println("Unable to update profile details");
             e.printStackTrace();
