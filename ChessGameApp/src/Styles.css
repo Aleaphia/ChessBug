@@ -38,6 +38,7 @@
 }
 /*End chess board styles ===================================================*/
 
+
 /* Button Styles for Settings and Profile Actions */
 .button {
     -fx-font-size: 14px;
@@ -48,6 +49,11 @@
     -fx-cursor: hand;
     -fx-transition: background-color 0.3s ease;
 }
+
+.whiteTurn {
+    -fx-background-color:darkgreen;
+}
+
 
 .button:hover {
     -fx-background-color: #3f51b5;

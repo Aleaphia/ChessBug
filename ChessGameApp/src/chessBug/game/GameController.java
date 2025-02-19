@@ -49,7 +49,6 @@ public class GameController implements IGameSelectionController{
     public List<Friend> getFriendList(){return client.getFriends();}
     public Boolean getGameComplete(){return model.getGameComplete();}
     public Piece getLocalPiece(String square){return model.getLocalPiece(square);}
-    @Override public List<Match> getOpenMatchList(){return client.getOpenMatches();}
     public Stream<String> getMatchMoves(){return match.poll(client);}
     public ArrayList<String> getMoveListForLocalPiece(String square){return model.getMoveListForLocalPiece(square);}
     public BorderPane getPage(){return view.getPage();}
@@ -58,6 +57,12 @@ public class GameController implements IGameSelectionController{
     public Boolean isThisPlayersTurn(){return (model.getPlayerTurn() && model.getPlayerColor()) ||
             (!model.getPlayerTurn() && !model.getPlayerColor());}
     public String getUserName(){return client.getOwnUser().getUsername();}
+    
+    //Overriden methods
+    //IGameSelectionController methods
+    @Override public List<Match> getOpenMatchList(){return client.getOpenMatches();}
+    @Override public List<Match> receiveMatchRequest(){return client.getMatchRequests();}
+    @Override public void acceptMatchRequest(Match match){client.acceptMatchRequest(match);}
     
     //Other Methods
     //loop database check

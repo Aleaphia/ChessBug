@@ -10,5 +10,7 @@ import java.util.List;
 public interface IGameSelectionController {
     public List<Match> getOpenMatchList();
     public void selectGame(Match match);
+    public List<Match> receiveMatchRequest();
+    public void acceptMatchRequest(Match match);
 
 }
