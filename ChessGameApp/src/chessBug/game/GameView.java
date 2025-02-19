@@ -85,7 +85,7 @@ public class GameView {
                     imageFileName += piece.getClass().getSimpleName();
 
                     //Load corresponding image
-                    try (FileInputStream imageFile = new FileInputStream("pieceImages/" + imageFileName + ".png")) {
+                    try (InputStream imageFile = GameView.class.getResourceAsStream("/resources/images/pieces/" + imageFileName + ".png")) {
                         //Create image
                         ImageView icon = new ImageView(new Image(imageFile));
                         //Style image
@@ -306,7 +306,7 @@ public class GameView {
         });
 
         //Create game button
-        Button createGame = new Button("Create Game");
+        Button createGame = new Button("Request Game");
         createGame.setOnMouseClicked(event -> {
             if (colorSelection[0] != '0' && friendSelection[0] != null){
                 //Determine color
@@ -318,7 +318,8 @@ public class GameView {
                 }
 
                 //Create new game
-                controller.createNewGame(playerColor, friendSelection[0]);
+                controller.sendGameRequest(playerColor, friendSelection[0]);
+                buildGameSelectionPrompt();
             }
             
         });

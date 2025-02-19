@@ -111,6 +111,7 @@ public class GameController implements IGameSelectionController{
         if (model.makePlayerMove(notation)){
             //Add notation
             view.addToNotationBoard(notation, !model.getPlayerTurn(), model.getTurnNumber());
+            match.updateStatusOnDatabase(client, model.getPlayerTurn() ? Match.WHITE_TURN : Match.BLACK_TURN);
             return true;
         }
         else { //If the game move is Illegal, output error message
@@ -142,16 +143,16 @@ public class GameController implements IGameSelectionController{
         //Check database
         continueDatabaseChecks();
     }
-    public void createNewGame(Boolean playerColor, User opponent){
-        //Create new matchin database
+    public void sendGameRequest(Boolean playerColor, User opponent){
+        // Send new match request in database for opponent
         try{
-            match =  (playerColor)?
-                    client.createMatch(client.getOwnUser(), opponent) :
-                    client.createMatch(opponent, client.getOwnUser());
+            client.sendMatchRequest(opponent, playerColor);
         }catch( Exception e){
             System.out.println("Error: Unable to create new match");
+            e.printStackTrace();
         }
-        
+        return;
+        /*
         //Get chat
         chat = match.getChat();
         
@@ -164,6 +165,7 @@ public class GameController implements IGameSelectionController{
         
         //Start recuring database checks
         continueDatabaseChecks();
+        */
     }
 
 }
