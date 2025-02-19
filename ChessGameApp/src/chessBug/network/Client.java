@@ -66,20 +66,6 @@ public class Client {
 		return new User(profile.getUserID(), profile.getUsername());
 	}
 
-	// Create a new match
-	public Match createMatch(User white, User black) throws NetworkException {
-		JSONObject matchMessage = new JSONObject();
-		matchMessage.put("white", white.getID());
-		matchMessage.put("black", black.getID());
-		JSONObject matchData = post("createMatch", matchMessage);
-
-		// If couldn't create match...
-		if(matchData.getBoolean("error"))
-			throw new NetworkException(matchData.opt("response").toString());
-
-		return new Match(matchData.getJSONObject("response").getInt("match"), matchData.getJSONObject("response").getInt("chat"), white, black, Match.IN_PROGRESS);
-	}
-
 	// Update profile with server data
 	public ProfileModel syncProfile() throws NetworkException {
 		JSONObject profileData = post("getProfileData", new JSONObject());

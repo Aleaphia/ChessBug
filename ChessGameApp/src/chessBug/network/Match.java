@@ -11,9 +11,10 @@ public class Match {
 	public static final String WHITE_WIN = "WhiteWin";
 	public static final String BLACK_WIN = "WhiteWin";
 	public static final String DRAW = "Draw";
-	public static final String IN_PROGRESS = "InProgress";
 	public static final String WHITE_REQUESTED = "WhiteRequested";
 	public static final String BLACK_REQUESTED = "BlackRequested";
+	public static final String WHITE_TURN = "WhiteTurn";
+	public static final String BLACK_TURN = "BlackTurn";
 
 	private int matchID;
 	private Chat chat;
@@ -22,7 +23,7 @@ public class Match {
 
 	private int movesNumber = 0;
 
-	private String status = IN_PROGRESS;
+	private String status;
 
 	private ArrayList<String> moves;
 
@@ -105,11 +106,8 @@ public class Match {
 		if(response.getBoolean("error")) {
 			System.err.println("Could not get match status!");
 			System.err.println(response.opt("response").toString());
-			return IN_PROGRESS;
-		}
-
-		if(response.opt("response")==null)
 			return null;
+		}
 
 		this.status = response.getString("response");
 		return response.getString("response");
