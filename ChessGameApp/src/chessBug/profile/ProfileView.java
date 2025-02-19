@@ -34,7 +34,12 @@ public class ProfileView extends VBox {
         setPadding(new Insets(20));
         setStyle("-fx-background-color: #2f3136; -fx-text-fill: white; -fx-border-radius: 10px;");
 
+        setPrefSize(3840, 2160);
         VBox.setVgrow(this, Priority.ALWAYS);
+        
+
+
+        setAlignment(Pos.CENTER);
 
         // Initialize UI components
         createProfileUI();
@@ -49,41 +54,39 @@ public class ProfileView extends VBox {
         }
         profileImageView.setFitWidth(100);
         profileImageView.setFitHeight(100);
-        profileImageView.setStyle("-fx-border-radius: 50%; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.6), 10, 0, 2, 2);");
-
-        // Username and Email Text
+    
+        // Username Text
         usernameText = new Text(model.getUsername());
         usernameText.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
         
-        emailText = new Text(model.getEmail());
-        emailText.setStyle("-fx-font-size: 16px; -fx-fill: gray;");
-
-        // Editable Username and Email fields
+    
+        // Editable Username
         usernameField = new TextField(model.getUsername());
         usernameField.setStyle("-fx-font-size: 24px;");
-        
-        emailField = new TextField(model.getEmail());
-        emailField.setStyle("-fx-font-size: 16px;");
-
-        // Container for profile image and text - Align profile image on the left
+        usernameField.setMaxWidth(300);
+        HBox.setHgrow(usernameField, Priority.ALWAYS); // ✅ Expands inside HBox
+    
+    
+        // Profile Header with Image and Username
         HBox profileHeader = new HBox(20, profileImageView, usernameText);
         profileHeader.setAlignment(Pos.CENTER_LEFT);
-        
+        HBox.setHgrow(usernameText, Priority.ALWAYS); // ✅ Allows username to expand
+    
         // Buttons for changing profile data
         Button updateProfileButton = new Button("Update Profile");
         updateProfileButton.setStyle("-fx-background-color: #4e8af3; -fx-text-fill: white;");
         updateProfileButton.setOnAction(e -> updateProfile());
-
-        // Change Profile Picture Button
+    
         changeProfilePicButton = new Button("Change Picture");
         changeProfilePicButton.setStyle("-fx-background-color: #4e8af3; -fx-text-fill: white;");
         changeProfilePicButton.setOnAction(e -> openFileChooserForProfilePic());
-
-        // Add the text info (email) and any additional user info below the profile image and name
+    
+        // User Info Section (fields and buttons)
         VBox userInfoSection = new VBox(10, profileHeader, usernameField, emailField, updateProfileButton, changeProfilePicButton);
         userInfoSection.setAlignment(Pos.CENTER_LEFT);
-
-        // Add the user info section to the main VBox layout
+        VBox.setVgrow(userInfoSection, Priority.ALWAYS); // ✅ Allows the section to expand in the VBox
+    
+        // Add everything to the main VBox layout
         getChildren().add(userInfoSection);
     }
 
