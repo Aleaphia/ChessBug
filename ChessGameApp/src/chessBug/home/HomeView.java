@@ -104,22 +104,27 @@ public class HomeView {
         
         return userStatsSpace;
     }
-    private VBox buildFriends(){
-        VBox friendsSpace = new VBox();
-        
-        //Build content
-        //Header
+    private VBox buildFriends() {
+        VBox friendsSpace = new VBox(10); // Added spacing
+        friendsSpace.setPadding(new Insets(20));
+        friendsSpace.setStyle("-fx-background-color: #2a2d34; -fx-border-radius: 8px; -fx-text-fill: white;"); // Dark theme
+    
+        // Header
         Label header = new Label("Friends");
-        //Display friend info
-        friendsListContent = new VBox();
+        header.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;");
+    
+        // Friends list
+        friendsListContent = new VBox(5);
         populateFriendsContent();
-        //Add new friend button
-        
-        friendsSpace.getChildren().addAll(header, friendsListContent, new SendFriendRequestUI(controller).getPage());
-        
-        
+    
+        // Add friend request UI
+        VBox sendRequestSection = new VBox(10, new SendFriendRequestUI(controller).getPage());
+        sendRequestSection.setStyle("-fx-background-color: #3b3f45; -fx-padding: 10px; -fx-border-radius: 5px;");
+    
+        friendsSpace.getChildren().addAll(header, friendsListContent, sendRequestSection);
         return friendsSpace;
     }
+    
     private void populateFriendsContent(){
         controller.getFriends().forEach(friend -> {
             Label curr = new Label(friend.getUsername());
@@ -131,12 +136,18 @@ public class HomeView {
             });
         });
     }
-    private void buildCurrentContent(){
-        currentContent = new VBox();
-        
+    private void buildCurrentContent() {
+        currentContent = new VBox(10);
+        currentContent.setPadding(new Insets(20));
+        currentContent.setStyle("-fx-background-color: #2a2d34; -fx-border-radius: 8px; -fx-text-fill: white;"); // Dark theme
+    
+        Label sectionTitle = new Label("Game & Requests");
+        sectionTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;");
+    
         currentContent.getChildren().addAll(
-                new ReceiveFriendRequestUI(controller).getPage(),
-                new GameSelectionUI(controller).getPage()
+            sectionTitle,
+            new ReceiveFriendRequestUI(controller).getPage(),
+            new GameSelectionUI(controller).getPage()
         );
     }
 }
