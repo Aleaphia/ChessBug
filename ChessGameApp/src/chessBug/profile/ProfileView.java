@@ -55,17 +55,23 @@ public class ProfileView extends VBox {
         profileImageView.setFitWidth(100);
         profileImageView.setFitHeight(100);
     
-        // Username Text
+        // Username and Email Text
         usernameText = new Text(model.getUsername());
         usernameText.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
         
+        emailText = new Text(model.getEmail());
+        emailText.setStyle("-fx-font-size: 16px; -fx-fill: gray;");
     
-        // Editable Username
+        // Editable Username and Email fields
         usernameField = new TextField(model.getUsername());
         usernameField.setStyle("-fx-font-size: 24px;");
         usernameField.setMaxWidth(300);
         HBox.setHgrow(usernameField, Priority.ALWAYS); // ✅ Expands inside HBox
     
+        emailField = new TextField(model.getEmail());
+        emailField.setStyle("-fx-font-size: 16px;");
+        emailField.setMaxWidth(300);
+        HBox.setHgrow(emailField, Priority.ALWAYS); // ✅ Expands inside HBox
     
         // Profile Header with Image and Username
         HBox profileHeader = new HBox(20, profileImageView, usernameText);
