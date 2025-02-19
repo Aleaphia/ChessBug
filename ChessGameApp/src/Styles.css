@@ -1,3 +1,5 @@
+/*Color variables*/
+
 /*Styles for all pages ======================================================*/
 .background{
     -fx-background-color: rgb(212, 215, 223);
@@ -45,7 +47,8 @@
 }
 .chatMessage{
     -fx-text-fill: white;
-    -fx-fill: white;
+    -fx-label-padding: 5;
+    -fx-wrap-text: true;
 }
 /*.thisPlayerMessage{}
 .otherPlayerMessage{}

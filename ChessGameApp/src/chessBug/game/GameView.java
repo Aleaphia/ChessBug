@@ -114,11 +114,7 @@ public class GameView {
                     //Test if the client player sent this message and add appropriate style class
                     (x.getAuthor().equals(controller.getUserName()))? 
                             "thisPlayerMessage": "otherPlayerMessage");
-            chatContent.getChildren().add(new Label(msg));
-            
-            
-            label.getStyleClass().forEach(y -> System.out.print(y + " "));
-            System.out.println();
+            chatContent.getChildren().add(label);
         });
     }
 
@@ -412,13 +408,17 @@ public class GameView {
         //ScrollPane policies
         scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scroll.setMaxWidth(Double.MAX_VALUE);
-        VBox.setVgrow(scroll, Priority.ALWAYS);        
+        //scroll.setMaxWidth(Double.MAX_VALUE);
+        VBox.setVgrow(scroll, Priority.ALWAYS);
+        chatSpace.setMaxWidth(200);
+        scroll.setMaxWidth(160);
 
         //chat space components
         chatSpace.getChildren().addAll(scroll, msgInput);
         
         //Styles ---------------------------------------------------------------
+        chatSpace.getStyleClass().add("chatBox");
+        scroll.getStyleClass().add("chatBox");
         chatContent.getStyleClass().add("chatBox");
 //        chatContent.setPrefHeight(2 * page.getHeight() -  msgInput.getHeight());
 
@@ -439,9 +439,6 @@ public class GameView {
 
             //Clear input
             msgInput.setText("");
-            
-            label.getStyleClass().forEach(y -> System.out.print(y + " "));
-            System.out.println();
         });
 
         scroll.setPrefHeight(gameBoard.getHeight());
