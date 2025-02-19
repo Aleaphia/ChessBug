@@ -31,9 +31,9 @@ public class GameSelectionUI {
     
     private void displayMatch(Match match){
         Button matchButton = new Button(match.toString());
-        if(match.getAllMoves().size()%2 == 0){ //TODO - fix
-            matchButton.getStyleClass().add("whiteTurn");
-        }
+//        if(match.getAllMoves().size()%2 == 0){ //TODO - fix
+//            matchButton.getStyleClass().add("whiteTurn");
+//        }
 
             matchButton.setOnMouseClicked(event -> {
                 if(!match.getStatus().equals("InProgress"))
