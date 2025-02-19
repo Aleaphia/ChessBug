@@ -16,6 +16,8 @@ Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (ActionEvent 
         timeline.play();
 */
 
+import java.io.InputStream;
+
 import org.json.JSONObject;
 
 import chessBug.game.GameController;
@@ -135,12 +137,14 @@ public class ChessBug extends Application {
         //Create button
         Button button = new Button();
 
-        //Load the image based on the provided image file name
-        String imagePath = "file:/C:/Users/Ziost/Documents/GitHub/ChessBug/ChessGameApp/src/resources/images/" + imageFileName;
-        Image image = new Image(imagePath);
+        //Load the image based on the provided image file name 
+        InputStream i = ChessBug.class.getResourceAsStream("/resources/images/"+imageFileName);
+        Image image = null;
+        if(i != null)
+            image = new Image(i);
 
-        if (image.isError()) {
-            System.out.println("Error loading image:" + imagePath);
+        if (image == null || image.isError()) {
+            System.out.println("Error loading image:" + imageFileName);
         }
 
         // Create ImageView for graphic
