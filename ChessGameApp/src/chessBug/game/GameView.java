@@ -115,6 +115,10 @@ public class GameView {
                     (x.getAuthor().equals(controller.getUserName()))? 
                             "thisPlayerMessage": "otherPlayerMessage");
             chatContent.getChildren().add(new Label(msg));
+            
+            
+            label.getStyleClass().forEach(y -> System.out.print(y + " "));
+            System.out.println();
         });
     }
 
@@ -358,6 +362,10 @@ public class GameView {
             //specify label alignment
             GridPane.setValignment(rowLabel, VPos.CENTER);
             GridPane.setHalignment(rowLabel, HPos.RIGHT);
+            
+            //Styles
+            colLabel.getStyleClass().add("boardLabel");
+            rowLabel.getStyleClass().add("boardLabel");
             //------------------------------------------------------------------
 
             //Create each board square in the row ------------------------------
@@ -431,6 +439,9 @@ public class GameView {
 
             //Clear input
             msgInput.setText("");
+            
+            label.getStyleClass().forEach(y -> System.out.print(y + " "));
+            System.out.println();
         });
 
         scroll.setPrefHeight(gameBoard.getHeight());

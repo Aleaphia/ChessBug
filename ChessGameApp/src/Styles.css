@@ -44,9 +44,10 @@
     -fx-padding: 20;
 }
 .chatMessage{
-    -fx-text-fill: #ffffff;
+    -fx-text-fill: white;
+    -fx-fill: white;
 }
-.thisPlayerMessage{}
+/*.thisPlayerMessage{}
 .otherPlayerMessage{}
 .botMessage{}
 
@@ -88,7 +89,7 @@
 }
 
 /*Chess board styles =======================================================*/
-.label{
+.boardLabel{
     -fx-text-alignment: center;
     -fx-label-padding: 5;
     -fx-wrap-text: true;
