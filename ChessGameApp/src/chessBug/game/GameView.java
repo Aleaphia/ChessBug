@@ -84,7 +84,7 @@ public class GameView {
                     imageFileName += piece.getClass().getSimpleName();
 
                     //Load corresponding image
-                    try (FileInputStream imageFile = new FileInputStream("pieceImages/" + imageFileName + ".png")) {
+                    try (InputStream imageFile = GameView.class.getResourceAsStream("/resources/images/pieces/" + imageFileName + ".png")) {
                         //Create image
                         ImageView icon = new ImageView(new Image(imageFile));
                         //Style image
