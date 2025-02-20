@@ -51,6 +51,7 @@ public class LoginUI {
         // Login Button
         Button loginButton = new Button("Login");
         loginButton.setStyle("-fx-background-color: #5865F2; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5px;");
+        loginButton.setDefaultButton(true);
         loginButton.setOnAction(event -> {
             JSONObject response = handleLogin.handle(usernameField.getText(), passwordField.getText());
             if (response.getBoolean("error")) {
