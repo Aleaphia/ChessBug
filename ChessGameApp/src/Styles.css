@@ -43,12 +43,14 @@
 .chatBox{
     -fx-background-color: rgb(43, 42, 40);
     -fx-font: 15px Tahoma;
-    -fx-padding: 20;
+    -fx-padding: 5;
 }
 .chatMessage{
     -fx-text-fill: white;
     -fx-label-padding: 5;
     -fx-wrap-text: true;
+    -fx-text-alignment: left;
+    -fx-max-width: Infinity;
 }
 /*.thisPlayerMessage{}
 .otherPlayerMessage{}

@@ -412,13 +412,16 @@ public class GameView {
         //scroll.setMaxWidth(Double.MAX_VALUE);
         VBox.setVgrow(scroll, Priority.ALWAYS);
         chatSpace.setMaxWidth(200);
-        scroll.setMaxWidth(160);
+        scroll.setPrefWidth(Double.MAX_VALUE);
+        scroll.setMaxWidth(Double.MAX_VALUE);
+        
+        chatContent.setMaxWidth(170);
+        chatContent.setAlignment(Pos.TOP_LEFT);
 
         //chat space components
         chatSpace.getChildren().addAll(scroll, msgInput);
         
         //Styles ---------------------------------------------------------------
-        chatSpace.getStyleClass().add("chatBox");
         scroll.getStyleClass().add("chatBox");
         chatContent.getStyleClass().add("chatBox");
 //        chatContent.setPrefHeight(2 * page.getHeight() -  msgInput.getHeight());
