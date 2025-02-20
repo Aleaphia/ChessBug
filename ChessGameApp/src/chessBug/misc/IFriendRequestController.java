@@ -7,4 +7,5 @@ public interface IFriendRequestController {
     public boolean sendFriendRequest(String username);
     public List<User> receiveFriendRequest();
     public void acceptFriendRequest(String username);
+    public void denyFriendRequest(String username);
 }

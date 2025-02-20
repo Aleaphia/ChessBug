@@ -28,11 +28,16 @@ public class ReceiveFriendRequestUI {
             friendRequests.forEach(user -> {
                 HBox curr = new HBox();
                 Button accept = new Button("Accept");
-                curr.getChildren().addAll(new Label(user.getUsername()), accept);
+                Button deny = new Button("Deny");
+                curr.getChildren().addAll(new Label(user.getUsername()), accept, deny);
                 page.getChildren().add(curr);
                 
                 accept.setOnAction(event -> {
                     controller.acceptFriendRequest(user.getUsername());
+                    curr.getChildren().clear();
+                });
+                deny.setOnAction(event -> {
+                    controller.denyFriendRequest(user.getUsername());
                     curr.getChildren().clear();
                 });
             });

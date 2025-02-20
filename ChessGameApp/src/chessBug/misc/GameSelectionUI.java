@@ -4,6 +4,7 @@ import chessBug.network.Match;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
 
 public class GameSelectionUI {
     private VBox page = new VBox();
@@ -30,23 +31,44 @@ public class GameSelectionUI {
     }
     
     private void displayMatch(Match match){
+        HBox hbox = new HBox();
         Button matchButton = new Button(match.toString());
-//        if(match.getAllMoves().size()%2 == 0){ //TODO - fix
-//            matchButton.getStyleClass().add("whiteTurn");
-//        }
-
-            matchButton.setOnMouseClicked(event -> {
-                if(!match.getStatus().equals("InProgress"))
-                    controller.acceptMatchRequest(match);
-                //Create loading screen
+        Button endButton = new Button((match.getStatus().substring(5).equals("Turn"))? "Forfiet" : "Deny");
+        
+        String currTurn = "";
+        switch(match.getStatus()){
+            case "WhiteTurn" -> currTurn = match.getWhite().getUsername();
+            case "BlackTurn" -> currTurn = match.getBlack().getUsername();
+        }
+        System.out.println(currTurn + ".vs " + controller.getUsername());
+        if (currTurn.equals(controller.getUsername())){
+            matchButton.getStyleClass().add("yourMove");
+        }
+            
+        
+        
+        hbox.getChildren().addAll(matchButton,endButton);
+        page.getChildren().add(hbox);
+        
+        matchButton.setOnAction(event -> {
+            if(!match.getStatus().equals("InProgress"))
+                controller.acceptMatchRequest(match);
+            //Create loading screen
+            //TODO
+            page.getChildren().clear();
+            page.getChildren().add(new Label("Loading..."));
+            //Update controller
+            controller.selectGame(match);
+        });
+        
+        endButton.setOnAction(event -> {
+            if(!match.getStatus().equals("InProgress"))
+                controller.denyMatchRequest(match);
+            else{}
                 //TODO
-                page.getChildren().clear();
-                page.getChildren().add(new Label("Loading..."));
-                //Update controller
-                controller.selectGame(match);
-                
-            });
+        });
+        
 
-            page.getChildren().add(matchButton);
+            
     }
 }

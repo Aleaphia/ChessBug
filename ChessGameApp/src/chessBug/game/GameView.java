@@ -17,6 +17,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.*;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.AnchorPane;
 
 public class GameView {
 
@@ -43,7 +44,7 @@ public class GameView {
     }
     public void displayMessage(String msg){
         Label curr = new Label(msg);
-        curr.getStyleClass().add("botMsg");
+        curr.getStyleClass().addAll("chatMessage","botMessage");
         chatContent.getChildren().add(curr);
     }
 
@@ -108,7 +109,12 @@ public class GameView {
         //Add each message to the chat
         controller.getChatMessages().forEach(x -> {
             String msg = x.getAuthor() + ": " + x.getContent();
-            chatContent.getChildren().add(new Label(msg));
+            Label label = new Label(msg);
+            label.getStyleClass().addAll("chatMessage",
+                    //Test if the client player sent this message and add appropriate style class
+                    (x.getAuthor().equals(controller.getUserName()))? 
+                            "thisPlayerMessage": "otherPlayerMessage");
+            chatContent.getChildren().add(label);
         });
     }
 
@@ -353,6 +359,10 @@ public class GameView {
             //specify label alignment
             GridPane.setValignment(rowLabel, VPos.CENTER);
             GridPane.setHalignment(rowLabel, HPos.RIGHT);
+            
+            //Styles
+            colLabel.getStyleClass().add("boardLabel");
+            rowLabel.getStyleClass().add("boardLabel");
             //------------------------------------------------------------------
 
             //Create each board square in the row ------------------------------
@@ -394,15 +404,25 @@ public class GameView {
         chatContent = new VBox(); //global variable to allow direct and easy manipulation for new mgs
         TextField msgInput = new TextField();
         
-        //Scroll pane containg chatContent
-        ScrollPane chatScroll = new ScrollPane(chatContent);
-        chatScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        chatScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        //ScrollPanes contain the chat contents to prevent chat page overflow
+        ScrollPane scroll = new ScrollPane(chatContent);
+        //ScrollPane policies
+        scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        //scroll.setMaxWidth(Double.MAX_VALUE);
+        VBox.setVgrow(scroll, Priority.ALWAYS);
+        chatSpace.setMaxWidth(200);
+        scroll.setPrefWidth(Double.MAX_VALUE);
+        scroll.setMaxWidth(Double.MAX_VALUE);
+        
+        chatContent.setMaxWidth(170);
+        chatContent.setAlignment(Pos.TOP_LEFT);
 
         //chat space components
-        chatSpace.getChildren().addAll(chatScroll, msgInput);
+        chatSpace.getChildren().addAll(scroll, msgInput);
         
         //Styles ---------------------------------------------------------------
+        scroll.getStyleClass().add("chatBox");
         chatContent.getStyleClass().add("chatBox");
 //        chatContent.setPrefHeight(2 * page.getHeight() -  msgInput.getHeight());
 
@@ -414,7 +434,9 @@ public class GameView {
             String msg = msgInput.getText();
 
             //Display msg on screen
-            chatContent.getChildren().add(new Label(user + ": " + msg));
+            Label label = new Label(user + ": " + msg);
+            label.getStyleClass().addAll("chatMessage","thisPlayerMessage"); //Style
+            chatContent.getChildren().add(label);
 
             //Send msg to database
             controller.sendChatMessage(msg);
@@ -423,8 +445,8 @@ public class GameView {
             msgInput.setText("");
         });
 
-        chatScroll.setPrefHeight(gameBoard.getHeight());
-        chatScroll.setMinHeight(100);
+        scroll.setPrefHeight(gameBoard.getHeight());
+        scroll.setMinHeight(100);
         chatContent.setAlignment(Pos.BOTTOM_CENTER);
         
         return chatSpace;
@@ -436,15 +458,17 @@ public class GameView {
         GridPane notationLabel = new GridPane();
         notationContent = new GridPane(); //global variable to allow direct and easy manipulation
         
-        //Scroll pane containg notation 
-        ScrollPane notationScroll = new ScrollPane(notationContent);
-        notationScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
-        notationScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        notationScroll.setPrefHeight(gameBoard.getHeight());
+        //ScrollPanes contain the chat contents to prevent page overflow
+        ScrollPane scroll = new ScrollPane(notationContent);
+        //ScrollPane policies
+        scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scroll.setMaxWidth(Double.MAX_VALUE);
+        VBox.setVgrow(scroll, Priority.ALWAYS);
         
         
         //notation space components
-        notationSpace.getChildren().addAll(notationLabel, notationScroll);
+        notationSpace.getChildren().addAll(notationLabel, scroll);
         
         //Create notation space
         notationLabel.add(new Label("White"), 1, 0);

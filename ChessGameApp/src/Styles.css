@@ -1,43 +1,9 @@
-/*Background Sytles*/
+/*Color variables*/
+
+/*Styles for all pages ======================================================*/
 .background{
     -fx-background-color: rgb(212, 215, 223);
 }
-
-
-/*Chess board styles =======================================================*/
-.label{
-    -fx-text-alignment: center;
-    -fx-label-padding: 5;
-    -fx-wrap-text: true;
-}
-.chessBoard {
-    -fx-font: 30px Tahoma;
-    /*Alignment*/
-    -fx-padding: 20;
-    /*Child-Alignment*/
-    -fx-alignment: center;
-}
-
-/*Square coloration*/
-.black { -fx-background-color: rgb(123, 147, 107);}
-.white{ -fx-background-color: rgb(223, 208, 174);}
-
-/*Classes to modify squares as user interacts*/
-.selected, .possibleMove{
-    -fx-border-width: 3;
-    -fx-border-insets: 0;
-}
-.selected{-fx-border-color: rgb(3, 255, 95); }
-.possibleMove{-fx-border-color: rgb(255, 238, 3);}
-
-
-.chatBox{
-    -fx-background-color: rgb(250, 249, 247);
-    -fx-font: 15px Tahoma;
-    -fx-padding: 20;
-}
-/*End chess board styles ===================================================*/
-
 
 /* Button Styles for Settings and Profile Actions */
 .button {
@@ -49,11 +15,6 @@
     -fx-cursor: hand;
     -fx-transition: background-color 0.3s ease;
 }
-
-.whiteTurn {
-    -fx-background-color:darkgreen;
-}
-
 
 .button:hover {
     -fx-background-color: #3f51b5;
@@ -78,7 +39,98 @@
     -fx-text-fill: #333;
 }
 
-/* Profile Page Styles */
+/*Chat box styles ---------------------------------------------------*/
+.chatBox{
+    -fx-background-color: rgb(43, 42, 40);
+    -fx-font: 15px Tahoma;
+    -fx-padding: 5;
+}
+.chatMessage{
+    -fx-text-fill: white;
+    -fx-label-padding: 5;
+    -fx-wrap-text: true;
+    -fx-text-alignment: left;
+    -fx-max-width: Infinity;
+}
+/*.thisPlayerMessage{}
+.otherPlayerMessage{}
+.botMessage{}
+
+
+/* Login page styling ==============================================================*/
+.login-error { 
+    -fx-border-color: #ff0000;
+}
+
+
+/* Home Page Styling ============================================================== */
+.home-page {
+    -fx-background-color: #36393f;
+    -fx-text-fill: white;
+    -fx-padding: 20px;
+}
+
+.home-page .welcome-message {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.home-page .section-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.home-page .activity-feed, .home-page .stats-section {
+    -fx-background-color: #2a2d34;
+    -fx-padding: 10px;
+    -fx-border-radius: 8px;
+}
+
+/* Login page styling */
+.login-error { 
+    -fx-border-color: #ff0000;
+}
+
+/*Chess board styles =======================================================*/
+.boardLabel{
+    -fx-text-alignment: center;
+    -fx-label-padding: 5;
+    -fx-wrap-text: true;
+}
+.chessBoard {
+    -fx-font: 30px Tahoma;
+    /*Alignment*/
+    -fx-padding: 20;
+    /*Child-Alignment*/
+    -fx-alignment: center;
+}
+
+/*Square coloration*/
+.black { -fx-background-color: rgb(111, 115, 172);}
+.white{ -fx-background-color: rgb(197, 194, 188);}
+
+/*Classes to modify squares as user interacts*/
+.selected, .possibleMove{
+    -fx-border-width: 3;
+    -fx-border-insets: 0;
+}
+.selected{-fx-border-color: rgb(3, 255, 95); }
+.possibleMove{-fx-border-color: rgb(255, 238, 3);}
+
+.whiteTurn {
+    -fx-background-color:darkgreen;
+}
+
+/*Game selection prompt*/
+.yourMove{
+    -fx-background-color:darkgreen;
+    -fx-padding:10px;
+    -fx-text-fill: white;
+}
+
+/* Profile Page Styles ==============================================*/
 .profilePage {
     -fx-background-color: #f7f7f7;
     -fx-padding: 20px;
@@ -148,32 +200,4 @@
         -fx-width: 150px;
     }
 }
-/* Home Page Styling */
-.home-page {
-    -fx-background-color: #36393f;
-    -fx-text-fill: white;
-    -fx-padding: 20px;
-}
 
-.home-page .welcome-message {
-    -fx-font-size: 24px;
-    -fx-font-weight: bold;
-    -fx-text-fill: white;
-}
-
-.home-page .section-title {
-    -fx-font-size: 18px;
-    -fx-font-weight: bold;
-    -fx-text-fill: white;
-}
-
-.home-page .activity-feed, .home-page .stats-section {
-    -fx-background-color: #2a2d34;
-    -fx-padding: 10px;
-    -fx-border-radius: 8px;
-}
-
-/* Login page styling */
-.login-error { 
-    -fx-border-color: #ff0000;
-}

@@ -60,9 +60,11 @@ public class GameController implements IGameSelectionController{
     
     //Overriden methods
     //IGameSelectionController methods
+    @Override public String getUsername(){return client.getOwnUser().getUsername();}
     @Override public List<Match> getOpenMatchList(){return client.getOpenMatches();}
     @Override public List<Match> receiveMatchRequest(){return client.getMatchRequests();}
     @Override public void acceptMatchRequest(Match match){client.acceptMatchRequest(match);}
+    @Override public void denyMatchRequest(Match match){client.denyMatchRequest(match);}
     
     //Other Methods
     //loop database check
