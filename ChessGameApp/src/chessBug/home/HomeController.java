@@ -32,11 +32,14 @@ public class HomeController implements IGameSelectionController, IFriendRequestC
     @Override public boolean sendFriendRequest(String username){return client.sendFriendRequest(username);}
     @Override public List<User> receiveFriendRequest(){return client.getFriendRequests();}
     @Override public void acceptFriendRequest(String user){client.acceptFriendRequest(user);}
+    @Override public void denyFriendRequest(String user){client.denyFriendRequest(user);}
     
     //IGameSelectionController methods
+    @Override public String getUsername(){return client.getOwnUser().getUsername();}
     @Override public List<Match> getOpenMatchList(){return client.getOpenMatches();}
     @Override public List<Match> receiveMatchRequest(){return client.getMatchRequests();}
     @Override public void acceptMatchRequest(Match match){client.acceptMatchRequest(match);}
+    @Override public void denyMatchRequest(Match match){client.denyMatchRequest(match);}
     @Override public void selectGame(Match match){
         view.setPage(new GameController(client, match).getPage());
     }

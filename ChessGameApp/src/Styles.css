@@ -123,6 +123,13 @@
     -fx-background-color:darkgreen;
 }
 
+/*Game selection prompt*/
+.yourMove{
+    -fx-background-color:darkgreen;
+    -fx-padding:10px;
+    -fx-text-fill: white;
+}
+
 /* Profile Page Styles ==============================================*/
 .profilePage {
     -fx-background-color: #f7f7f7;
