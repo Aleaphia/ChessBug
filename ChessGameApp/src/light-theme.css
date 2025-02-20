@@ -1,0 +1,34 @@
+/* light-theme.css */
+.root {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: black;
+}
+
+.button {
+    -fx-background-color: #f0f0f0;
+    -fx-text-fill: black;
+}
+
+.label {
+    -fx-text-fill: black;
+}
+
+.combo-box, .check-box {
+    -fx-background-color: #f0f0f0;
+    -fx-text-fill: black;
+}
+
+.combo-box .arrow {
+    -fx-background-color: #888888;
+}
+
+.tooltip {
+    -fx-background-color: #f0f0f0;
+    -fx-text-fill: black;
+}
+
+.text-field {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: black;
+    -fx-prompt-text-fill: #888888;
+}

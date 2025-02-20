@@ -32,7 +32,7 @@ public class ProfileView extends VBox {
         this.model = model;
         setSpacing(20);
         setPadding(new Insets(20));
-        setStyle("-fx-background-color: #2f3136; -fx-text-fill: white; -fx-border-radius: 10px;");
+        setStyle("-fx-background-color:rgb(212, 215, 223); -fx-text-fill: white; -fx-border-radius: 10px;");
 
         setPrefSize(3840, 2160);
         VBox.setVgrow(this, Priority.ALWAYS);

@@ -101,10 +101,27 @@ public class PreferencesController {
     private void handleThemeChange(String theme) {
         System.out.println("Theme changed to: " + theme);
         String themeFile = theme.equals("Dark") ? "dark-theme.css" : "light-theme.css";
+        
+        // Ensure scene is not null
         Scene scene = soundCheckBox.getScene();  // Use soundCheckBox's scene to access the main scene
-        scene.getStylesheets().clear();
-        scene.getStylesheets().add(getClass().getResource(themeFile).toExternalForm());
+        if (scene != null) {
+            // Print the URL to verify the correct CSS file is being loaded
+            System.out.println("Applying theme from: " + getClass().getResource(themeFile).toExternalForm());
+            
+            // Clear existing styles and add the new theme
+            scene.getStylesheets().clear();
+            scene.getStylesheets().add(getClass().getResource(themeFile).toExternalForm());
+    
+            // Optionally, force a layout update
+            scene.getRoot().requestLayout();
+    
+            // Save the selected theme to preferences
+            preferences.put("theme", theme);
+        } else {
+            System.out.println("Scene is null, theme change failed.");
+        }
     }
+    
 
     // Handle auto-save preference change
     private void handleAutoSave(boolean isEnabled) {
