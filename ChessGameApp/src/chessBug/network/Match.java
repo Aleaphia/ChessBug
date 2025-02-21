@@ -85,32 +85,8 @@ public class Match {
 		return out;
 	}
 
-	public void updateStatusOnDatabase(Client client, String status) {
-		JSONObject sendData = new JSONObject();
+	public void setStatus(String status) {
 		this.status = status;
-		sendData.put("match", matchID);
-		sendData.put("status", status);
-		
-		JSONObject response = client.post("setMatchStatus", sendData);
-		if(response.getBoolean("error")) {
-			System.err.println("Could not set match status!");
-			System.err.println(response.opt("response").toString());
-		}
-	}
-
-	public String getStatusFromDatabase(Client client) {
-		JSONObject sendData = new JSONObject();
-		sendData.put("match", matchID);
-
-		JSONObject response = client.post("getMatchStatus", sendData);
-		if(response.getBoolean("error")) {
-			System.err.println("Could not get match status!");
-			System.err.println(response.opt("response").toString());
-			return null;
-		}
-
-		this.status = response.getString("response");
-		return response.getString("response");
 	}
 
 	public String getStatus() {

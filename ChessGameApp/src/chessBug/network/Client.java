@@ -341,6 +341,34 @@ public class Client {
 		return result;
 	}
 
+	public void setMatchStatus(Match match, String status) {
+		JSONObject sendData = new JSONObject();
+		match.setStatus(status);
+		sendData.put("match", match.getID());
+		sendData.put("status", status);
+		
+		JSONObject response = post("setMatchStatus", sendData);
+		if(response.getBoolean("error")) {
+			System.err.println("Could not set match status!");
+			System.err.println(response.opt("response").toString());
+		}
+	}
+
+	public String syncMatchStatus(Match match) {
+		JSONObject sendData = new JSONObject();
+		sendData.put("match", match.getID());
+
+		JSONObject response = post("getMatchStatus", sendData);
+		if(response.getBoolean("error")) {
+			System.err.println("Could not get match status!");
+			System.err.println(response.opt("response").toString());
+			return null;
+		}
+
+		match.setStatus(response.getString("response"));
+		return response.getString("response");
+	}
+
 	public JSONObject post(String function, JSONObject message) {
 		// Sent JSON Object to server and retrieve response
 		message.put("username", profile.getUsername());
