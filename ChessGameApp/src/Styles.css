@@ -4,6 +4,9 @@
 .background{
     -fx-background-color: rgb(212, 215, 223);
 }
+.label {
+    -fx-text-fill: white;
+}
 
 /* Button Styles for Settings and Profile Actions */
 .button {

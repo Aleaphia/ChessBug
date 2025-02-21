@@ -87,7 +87,7 @@ public class HomeView {
         
         // Featured or Live Game section (Optional)
         VBox liveGameSection = new VBox(10);
-        liveGameSection.setStyle("-fx-background-color: #2a2d34; -fx-padding: 10px; -fx-border-radius: 8px; -fx-text-fill: white;");
+        liveGameSection.setStyle("-fx-background-color:rgb(42, 45, 52); -fx-padding: 10px; -fx-border-radius: 8px; -fx-text-fill: white;");
         Label liveGameTitle = new Label("Featured Game");
         liveGameTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;");
         
@@ -128,6 +128,7 @@ public class HomeView {
     private void populateFriendsContent(){
         controller.getFriends().forEach(friend -> {
             Label curr = new Label(friend.getUsername());
+            curr.setStyle("-fx-text-fill: white;");
             
             friendsListContent.getChildren().add(curr);
             
