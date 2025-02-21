@@ -4,12 +4,16 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Base64;
+
+import java.nio.file.Files;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -28,7 +32,7 @@ public class Client {
 
 	public Client(String username, String password) throws ClientAuthException {
 		// Call "login" function from the server
-		profile = new ProfileModel(0, username, password, "", "");
+		profile = new ProfileModel(0, username, password, "", ProfileModel.DEFAULT_PROFILE_PICTURE);
 		JSONObject loginMessage = post("login", new JSONObject());
 
 		// If the server returns an error, throw an exception
@@ -76,6 +80,8 @@ public class Client {
 
 		// We need to send correct username and password to retrieve information so no need to update those variables
 		profile.setEmail(profileData.getJSONObject("response").getString("EmailAddress"));
+		if(!profileData.getJSONObject("response").isNull("pfp"))
+			profile.setProfilePicURL("https://www.zandgall.com/chessbug/content/"+profileData.getJSONObject("response").getString("pfp"));
 		profile.setUserID(profileData.getJSONObject("response").getInt("UserID"));
 
 		return profile;
@@ -367,6 +373,24 @@ public class Client {
 
 		match.setStatus(response.getString("response"));
 		return response.getString("response");
+	}
+
+	public void uploadProfilePicture(File file) {
+		JSONObject send = new JSONObject();
+		try {
+			send.put("image", Base64.getEncoder().encodeToString(Files.readAllBytes(file.toPath())));
+
+			JSONObject received = post("uploadProfilePicture", send);
+			if(received.getBoolean("error")) {
+				System.err.println("Could not upload profile picture! " + file.toPath());
+				System.err.println(received.opt("response").toString());
+				return;
+			}
+
+			profile.setProfilePicURL("https://www.zandgall.com/chessbug/content/" + received.getString("response"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public JSONObject post(String function, JSONObject message) {

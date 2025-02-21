@@ -11,7 +11,7 @@ public class ProfileController {
 
     public ProfileController(Client client) {
         this.client = client;
-        this.view = new ProfileView(client.getProfile());
+        this.view = new ProfileView(client);
     }
 
     public ProfileView getPage() {
@@ -19,13 +19,13 @@ public class ProfileController {
     }
 
    // Update user profile data (username, password, email, etc.)
-    public void updateProfile(String newUsername, String newPassword, String newEmail, String newProfilePicPath) {
+    public void updateProfile(String newUsername, String newPassword, String newEmail, String newProfilePicURL) {
         try {
             // Update the profile on the server
             client.updateProfile(newUsername, newPassword, newEmail);
             
             // Set the new profile picture path
-            client.getProfile().setProfilePicPath(newProfilePicPath);
+            client.getProfile().setProfilePicURL(newProfilePicURL);
             
             // After updating, refresh the view with the updated data (need to fix)
            // view.updateProfileView(client.getProfile());  // This updates the profile UI
@@ -35,6 +35,6 @@ public class ProfileController {
         }
         
         // Update the view with the new data
-        view = new ProfileView(client.getProfile());
+        view = new ProfileView(client);
     }
 }
