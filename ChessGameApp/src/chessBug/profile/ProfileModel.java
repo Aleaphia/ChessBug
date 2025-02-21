@@ -1,19 +1,21 @@
 package chessBug.profile;
 
 public class ProfileModel {
+    public static final String DEFAULT_PROFILE_PICTURE = "https://www.zandgall.com/chessbug/content/chessbug";
+
     private int userID;
     private String username;
     private String password; // It's okay to keep this in memory
     private String email;
-    private String profilePicPath; // Path to the profile picture (optional)
+    private String profilePicURL; // Path to the profile picture (optional)
 
     // Constructor
-    public ProfileModel(int userID, String username, String password, String email, String profilePicPath) {
+    public ProfileModel(int userID, String username, String password, String email, String profilePicURL) {
         this.userID = userID;
         this.username = username;
         this.password = password;
         this.email = email;
-        this.profilePicPath = profilePicPath;
+        this.profilePicURL = profilePicURL;
     }
 
     // Getters and setters
@@ -49,11 +51,11 @@ public class ProfileModel {
         this.email = email;
     }
 
-    public String getProfilePicPath() {
-        return profilePicPath;
+    public String getProfilePicURL() {
+        return profilePicURL;
     }
 
-    public void setProfilePicPath(String profilePicPath) {
-        this.profilePicPath = profilePicPath;
+    public void setProfilePicURL(String profilePicURL) {
+        this.profilePicURL = profilePicURL;
     }
 }

@@ -1,6 +1,10 @@
 package chessBug.profile;
 
+import chessBug.network.Client;
+
 import java.io.File;
+import java.util.Base64;
+import java.nio.file.Files;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -28,8 +32,8 @@ public class ProfileView extends VBox {
 
     private Button changeProfilePicButton;
 
-    public ProfileView(ProfileModel model) {
-        this.model = model;
+    public ProfileView(Client client) {
+        this.model = client.getProfile();
         setSpacing(20);
         setPadding(new Insets(20));
         setStyle("-fx-background-color:rgb(212, 215, 223); -fx-text-fill: white; -fx-border-radius: 10px;");
@@ -42,15 +46,16 @@ public class ProfileView extends VBox {
         setAlignment(Pos.CENTER);
 
         // Initialize UI components
-        createProfileUI();
+        createProfileUI(client);
     }
 
-    private void createProfileUI() {
+    private void createProfileUI(Client client) {
         // Profile Picture
         profileImageView = new ImageView();
-        if (model.getProfilePicPath() != null && !model.getProfilePicPath().isEmpty()) {
-            Image profileImage = new Image("file:" + model.getProfilePicPath());
+        if (model.getProfilePicURL() != null && !model.getProfilePicURL().isEmpty()) {
+            Image profileImage = new Image(model.getProfilePicURL());
             profileImageView.setImage(profileImage);
+            System.out.println("Set profile picture to " + model.getProfilePicURL());
         }
         profileImageView.setFitWidth(100);
         profileImageView.setFitHeight(100);
@@ -85,7 +90,7 @@ public class ProfileView extends VBox {
     
         changeProfilePicButton = new Button("Change Picture");
         changeProfilePicButton.setStyle("-fx-background-color: #4e8af3; -fx-text-fill: white;");
-        changeProfilePicButton.setOnAction(e -> openFileChooserForProfilePic());
+        changeProfilePicButton.setOnAction(e -> openFileChooserForProfilePic(client));
     
         // User Info Section (fields and buttons)
         VBox userInfoSection = new VBox(10, profileHeader, usernameField, emailField, updateProfileButton, changeProfilePicButton);
@@ -107,8 +112,8 @@ public class ProfileView extends VBox {
         }
 
         // Only reload the image if the profile picture has changed
-        if (!profileImageView.getImage().getUrl().equals("file:" + updatedProfile.getProfilePicPath())) {
-            Image updatedImage = new Image("file:" + updatedProfile.getProfilePicPath());
+        if (!profileImageView.getImage().getUrl().equals(updatedProfile.getProfilePicURL())) {
+            Image updatedImage = new Image(updatedProfile.getProfilePicURL());
             profileImageView.setImage(updatedImage);
         }
     }
@@ -137,7 +142,6 @@ public class ProfileView extends VBox {
         // Update the view with new data
         updateProfileView(model);
         showConfirmation();
-        
     }
 
     private void showError(String message) {
@@ -157,9 +161,9 @@ public class ProfileView extends VBox {
     }
 
     // Method to open file chooser for changing profile picture
-    private void openFileChooserForProfilePic() {
+    private void openFileChooserForProfilePic(Client client) {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif"));
         
         Stage stage = new Stage();
         File file = fileChooser.showOpenDialog(stage);
@@ -168,7 +172,7 @@ public class ProfileView extends VBox {
             // Preview the image before saving
             Image selectedImage = new Image("file:" + file.getAbsolutePath());
             profileImageView.setImage(selectedImage);
-            model.setProfilePicPath(file.getAbsolutePath());
+            client.uploadProfilePicture(file);
         }
     }
 }

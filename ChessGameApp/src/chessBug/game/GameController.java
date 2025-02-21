@@ -113,7 +113,7 @@ public class GameController implements IGameSelectionController{
         if (model.makePlayerMove(notation)){
             //Add notation
             view.addToNotationBoard(notation, !model.getPlayerTurn(), model.getTurnNumber());
-            match.updateStatusOnDatabase(client, model.getPlayerTurn() ? Match.WHITE_TURN : Match.BLACK_TURN);
+            client.setMatchStatus(match, model.getPlayerTurn() ? Match.WHITE_TURN : Match.BLACK_TURN);
             return true;
         }
         else { //If the game move is Illegal, output error message
