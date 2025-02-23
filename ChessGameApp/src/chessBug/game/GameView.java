@@ -53,13 +53,13 @@ public class GameView {
     }
 
     //Refresher methods
-    public void refresh() {
+    public void refresh(Client client) {
         refreshGameDisplay();
-        internalRefreshMessageBoard();
+        internalRefreshMessageBoard(client);
     }
 
-    public void refreshMessageBoard() {
-        internalRefreshMessageBoard();
+    public void refreshMessageBoard(Client client) {
+        internalRefreshMessageBoard(client);
     }
 
     private void refreshGameDisplay() {
@@ -104,17 +104,27 @@ public class GameView {
 
     }
 
-    private void internalRefreshMessageBoard() {
+    private void internalRefreshMessageBoard(Client client) {
         //Get any new messages
         //Add each message to the chat
         controller.getChatMessages().forEach(x -> {
+            HBox pfpSplit = new HBox();
+            pfpSplit.setAlignment(Pos.TOP_LEFT);
+            Image pfp = new Image(client.getUserProfilePictureURL(x.getAuthor()));
+            ImageView pfpView = new ImageView(pfp);
             String msg = x.getAuthor() + ": " + x.getContent();
+            pfpView.setFitWidth(32);
+            pfpView.setFitHeight(32);
+            pfpView.setStyle("-fx-margin: 0 0 100 0; -fx-alignment: top-left;");
             Label label = new Label(msg);
             label.getStyleClass().addAll("chatMessage",
                     //Test if the client player sent this message and add appropriate style class
                     (x.getAuthor().equals(controller.getUserName()))? 
                             "thisPlayerMessage": "otherPlayerMessage");
-            chatContent.getChildren().add(label);
+            label.setStyle("-fx.alignment: top-left;");
+            pfpSplit.setStyle("-fx.alignment: top-left;");
+            pfpSplit.getChildren().addAll(pfpView, label);
+            chatContent.getChildren().add(pfpSplit);
         });
     }
 
