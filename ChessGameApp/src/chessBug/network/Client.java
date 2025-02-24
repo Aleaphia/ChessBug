@@ -375,6 +375,25 @@ public class Client {
 		return response.getString("response");
 	}
 
+	public String getUserProfilePictureURL(String username) {
+		JSONObject sendData = new JSONObject();
+		sendData.put("target", username);
+
+		JSONObject received = post("getUserProfilePictureID", sendData);
+		if(received.getBoolean("error")) {
+			System.err.println("Could not get user profile picture: " + username);
+			System.err.println(received.opt("response").toString());
+			return ProfileModel.DEFAULT_PROFILE_PICTURE;
+		}
+
+		if(received.isNull("response"))
+			return ProfileModel.DEFAULT_PROFILE_PICTURE;	
+
+		return "https://www.zandgall.com/chessbug/content/" + received.getString("response");
+	}
+
+	public String getUserProfilePictureURL(User u) { return getUserProfilePictureURL(u.getUsername()); }
+
 	public void uploadProfilePicture(File file) {
 		JSONObject send = new JSONObject();
 		try {

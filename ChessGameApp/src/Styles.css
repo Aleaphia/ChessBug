@@ -50,10 +50,14 @@
 }
 .chatMessage{
     -fx-text-fill: white;
-    -fx-label-padding: 5;
+    /* -fx-label-padding: 5; */
     -fx-wrap-text: true;
     -fx-text-alignment: left;
     -fx-max-width: Infinity;
+}
+.chatPfp {
+    -fx-padding: 5;
+    -fx-alignment: top-left;
 }
 /*.thisPlayerMessage{}
 .otherPlayerMessage{}
