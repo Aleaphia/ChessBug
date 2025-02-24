@@ -108,23 +108,24 @@ public class GameView {
         //Get any new messages
         //Add each message to the chat
         controller.getChatMessages().forEach(x -> {
-            HBox pfpSplit = new HBox();
-            pfpSplit.setAlignment(Pos.TOP_LEFT);
+            HBox messageContainer = new HBox();
+
             Image pfp = new Image(client.getUserProfilePictureURL(x.getAuthor()));
             ImageView pfpView = new ImageView(pfp);
-            String msg = x.getAuthor() + ": " + x.getContent();
             pfpView.setFitWidth(32);
             pfpView.setFitHeight(32);
-            pfpView.setStyle("-fx-margin: 0 0 100 0; -fx-alignment: top-left;");
+            StackPane pfpViewContainer = new StackPane(pfpView);
+            pfpViewContainer.getStyleClass().add("chatPfp");
+            
+            String msg = x.getAuthor() + ": " + x.getContent();
             Label label = new Label(msg);
             label.getStyleClass().addAll("chatMessage",
                     //Test if the client player sent this message and add appropriate style class
                     (x.getAuthor().equals(controller.getUserName()))? 
                             "thisPlayerMessage": "otherPlayerMessage");
-            label.setStyle("-fx.alignment: top-left;");
-            pfpSplit.setStyle("-fx.alignment: top-left;");
-            pfpSplit.getChildren().addAll(pfpView, label);
-            chatContent.getChildren().add(pfpSplit);
+            
+            messageContainer.getChildren().addAll(pfpViewContainer, label);
+            chatContent.getChildren().add(messageContainer);
         });
     }
 
@@ -440,13 +441,7 @@ public class GameView {
         //Function
         msgInput.setOnAction(event -> {
             //Formulate message
-            String user = controller.getUserName();
             String msg = msgInput.getText();
-
-            //Display msg on screen
-            Label label = new Label(user + ": " + msg);
-            label.getStyleClass().addAll("chatMessage","thisPlayerMessage"); //Style
-            chatContent.getChildren().add(label);
 
             //Send msg to database
             controller.sendChatMessage(msg);

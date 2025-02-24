@@ -386,6 +386,9 @@ public class Client {
 			return ProfileModel.DEFAULT_PROFILE_PICTURE;
 		}
 
+		if(received.isNull("response"))
+			return ProfileModel.DEFAULT_PROFILE_PICTURE;	
+
 		return "https://www.zandgall.com/chessbug/content/" + received.getString("response");
 	}
 

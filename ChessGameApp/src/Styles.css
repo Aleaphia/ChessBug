@@ -55,6 +55,10 @@
     -fx-text-alignment: left;
     -fx-max-width: Infinity;
 }
+.chatPfp {
+    -fx-padding: 5;
+    -fx-alignment: top-left;
+}
 /*.thisPlayerMessage{}
 .otherPlayerMessage{}
 .botMessage{}
