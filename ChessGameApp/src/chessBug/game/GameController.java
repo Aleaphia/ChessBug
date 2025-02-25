@@ -10,7 +10,6 @@ import chessGame.*;
 import chessBug.network.*;
 import java.util.*;
 import java.util.stream.Stream;
-import java.util.concurrent.CompletableFuture;
 
 import javafx.event.ActionEvent;
 import javafx.util.Duration;
@@ -91,35 +90,51 @@ public class GameController implements IGameSelectionController{
         timeline.play();
     }
 
+    /** playerMove - makes extra changes needed for user moves (not database moves), e.g., update database, clear selected square from model
+     *  Add code here if it should only happen when the move comes from this client/user
+     */
     public void playerMove(String notation){
+        //Check for legal move, also performs updates independent of move origin
         if (internalPlayerMove(notation)){
-            match.makeMove(client, notation);
+            //Update database
+            match.makeMove(client, notation); //Add move
+            client.setMatchStatus(match, model.getPlayerTurn() ? Match.WHITE_TURN : Match.BLACK_TURN); //set game status
+            
+            //Update view
             view.deselectSquare();
             view.refresh(client);
+            
+            //Check for game end
             if (model.getGameComplete()){
+                //Get end result
                 String endMsg = model.getEndMessage();
-                view.displayMessage(endMsg);
                 
-                //TODO - Update database with game result
                 if (endMsg.charAt(11) == 'C'){ //Check for "Checkmate" vs "Draw" or "Stalemate"
+                    System.out.println("checkmate");
                     boolean winner = (endMsg.charAt(22) == 'w'); // Check for  "...white" vs "...black"
-                    client.setMatchStatus(match, (winner) ? Match.WHITE_WIN:Match.BLACK_WIN);
+                    System.out.println((winner)? "white" : "black");
+                    client.setMatchStatus(match, (winner) ? Match.WHITE_WIN : Match.BLACK_WIN);
                 }
+                else //If there is no winner, than the game is a draw
+                    client.setMatchStatus(match, Match.DRAW);
             }
         }
     }
     
+    /** internalPlayerMove - preforms changes to model and view needed by both database and user moves
+     *  Add code here if it should happen regardless of move origin
+     */
     private boolean internalPlayerMove(String notation){
         //Attempt to make player move, will return true on success
         if (model.makePlayerMove(notation)){
             //Add notation
             view.addToNotationBoard(notation, !model.getPlayerTurn(), model.getTurnNumber());
-            client.setMatchStatus(match, model.getPlayerTurn() ? Match.WHITE_TURN : Match.BLACK_TURN);
-            return true;
-        }
-        else { //If the game move is Illegal, output error message
-            //TODO
             
+            //At end of game, display end message
+            if (model.getGameComplete()){
+                view.displayMessage(model.getEndMessage());
+            }
+            return true;
         }
         return false;
     }
