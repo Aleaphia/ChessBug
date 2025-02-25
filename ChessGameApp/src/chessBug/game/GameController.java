@@ -97,12 +97,13 @@ public class GameController implements IGameSelectionController{
             view.deselectSquare();
             view.refresh();
             if (model.getGameComplete()){
-                String endMsg = "Game over: Checkmate, black wins!";//model.getEndMessage();
+                String endMsg = model.getEndMessage();
                 view.displayMessage(endMsg);
                 
                 //TODO - Update database with game result
                 if (endMsg.charAt(11) == 'C'){ //Check for "Checkmate" vs "Draw" or "Stalemate"
-                    boolean winner = (endMsg.charAt(22) == 'w');
+                    boolean winner = (endMsg.charAt(22) == 'w'); // Check for  "...white" vs "...black"
+                    client.setMatchStatus(match, (winner) ? Match.WHITE_WIN:Match.BLACK_WIN);
                 }
             }
         }
