@@ -78,10 +78,10 @@ public class GameController implements IGameSelectionController{
                     internalPlayerMove(move);
                     
                         });
-                view.refresh();
+                view.refresh(client);
             }
             else{ // during this player's turn just refresh chat
-                view.refreshMessageBoard();
+                view.refreshMessageBoard(client);
             }
             
             
@@ -95,7 +95,7 @@ public class GameController implements IGameSelectionController{
         if (internalPlayerMove(notation)){
             match.makeMove(client, notation);
             view.deselectSquare();
-            view.refresh();
+            view.refresh(client);
             if (model.getGameComplete()){
                 String endMsg = model.getEndMessage();
                 view.displayMessage(endMsg);
@@ -141,7 +141,7 @@ public class GameController implements IGameSelectionController{
         
         //Update chat/match status
         match.poll(client).forEach((move) -> internalPlayerMove(move));
-        view.refresh();
+        view.refresh(client);
         
         //Check database
         continueDatabaseChecks();
