@@ -4,22 +4,24 @@ import org.json.JSONObject;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
 public class LoginUI {
-    private VBox page;
+    private Node page;
 
     public LoginUI(LoginHandle handleLogin, LoginHandle handleAccountCreation) {
         page = createLoginPage(handleLogin, handleAccountCreation);
     }
 
-    private VBox createLoginPage(LoginHandle handleLogin, LoginHandle handleAccountCreation) {
+    private Node createLoginPage(LoginHandle handleLogin, LoginHandle handleAccountCreation) {
         // Use to report errors to the user
         Label errorTitle = new Label(), errorDescription = new Label();
         errorTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #FF5555;");
@@ -28,7 +30,7 @@ public class LoginUI {
         VBox loginPage = new VBox(15);
         loginPage.setAlignment(Pos.CENTER);
         loginPage.setPadding(new Insets(40));
-        loginPage.setStyle("-fx-background-color: #36393F; -fx-text-fill: white;");
+        loginPage.getStyleClass().add("loginPane");
 
         // Title
         Label loginTitle = new Label("Welcome back!");
@@ -79,10 +81,12 @@ public class LoginUI {
 
         // Add components to the login page
         loginPage.getChildren().addAll(loginTitle, subtitle, usernameField, passwordField, loginButton, createAccountButton);
-        return loginPage;
+        StackPane page = new StackPane(loginPage);
+        page.setStyle("-fx-width: 33.33%; -fx-alignment: center;");
+        return page;
     }
 
-    public VBox getPage() {
+    public Node getPage() {
         return page;
     }
 
