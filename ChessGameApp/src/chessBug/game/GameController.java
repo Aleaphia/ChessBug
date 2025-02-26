@@ -98,7 +98,7 @@ public class GameController implements IGameSelectionController{
         if (internalPlayerMove(notation)){
             //Update database
             match.makeMove(client, notation); //Add move
-            client.setMatchStatus(match, model.getPlayerTurn() ? Match.WHITE_TURN : Match.BLACK_TURN); //set game status
+            client.setMatchStatus(match, model.getPlayerTurn() ? Match.Status.WHITE_TURN.toString() : Match.Status.BLACK_TURN.toString()); //set game status
             
             //Update view
             view.deselectSquare();
@@ -113,10 +113,10 @@ public class GameController implements IGameSelectionController{
                     System.out.println("checkmate");
                     boolean winner = (endMsg.charAt(22) == 'w'); // Check for  "...white" vs "...black"
                     System.out.println((winner)? "white" : "black");
-                    client.setMatchStatus(match, (winner) ? Match.WHITE_WIN : Match.BLACK_WIN);
+                    client.setMatchStatus(match, (winner) ? Match.Status.WHITE_WIN.toString(): Match.Status.BLACK_WIN.toString());
                 }
                 else //If there is no winner, than the game is a draw
-                    client.setMatchStatus(match, Match.DRAW);
+                    client.setMatchStatus(match, Match.Status.DRAW.toString());
             }
         }
     }

@@ -195,7 +195,7 @@ public class Client {
 	public boolean sendMatchRequest(String username, boolean playingAsWhite) {
 		JSONObject send = new JSONObject();
 		send.put("target", username);
-		send.put("request", playingAsWhite ? Match.WHITE_REQUESTED : Match.BLACK_REQUESTED);
+		send.put("request", (playingAsWhite)? Match.Status.WHITE_REQUESTED : Match.Status.BLACK_REQUESTED);
 		JSONObject received = post("sendMatchRequest", send);
 
 		// Return none if error in response

@@ -7,14 +7,24 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class Match {
-	// Although not very distinct, gives definitive list of possible statuses
-	public static final String WHITE_WIN = "WhiteWin";
-	public static final String BLACK_WIN = "WhiteWin";
-	public static final String DRAW = "Draw";
-	public static final String WHITE_REQUESTED = "WhiteRequested";
-	public static final String BLACK_REQUESTED = "BlackRequested";
-	public static final String WHITE_TURN = "WhiteTurn";
-	public static final String BLACK_TURN = "BlackTurn";
+    public enum Status {
+        WHITE_WIN("WhiteWin"), BLACK_WIN("BlackWin"), DRAW("Draw"),
+        WHITE_REQUESTED("WhiteRequested"),BLACK_REQUESTED("BlackRequested"),
+        WHITE_TURN("WhiteTurn"),BLACK_TURN("BlackTurn");
+        
+        private final String stringName;
+        
+        Status(String stringName){this.stringName = stringName;}
+        @Override public String toString(){return stringName;}
+    }
+//	// Although not very distinct, gives definitive list of possible statuses
+//	public static final String WHITE_WIN = "WhiteWin";
+//	public static final String BLACK_WIN = "BlackWin";
+//	public static final String DRAW = "Draw";
+//	public static final String WHITE_REQUESTED = "WhiteRequested";
+//	public static final String BLACK_REQUESTED = "BlackRequested";
+//	public static final String WHITE_TURN = "WhiteTurn";
+//	public static final String BLACK_TURN = "BlackTurn";
 
 	private int matchID;
 	private Chat chat;
