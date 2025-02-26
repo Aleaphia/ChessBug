@@ -1,7 +1,7 @@
-/*Color variables*/
+/* ====================== GLOBAL STYLES ====================== */
 
-/*Styles for all pages ======================================================*/
-.background{
+/* Background */
+.background {
     -fx-background-color: rgb(212, 215, 223);
 }
 
@@ -12,34 +12,44 @@
     -fx-background-position: center center;
 }
 
+/* Labels */
 .label {
     -fx-text-fill: white;
 }
 
-/* Button Styles for Settings and Profile Actions */
-.button {
+/* ====================== BUTTON STYLES ====================== */
+
+.button, .file-chooser-button, .change-password-button {
     -fx-font-size: 14px;
     -fx-padding: 10px 20px;
-    -fx-background-color: #5c6bc0;
-    -fx-text-fill: white;
     -fx-border-radius: 5px;
+    -fx-text-fill: white;
     -fx-cursor: hand;
     -fx-transition: background-color 0.3s ease;
 }
 
-.button:hover {
+.button, .file-chooser-button {
+    -fx-background-color: #5c6bc0;
+}
+
+.button:hover, .file-chooser-button:hover {
     -fx-background-color: #3f51b5;
 }
 
-/* ComboBox and CheckBox Styles */
+.change-password-button {
+    -fx-background-color: #f44336;
+}
+
+.change-password-button:hover {
+    -fx-background-color: #d32f2f;
+}
+
+/* ====================== FORM ELEMENTS ====================== */
+
 .combo-box, .check-box {
     -fx-font-size: 14px;
     -fx-pref-width: 200px;
     -fx-padding: 10px;
-}
-
-.check-box {
-    -fx-font-size: 14px;
 }
 
 .combo-box {
@@ -50,29 +60,28 @@
     -fx-text-fill: #333;
 }
 
-/*Chat box styles ---------------------------------------------------*/
-.chatBox{
+/* ====================== CHAT BOX STYLES ====================== */
+
+.chatBox {
     -fx-background-color: rgb(43, 42, 40);
     -fx-font: 15px Tahoma;
     -fx-padding: 5;
 }
-.chatMessage{
+
+.chatMessage {
     -fx-text-fill: white;
-    /* -fx-label-padding: 5; */
     -fx-wrap-text: true;
     -fx-text-alignment: left;
     -fx-max-width: Infinity;
 }
+
 .chatPfp {
     -fx-padding: 5;
     -fx-alignment: top-left;
 }
-/*.thisPlayerMessage{}
-.otherPlayerMessage{}
-.botMessage{}
 
+/* ====================== LOGIN PAGE ====================== */
 
-/* Login page styling ==============================================================*/
 .login-error { 
     -fx-border-color: #ff0000;
 }
@@ -82,7 +91,8 @@
     -fx-text-fill: white;
 }
 
-/* Home Page Styling ============================================================== */
+/* ====================== HOME PAGE ====================== */
+
 .home-page {
     -fx-background-color: #36393f;
     -fx-text-fill: white;
@@ -92,13 +102,11 @@
 .home-page .welcome-message {
     -fx-font-size: 24px;
     -fx-font-weight: bold;
-    -fx-text-fill: white;
 }
 
 .home-page .section-title {
     -fx-font-size: 18px;
     -fx-font-weight: bold;
-    -fx-text-fill: white;
 }
 
 .home-page .activity-feed, .home-page .stats-section {
@@ -107,49 +115,42 @@
     -fx-border-radius: 8px;
 }
 
-/* Login page styling */
-.login-error { 
-    -fx-border-color: #ff0000;
-}
+/* ====================== CHESS BOARD ====================== */
 
-/*Chess board styles =======================================================*/
-.boardLabel{
+.boardLabel {
     -fx-text-alignment: center;
     -fx-label-padding: 5;
     -fx-wrap-text: true;
 }
+
 .chessBoard {
     -fx-font: 30px Tahoma;
-    /*Alignment*/
     -fx-padding: 20;
-    /*Child-Alignment*/
     -fx-alignment: center;
 }
 
-/*Square coloration*/
-.black { -fx-background-color: rgb(111, 115, 172);}
-.white{ -fx-background-color: rgb(197, 194, 188);}
+/* Chess Square Styles */
+.black { -fx-background-color: rgb(111, 115, 172); }
+.white { -fx-background-color: rgb(197, 194, 188); }
 
-/*Classes to modify squares as user interacts*/
-.selected, .possibleMove{
+/* Square Interaction */
+.selected, .possibleMove {
     -fx-border-width: 3;
     -fx-border-insets: 0;
 }
-.selected{-fx-border-color: rgb(3, 255, 95); }
-.possibleMove{-fx-border-color: rgb(255, 238, 3);}
 
-.whiteTurn {
-    -fx-background-color:darkgreen;
-}
+.selected { -fx-border-color: rgb(3, 255, 95); }
+.possibleMove { -fx-border-color: rgb(255, 238, 3); }
 
-/*Game selection prompt*/
-.yourMove{
-    -fx-background-color:darkgreen;
-    -fx-padding:10px;
+/* Player Turn Indicator */
+.whiteTurn, .yourMove {
+    -fx-background-color: darkgreen;
+    -fx-padding: 10px;
     -fx-text-fill: white;
 }
 
-/* Profile Page Styles ==============================================*/
+/* ====================== PROFILE PAGE ====================== */
+
 .profilePage {
     -fx-background-color: #f7f7f7;
     -fx-padding: 20px;
@@ -164,7 +165,7 @@
     -fx-background-color: #ffffff;
 }
 
-/* Username and Email Labels */
+/* Username and Email */
 .usernameLabel, .emailLabel {
     -fx-font-size: 16px;
     -fx-font-weight: bold;
@@ -172,51 +173,21 @@
     -fx-padding: 5px;
 }
 
-/* FileChooser Button Style */
-.file-chooser-button {
-    -fx-background-color: #5c6bc0;
-    -fx-text-fill: white;
-    -fx-font-size: 14px;
-    -fx-padding: 10px;
-    -fx-border-radius: 5px;
-}
+/* ====================== GENERAL LAYOUT ====================== */
 
-.file-chooser-button:hover {
-    -fx-background-color: #3f51b5;
-}
-
-/* Change Password Button */
-.change-password-button {
-    -fx-background-color: #f44336;
-    -fx-text-fill: white;
-    -fx-font-size: 14px;
-    -fx-padding: 10px;
-    -fx-border-radius: 5px;
-}
-
-.change-password-button:hover {
-    -fx-background-color: #d32f2f;
-}
-
-/* Horizontal Spacing for Profile Layout */
-.profile-layout {
-    -fx-spacing: 15px;
-    -fx-alignment: center;
-}
-
-/* General layout styling for the preference and profile pages */
-.layout {
+.layout, .profile-layout {
     -fx-spacing: 15px;
     -fx-alignment: center;
     -fx-padding: 10px;
 }
+
+/* ====================== RESPONSIVE DESIGN ====================== */
 
 @media screen and (max-width: 800px) {
     .background {
-        -fx-background-color: #2f3136; /* Lighten for smaller screens */
+        -fx-background-color: #2f3136;
     }
     .sidebar {
         -fx-width: 150px;
     }
 }
-

@@ -1,0 +1,23 @@
+/* ====================== PROFILE PAGE ====================== */
+
+.profilePage {
+    -fx-background-color: #f7f7f7;
+    -fx-padding: 20px;
+}
+
+/* Profile Picture */
+.profile-picture {
+    -fx-border-radius: 50%;
+    -fx-border-color: #b0bec5;
+    -fx-border-width: 2px;
+    -fx-padding: 10px;
+    -fx-background-color: #ffffff;
+}
+
+/* Username and Email */
+.usernameLabel, .emailLabel {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333;
+    -fx-padding: 5px;
+}
