@@ -30,6 +30,8 @@ import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.HPos;
+import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -38,6 +40,10 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 /**
  *
@@ -48,6 +54,7 @@ public class ChessBug extends Application {
     Scene mainScene;
     Pane page = new VBox(); // space to change with page details
     HBox mainPane;
+    GridPane loginPane;
     Client client;
 
     LoginUI loginUI;
@@ -55,11 +62,19 @@ public class ChessBug extends Application {
     @Override
     public void start(Stage primaryStage) {
     //Create stage layout ======================================================
-        //Main pane
-        mainPane = new HBox();
-        mainPane.getStyleClass().add("background");
 
-        loginUI = new LoginUI(
+        loginPane = new GridPane();
+        loginPane.getStyleClass().addAll("background", "login");
+
+        // Set up sizing constraints, middle is always 300x480, and everything else grows and shrinks around it
+        RowConstraints row = new RowConstraints(0, 0, Double.MAX_VALUE, Priority.ALWAYS, VPos.CENTER, true),
+                   rowMain = new RowConstraints(480, 480, 480);
+        loginPane.getRowConstraints().addAll(row, rowMain, row);
+        ColumnConstraints column = new ColumnConstraints(0, 0, Double.MAX_VALUE, Priority.ALWAYS, HPos.CENTER, true),
+                      columnMain = new ColumnConstraints(300, 300, 300);
+        loginPane.getColumnConstraints().addAll(column, columnMain, column);
+
+         loginUI = new LoginUI(
             (String username, String password) -> { // Handle login
                 JSONObject out = new JSONObject();
                 try {
@@ -68,6 +83,7 @@ public class ChessBug extends Application {
                     //Create Menu
                     mainPane.getChildren().clear();
                     mainPane.getChildren().addAll(createSidebar(), page);
+                    mainScene.setRoot(mainPane);
                 } catch (ClientAuthException e) {
                     e.printStackTrace();
                     out.put("error", true);
@@ -83,6 +99,7 @@ public class ChessBug extends Application {
                     //Create Menu
                     mainPane.getChildren().clear();
                     mainPane.getChildren().addAll(createSidebar(), page);
+                    mainScene.setRoot(mainPane);
                 } catch(ClientAuthException e){
                     e.printStackTrace();
                     out.put("error", true);
@@ -93,11 +110,16 @@ public class ChessBug extends Application {
             }
         );
 
-        mainPane.getChildren().add(loginUI.getPage());
+        // mainPane.getChildren().add(loginUI.getPage());
+        loginPane.add(loginUI.getPage(), 1, 1);
+
+        //Main pane
+        mainPane = new HBox();
+        mainPane.getStyleClass().addAll("background");
 
         //Scene and Stage ------------------------------------------------------
         primaryStage.setTitle("ChessBug"); //Name for application stage
-        mainScene = new Scene(mainPane, 800, 600); //Add mainPane to the mainScene
+        mainScene = new Scene(loginPane, 800, 600); //Add mainPane to the mainScene
         primaryStage.setScene(mainScene);//Add mainScene to primaryStage
         
         //Style
@@ -181,8 +203,7 @@ public class ChessBug extends Application {
                 page.getChildren().add(new HomeController(client).getPage());
                 break;
             case "Log Out":
-                mainPane.getChildren().clear();
-                mainPane.getChildren().add(loginUI.getPage());
+                mainScene.setRoot(loginPane);
                 break;
             default:
                 page.getChildren().add(new Label("Welcome to ChessBug!"));

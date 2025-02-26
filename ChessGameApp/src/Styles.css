@@ -4,6 +4,14 @@
 .background{
     -fx-background-color: rgb(212, 215, 223);
 }
+
+.background.login {
+    -fx-background-image: url("/resources/images/BugBackground.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: contain;
+    -fx-background-position: center center;
+}
+
 .label {
     -fx-text-fill: white;
 }
@@ -69,6 +77,10 @@
     -fx-border-color: #ff0000;
 }
 
+.loginPane {
+    -fx-background-color: rgba(54, 57, 63, 0.8);
+    -fx-text-fill: white;
+}
 
 /* Home Page Styling ============================================================== */
 .home-page {
