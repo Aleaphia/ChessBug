@@ -153,6 +153,7 @@ public class GameController implements IGameSelectionController{
         
         //Build game page
         view.buildGamePage();
+        System.out.println("hi there");
         
         //Update chat/match status
         match.poll(client).forEach((move) -> internalPlayerMove(move));
