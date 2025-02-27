@@ -34,21 +34,18 @@ import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.GridPane;
+import javafx.scene.Node;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
-/**
- *
- * @author shosh
- */
+
 public class ChessBug extends Application {
     //Global variables
     Scene mainScene;
@@ -56,8 +53,6 @@ public class ChessBug extends Application {
     HBox mainPane = new HBox();
     GridPane loginPane;
     Client client;
-
-    LoginUI loginUI;
     
     @Override
     public void start(Stage primaryStage) {
@@ -87,7 +82,7 @@ public class ChessBug extends Application {
                       columnMain = new ColumnConstraints(300, 300, 300);
         loginPane.getColumnConstraints().addAll(column, columnMain, column);
 
-         loginUI = new LoginUI(
+         LoginUI loginUI = new LoginUI(
             (String username, String password) -> { // Handle login
                 JSONObject out = new JSONObject();
                 try {
@@ -141,14 +136,19 @@ public class ChessBug extends Application {
         // Add items to the sidebar
         sidebar.getChildren().addAll(
                 logo,
-                createSideBarButton("Home.png", event -> page.getChildren().add(new HomeController(client).getPage())),
-                createSideBarButton("Chess.png", event -> page.getChildren().add(new GameController(client).getPage())),
-                createSideBarButton("Gear.png", event -> page.getChildren().add(new PreferencesController().getPage())),
-                createSideBarButton("User.png", event -> page.getChildren().add(new ProfileController(client).getPage())),
+                createSideBarButton("Home.png", event -> changePage(new HomeController(client).getPage())),
+                createSideBarButton("Chess.png", event -> changePage(new GameController(client).getPage())),
+                createSideBarButton("Gear.png", event -> changePage(new PreferencesController().getPage())),
+                createSideBarButton("User.png", event -> changePage(new ProfileController(client).getPage())),
                 createSideBarButton("Logout.png", event -> mainScene.setRoot(loginPane))
                 );
     
         return sidebar;
+    }
+    private void changePage(Node newPage){
+        //Clear and add new page
+        page.getChildren().clear();
+        page.getChildren().add(newPage);
     }
 
     private Button createSideBarButton(String imageFileName, EventHandler<ActionEvent> eventHandler) {
