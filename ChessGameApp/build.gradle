@@ -45,6 +45,7 @@ sourceSets {
 
 application {
     mainClass = 'chessBug.ChessBug'
+    mainModule = 'chessbug'
 }
 
 task clientExample(dependsOn: classes, type: JavaExec) {
