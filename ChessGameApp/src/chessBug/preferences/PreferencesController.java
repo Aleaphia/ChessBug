@@ -100,25 +100,32 @@ public class PreferencesController {
     // Handle the theme change
     private void handleThemeChange(String theme) {
         System.out.println("Theme changed to: " + theme);
-        String themeFile = theme.equals("Dark") ? "dark-theme.css" : "light-theme.css";
         
-        // Ensure scene is not null
-        Scene scene = soundCheckBox.getScene();  // Use soundCheckBox's scene to access the main scene
+        // Determine the theme file
+        String themeFile = theme.equals("Dark") ? "/styles/dark-theme.css" : "/styles/light-theme.css";
+    
+        // Ensure the scene exists
+        Scene scene = soundCheckBox.getScene();
         if (scene != null) {
-            // Print the URL to verify the correct CSS file is being loaded
-            System.out.println("Applying theme from: " + getClass().getResource(themeFile).toExternalForm());
-            
-            // Clear existing styles and add the new theme
-            scene.getStylesheets().clear();
-            scene.getStylesheets().add(getClass().getResource(themeFile).toExternalForm());
+            try {
+                // Load and apply the new theme
+                String cssPath = getClass().getResource(themeFile).toExternalForm();
+                System.out.println("Applying theme from: " + cssPath);
     
-            // Optionally, force a layout update
-            scene.getRoot().requestLayout();
+                // Clear existing styles and apply the new one
+                scene.getStylesheets().clear();
+                scene.getStylesheets().add(cssPath);
     
-            // Save the selected theme to preferences
-            preferences.put("theme", theme);
+                // Force layout update
+                scene.getRoot().requestLayout();
+    
+                // Save the selected theme to preferences
+                preferences.put("theme", theme);
+            } catch (NullPointerException e) {
+                System.out.println("Error: Could not load CSS file: " + themeFile);
+            }
         } else {
-            System.out.println("Scene is null, theme change failed.");
+            System.out.println("Scene is null, cannot apply theme.");
         }
     }
     
@@ -168,5 +175,7 @@ public class PreferencesController {
         themeComboBox.setValue(preferences.get("theme", "Light"));
         autoSaveCheckBox.setSelected(preferences.getBoolean("autoSaveEnabled", true));
         timeControlComboBox.setValue(preferences.get("timeControl", "None"));
+
+        handleThemeChange(themeComboBox.getValue());
     }
 }

@@ -1,0 +1,19 @@
+/* ====================== CHAT BOX STYLES ====================== */
+
+.chatBox {
+    -fx-background-color: rgb(43, 42, 40);
+    -fx-font: 15px Tahoma;
+    -fx-padding: 5;
+}
+
+.chatMessage {
+    -fx-text-fill: white;
+    -fx-wrap-text: true;
+    -fx-text-alignment: left;
+    -fx-max-width: Infinity;
+}
+
+.chatPfp {
+    -fx-padding: 5;
+    -fx-alignment: top-left;
+}
