@@ -7,12 +7,16 @@ package chessBug.home;
 import chessBug.misc.GameSelectionUI;
 import chessBug.misc.ReceiveFriendRequestUI;
 import chessBug.misc.SendFriendRequestUI;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
 public class HomeView {
     
@@ -33,7 +37,20 @@ public class HomeView {
         page.setLeft(buildUserStats());
         page.setRight(buildFriends());
         page.setCenter(currentContent);
+        continueDatabaseChecks();
     }
+    private void continueDatabaseChecks(){
+        //Check database
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (ActionEvent event) -> {
+            //Add repeated database checks here ================================
+            //Reload friend list
+            populateFriendsContent();
+            // =================================================================
+        }));
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
+    }
+    
     public BorderPane getPage(){return page;}
     public void setPage(BorderPane page){this.page = page;}
     
@@ -126,15 +143,12 @@ public class HomeView {
     }
     
     private void populateFriendsContent(){
+        friendsListContent.getChildren().clear();
         controller.getFriends().forEach(friend -> {
             Label curr = new Label(friend.getUsername());
             curr.setStyle("-fx-text-fill: white;");
             
             friendsListContent.getChildren().add(curr);
-            
-            curr.setOnMouseClicked(event ->{
-                //TODO
-            });
         });
     }
     private void buildCurrentContent() {

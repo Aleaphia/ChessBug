@@ -82,9 +82,10 @@ public class GameSelectionUI {
         matchButton.setOnAction(event -> {
             //If the match is requested, accept the Match
             if(match.getStatus().equals(Match.Status.BLACK_REQUESTED.toString())
-                    || match.getStatus().equals(Match.Status.WHITE_REQUESTED.toString()))
+                    || match.getStatus().equals(Match.Status.WHITE_REQUESTED.toString())){
                 controller.acceptMatchRequest(match);
-            
+            }
+                            
             //Create loading screen
             //TODO
             page.getChildren().clear();
