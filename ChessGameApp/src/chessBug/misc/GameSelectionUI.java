@@ -69,7 +69,6 @@ public class GameSelectionUI {
             case "WhiteTurn" -> currTurn = match.getWhite().getUsername();
             case "BlackTurn" -> currTurn = match.getBlack().getUsername();
         }
-        System.out.println(currTurn + ".vs " + controller.getUsername());
         if (currTurn.equals(controller.getUsername())){
             matchButton.getStyleClass().add("yourMove");
         }

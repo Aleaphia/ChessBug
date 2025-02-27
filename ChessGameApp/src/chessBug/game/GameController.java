@@ -72,17 +72,12 @@ public class GameController implements IGameSelectionController{
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (ActionEvent event) -> {
             //Add repeated database checks here ================================
             if(!isThisPlayersTurn()){ //While waiting for other player's move check database and update boardstate
-                match.poll(client).forEach((move) -> {
-                    System.out.println(move);
-                    internalPlayerMove(move);
-                    
-                        });
+                match.poll(client).forEach((move) -> internalPlayerMove(move));
                 view.refresh(client);
             }
             else{ // during this player's turn just refresh chat
                 view.refreshMessageBoard(client);
             }
-            
             
             // =================================================================
         }));
@@ -110,9 +105,7 @@ public class GameController implements IGameSelectionController{
                 String endMsg = model.getEndMessage();
                 
                 if (endMsg.charAt(11) == 'C'){ //Check for "Checkmate" vs "Draw" or "Stalemate"
-                    System.out.println("checkmate");
                     boolean winner = (endMsg.charAt(22) == 'w'); // Check for  "...white" vs "...black"
-                    System.out.println((winner)? "white" : "black");
                     client.setMatchStatus(match, (winner) ? Match.Status.WHITE_WIN.toString(): Match.Status.BLACK_WIN.toString());
                 }
                 else //If there is no winner, than the game is a draw
@@ -153,7 +146,6 @@ public class GameController implements IGameSelectionController{
         
         //Build game page
         view.buildGamePage();
-        System.out.println("hi there");
         
         //Update chat/match status
         match.poll(client).forEach((move) -> internalPlayerMove(move));
