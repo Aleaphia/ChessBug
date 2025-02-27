@@ -49,4 +49,7 @@ public class HomeController implements IGameSelectionController, IFriendRequestC
         page.getChildren().clear();
         page.getChildren().add(new GameController(client, match).getPage());
     }
+    @Override public void forfitMatch(Match match){ client.setMatchStatus(match, getUserName().equals(match.getWhite().getUsername()) ? 
+            Match.Status.BLACK_WIN.toString() : Match.Status.WHITE_TURN.toString());} //If the user who forfit is white -> black wins, otherwise white wins
+    
 }

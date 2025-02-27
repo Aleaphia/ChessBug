@@ -18,6 +18,7 @@ public interface IGameSelectionController {
     public List<Match> receiveMatchRequest();
     public void acceptMatchRequest(Match match);
     public void denyMatchRequest(Match match);
+    public void forfitMatch(Match match);
     //TODO public void forfeitGame(Match match);
 
 }

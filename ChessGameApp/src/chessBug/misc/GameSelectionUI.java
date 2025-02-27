@@ -94,10 +94,11 @@ public class GameSelectionUI {
         });
         
         endButton.setOnAction(event -> {
-            if(!match.getStatus().equals("InProgress"))
+            if(match.getStatus().equals(Match.Status.BLACK_REQUESTED.toString()) ||
+                    match.getStatus().equals(Match.Status.WHITE_REQUESTED.toString()))
                 controller.denyMatchRequest(match);
-            else{}
-                //TODO
+            else
+                controller.forfitMatch(match);
         });
         
 

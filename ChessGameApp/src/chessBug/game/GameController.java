@@ -64,6 +64,8 @@ public class GameController implements IGameSelectionController{
     @Override public List<Match> receiveMatchRequest(){return client.getMatchRequests();}
     @Override public void acceptMatchRequest(Match match){client.setMatchStatus(match, Match.Status.WHITE_TURN.toString());}
     @Override public void denyMatchRequest(Match match){client.denyMatchRequest(match);}
+    @Override public void forfitMatch(Match match){ client.setMatchStatus(match, getUserName().equals(match.getWhite().getUsername()) ? 
+            Match.Status.BLACK_WIN.toString() : Match.Status.WHITE_TURN.toString());} //If the user who forfit is white -> black wins, otherwise white wins
     
     //Other Methods
     //loop database check
