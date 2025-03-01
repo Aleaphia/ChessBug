@@ -21,10 +21,10 @@ import javafx.scene.layout.AnchorPane;
 
 public class GameView {
 
-    private GameController controller;
+    private final GameController controller;
 
     //Page state
-    private BorderPane page = new BorderPane();
+    private final BorderPane page = new BorderPane();
     private GridPane gameBoard;
     private VBox chatContent;
     private GridPane notationContent;
@@ -34,116 +34,252 @@ public class GameView {
     //Constructors
     public GameView(GameController controller) {
         this.controller = controller;
-
         buildGameSelectionPrompt();
     }
 
-    //Getter/Setter Methods
-    public BorderPane getPage() {
-        return page;
-    }
-    public void displayMessage(String msg){
-        Label curr = new Label(msg);
-        curr.getStyleClass().addAll("chatMessage","botMessage");
-        chatContent.getChildren().add(curr);
-    }
-
-    public void deselectSquare() {
-        selectedSquare = null;
-    }
-
-    //Refresher methods
-    public void refresh(Client client) {
-        refreshGameDisplay();
-        internalRefreshMessageBoard(client);
-    }
-
-    public void refreshMessageBoard(Client client) {
-        internalRefreshMessageBoard(client);
-    }
-
-    private void refreshGameDisplay() {
-        //Update each square in chessBoard to reflect game's condition
-        /*
-        Note: we only need to modify squares (not labels), and all squares are
-        created from the BoarderPane class, so we can modify all BoarderPane
-        children of chessBoard.
-         */
+    //Getter/Setters ===========================================================
+    //Getter Methods
+    public BorderPane getPage() {return page;}
+    private BorderPane getBorderPaneFromId(String id) {
+        BorderPane[] squarePane = new BorderPane[1];
         gameBoard.getChildren().forEach(child -> {
             if (child instanceof BorderPane square) {
-                //System.out.println("Debug: Board id: " + board.getParent().getId() + ", game list size: " + gameList.size());
-
-                //Clear the square's display content
-                square.getChildren().clear();
-
-                //Get the piece inhabiting the corresponding location in the game
-                Piece piece = controller.getLocalPiece(square.getId());
-                //If the piece is not null, load the correct image representation of the piece
-                if (piece != null) {
-                    //Determine imageFileName for based on the piece
-                    String imageFileName = (piece.getColor()) ? "white" : "black";
-                    imageFileName += piece.getClass().getSimpleName();
-
-                    //Load corresponding image
-                    try (InputStream imageFile = GameView.class.getResourceAsStream("/resources/images/pieces/" + imageFileName + ".png")) {
-                        //Create image
-                        ImageView icon = new ImageView(new Image(imageFile));
-                        //Style image
-                        icon.setFitHeight(square.getMinHeight() - 6); //Set Height of image. Note x - 6 allows for insets of 3px
-                        icon.setPreserveRatio(true); //Maintain ratio
-                        //Add image
-                        square.setCenter(icon);
-                    } catch (IOException e) {
-                        //If image is not found, use a label to hold the piece's string representation
-                        square.getChildren().add(new Label(piece.toString()));
-                    }
+                if (square.getId().equals(id)) {
+                    squarePane[0] = square;
                 }
             }
         });
-        //======================================================================
-
+        return squarePane[0];
     }
+    
+    //Setter Methods
+    public void deselectSquare() {selectedSquare = null;}
+    
+    //Other Methods ============================================================
+    //Builder methods ----------------------------------------------------------
+    //Game selection and creation prompts
+    private void buildGameSelectionPrompt() {
+        //Clear page
+        page.getChildren().clear();
 
-    private void internalRefreshMessageBoard(Client client) {
-        //Get any new messages
-        //Add each message to the chat
-        controller.getChatMessages().forEach(x -> {
-            HBox messageContainer = new HBox();
+        //Game Prompt Panel
+        VBox promptSelectionPanel = new VBox();
+        page.setCenter(promptSelectionPanel);
 
-            Image pfp = new Image(client.getUserProfilePictureURL(x.getAuthor()));
-            ImageView pfpView = new ImageView(pfp);
-            pfpView.setFitWidth(32);
-            pfpView.setFitHeight(32);
-            StackPane pfpViewContainer = new StackPane(pfpView);
-            pfpViewContainer.getStyleClass().add("chatPfp");
-            
-            String msg = x.getAuthor() + ": " + x.getContent();
-            Label label = new Label(msg);
-            label.getStyleClass().addAll("chatMessage",
-                    //Test if the client player sent this message and add appropriate style class
-                    (x.getAuthor().equals(controller.getUserName()))? 
-                            "thisPlayerMessage": "otherPlayerMessage");
-            
-            messageContainer.getChildren().addAll(pfpViewContainer, label);
-            chatContent.getChildren().add(messageContainer);
-        });
+        //New game button
+        Button newGame = new Button("New Game");
+        newGame.setOnMouseClicked(event -> buildGameCreationPrompt());
+        promptSelectionPanel.getChildren().addAll(newGame, new GameSelectionUI(controller).getPage());
     }
+    private void buildGameCreationPrompt() {
+        //Clear page
+        page.getChildren().clear();
 
-    public void addToNotationBoard(String move, Boolean playerTurn, int gameMove) {
-        //Expanded notation string
-        String expandedMove = move.substring(0, 2) + "-" + move.substring(2, 4)
-                + ((move.length() == 4) ? "" : ("=" + move.substring(4))); //add promotion info if needed
-        //Place notation one the notation board
-        if (playerTurn) { //White just moved
-            notationContent.add(new Label(Integer.toString(gameMove)), 0, gameMove); //Add new turn label
-            notationContent.add(new Label(expandedMove), 1, gameMove); //Add white move
-        } else { //Black just moved
-            notationContent.add(new Label(expandedMove), 2, gameMove); //Add black move
+        //Game Prompt Panel
+        VBox promptSelectionPanel = new VBox();
+        page.setCenter(promptSelectionPanel);
+
+        //Select Color
+        promptSelectionPanel.getChildren().add(new Label("Select color:"));
+        char[] colorSelection = new char[1];
+        colorSelection[0] = '0'; //w for white, b for black, r for random
+        ToggleGroup colorOptions = new ToggleGroup();
+        String[] colorOptionList = {"white", "black", "random"};
+
+        for (String option : colorOptionList) {
+            RadioButton curr = new RadioButton(option);
+            curr.setOnAction(event -> colorSelection[0] = option.charAt(0));
+            curr.setToggleGroup(colorOptions);
+            promptSelectionPanel.getChildren().add(curr);
         }
-    }
 
+        //Challenge friend: list friends in radio buttons
+        promptSelectionPanel.getChildren().add(new Label("Challenge friend:"));
+        Friend[] friendSelection = new Friend[1];
+        friendSelection[0] = null;
+        ToggleGroup friendOptions = new ToggleGroup();
+        
+        controller.getFriendList().forEach(friend -> {
+            RadioButton curr = new RadioButton(friend.getUsername());
+            curr.setOnAction(event -> friendSelection[0] = friend);
+            curr.setToggleGroup(friendOptions);
+            promptSelectionPanel.getChildren().add(curr);
+        });
+
+        //Create game button
+        Button createGame = new Button("Request Game");
+        createGame.setOnMouseClicked(event -> {
+            if (colorSelection[0] != '0' && friendSelection[0] != null){
+                //Determine color
+                boolean playerColor;
+                switch (colorSelection[0]) {
+                    case 'w' -> playerColor = true; //white
+                    case 'b' -> playerColor = false; // black
+                    default -> playerColor = new Random().nextBoolean(); //random
+                }
+
+                //Create new game
+                controller.sendGameRequest(playerColor, friendSelection[0]);
+                buildGameSelectionPrompt();
+            }
+            
+        });
+        promptSelectionPanel.getChildren().add(createGame);
+    }
+    
+    //Game page
+    /** buildGamePage - creates the page layout to display match, chat, and notation
+     */
+    public void buildGamePage() {
+        //Clear page
+        page.getChildren().clear();
+
+        //Create spaces
+        createGameBoard(controller.getPlayerColor());
+        
+        //Page layout
+        page.setCenter(gameBoard);
+        page.setLeft(createChatSpace());
+        page.setRight(createNotationSpace());    
+    }
+    
+    //Assistant methods to build the differnt portions of the game page
+    private void createGameBoard(boolean isWhitePerspective) {
+        //Create chessBoard
+        gameBoard = new GridPane();
+        gameBoard.getStyleClass().add("chessBoard");
+
+        //Layout chess board within chessBoard =================================
+        for (int row = 0; row < 8; row++) {
+            //Create notation labels for the board -----------------------------
+            //Collumn labels:   a, b, c, d, e, f, g, h
+            Label colLabel = new Label(String.valueOf((char) ('a' + row))); //Create label
+            gameBoard.add(colLabel, (isWhitePerspective) ? row + 1 : 8 - row, 8); //Add label to chessBoard
+            GridPane.setHalignment(colLabel, HPos.CENTER); //specify label alignment
+
+            //Row labels:       8, 7, 6, 5, 4, 3, 2, 1
+            Label rowLabel = new Label(String.valueOf(8 - row)); //Create label
+            gameBoard.add(rowLabel, 0, (isWhitePerspective) ? row : 7 - row); //Add label to chessBoard
+            //specify label alignment
+            GridPane.setValignment(rowLabel, VPos.CENTER);
+            GridPane.setHalignment(rowLabel, HPos.RIGHT);
+            
+            //Styles
+            colLabel.getStyleClass().add("boardLabel");
+            rowLabel.getStyleClass().add("boardLabel");
+            //------------------------------------------------------------------
+
+            //Create each board square in the row ------------------------------
+            for (int col = 0; col < 8; col++) {
+                //Create new pane to represent square
+                BorderPane square = new BorderPane();
+                //Set square ID to notational square name (e.g., b4, c6, h1, etc.)
+                square.setId("" + (char) ('a' + col) + (row + 1));
+
+                //Give squares a class based on color to create checkered pattern
+                if ((row + col) % 2 != 0) {
+                    square.getStyleClass().add("white");
+                } else {
+                    square.getStyleClass().add("black");
+                }
+
+                //Square styles
+                //Specify size for square
+                int squareSize = 50;
+                square.setMinHeight(squareSize);
+                square.setMinWidth(squareSize);
+                //Align square
+                GridPane.setValignment(square, VPos.CENTER);
+                GridPane.setHalignment(square, HPos.CENTER);
+
+                //Add functionality to pressing a square
+                square.setOnMouseClicked(event -> boardInteraction((BorderPane) event.getSource()));
+
+                //Add square to chessBoard
+                gameBoard.add(square, (isWhitePerspective) ? col + 1 : 8 - col, (isWhitePerspective) ? 7 - row : row);
+            }
+        }
+        //----------------------------------------------------------------------
+    }
+    private VBox createChatSpace() {
+        //Create Chat space
+        VBox chatSpace = new VBox();
+        chatContent = new VBox(); //global variable to allow direct and easy manipulation for new mgs
+        TextField msgInput = new TextField();
+        
+        //ScrollPanes contain the chat contents to prevent chat page overflow
+        ScrollPane scroll = new ScrollPane(chatContent);
+        //ScrollPane policies
+        scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        //scroll.setMaxWidth(Double.MAX_VALUE);
+        VBox.setVgrow(scroll, Priority.ALWAYS);
+        chatSpace.setMaxWidth(200);
+        scroll.setPrefWidth(Double.MAX_VALUE);
+        scroll.setMaxWidth(Double.MAX_VALUE);
+        
+        chatContent.setMaxWidth(170);
+        chatContent.setAlignment(Pos.TOP_LEFT);
+
+        //chat space components
+        chatSpace.getChildren().addAll(scroll, msgInput);
+        
+        //Styles ---------------------------------------------------------------
+        scroll.getStyleClass().add("chatBox");
+        chatContent.getStyleClass().add("chatBox");
+//        chatContent.setPrefHeight(2 * page.getHeight() -  msgInput.getHeight());
+
+        // ---------------------------------------------------------------------
+        //Function
+        msgInput.setOnAction(event -> {
+            //Formulate message
+            String msg = msgInput.getText();
+
+            //Send msg to database
+            controller.sendChatMessage(msg);
+
+            //Clear input
+            msgInput.setText("");
+        });
+
+        scroll.setPrefHeight(gameBoard.getHeight());
+        scroll.setMinHeight(100);
+        chatContent.setAlignment(Pos.BOTTOM_CENTER);
+        
+        return chatSpace;
+    }
+    private VBox createNotationSpace() {
+        //Create notation space
+        VBox notationSpace = new VBox();
+        GridPane notationLabel = new GridPane();
+        notationContent = new GridPane(); //global variable to allow direct and easy manipulation
+        
+        //ScrollPanes contain the chat contents to prevent page overflow
+        ScrollPane scroll = new ScrollPane(notationContent);
+        //ScrollPane policies
+        scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scroll.setMaxWidth(Double.MAX_VALUE);
+        VBox.setVgrow(scroll, Priority.ALWAYS);
+        
+        
+        //notation space components
+        notationSpace.getChildren().addAll(notationLabel, scroll);
+        
+        //Create notation space
+        notationLabel.add(new Label("White"), 1, 0);
+        notationLabel.add(new Label("Black"), 2, 0);
+        //Hold space 
+        Label newLabel = new Label();
+        newLabel.setMinWidth(25);
+        notationLabel.add(newLabel,0,0);
+
+        return notationSpace;
+    }
+    
+    //Board interactions -------------------------------------------------------
     private void boardInteraction(BorderPane square) {
-        if (!controller.getGameComplete() && controller.isThisPlayersTurn()  //correct color turn
+        if (!controller.isGameComplete() && controller.isThisPlayersTurn()  //correct color turn
                 ){
             /*
             One of two valid actions may occur when a user selects a square:
@@ -220,9 +356,8 @@ public class GameView {
             //==================================================================
         }
     }
-
     //Handling Promotion Moves: Create form for promotion piece selection
-    public void promote(BorderPane square, String potentialMove) {
+    private void promote(BorderPane square, String potentialMove) {
         //Determine icons to display
         String color = (controller.getPlayerTurn()) ? "white" : "black";
         String[] choices = {"Queen", "Rook", "Bishop", "Knight"};
@@ -253,236 +388,117 @@ public class GameView {
             System.out.println("Error loading promotion prompt images");
         }
     }
+    
+    //Refresher methods --------------------------------------------------------
+    //Public methods
+    /**refresh - reloads entire page - refreshes game board and chat
+     * @param client - database connection needed to update the message board
+     */
+    public void refresh(Client client) {
+        refreshGameDisplay();
+        internalRefreshMessageBoard(client);
+    }
 
-    private BorderPane getBorderPaneFromId(String id) {
-        BorderPane[] squarePane = new BorderPane[1];
+    /** refreshMessageBoard - checks database for new messages - only refreshes chat
+     * @param client - database connection
+     */
+    public void refreshMessageBoard(Client client) {
+        internalRefreshMessageBoard(client);
+    }
+    
+    //Private methdos
+    private void internalRefreshMessageBoard(Client client) {
+        //Get any new messages, add each message to the chat
+        controller.getChatMessages().forEach(msg -> {
+            HBox messageContainer = new HBox();
+
+            //Build content
+            //profile picture
+            ImageView pfpView = new ImageView(new Image(client.getUserProfilePictureURL(msg.getAuthor())));
+            StackPane pfpViewContainer = new StackPane(pfpView);
+            
+            pfpView.setFitWidth(32);
+            pfpView.setFitHeight(32);
+            pfpViewContainer.getStyleClass().add("chatPfp");
+            
+            //Message
+            Label label = new Label(msg.getAuthor() + ": " + msg.getContent());
+            
+            label.getStyleClass().addAll("chatMessage",
+                    //Test if the client player sent this message and add appropriate style class
+                    (msg.getAuthor().equals(controller.getUsername()))? 
+                            "thisPlayerMessage": "otherPlayerMessage");
+            
+            //Add contents to chat container
+            messageContainer.getChildren().addAll(pfpViewContainer, label);
+            chatContent.getChildren().add(messageContainer);
+        });
+    }
+    private void refreshGameDisplay() {
+        //Update each square in chessBoard to reflect game's condition
+        /*
+        Note: we only need to modify squares (not labels), and all squares are
+        created from the BoarderPane class, so we can modify all BoarderPane
+        children of chessBoard.
+         */
         gameBoard.getChildren().forEach(child -> {
             if (child instanceof BorderPane square) {
-                if (square.getId().equals(id)) {
-                    squarePane[0] = square;
+                //System.out.println("Debug: Board id: " + board.getParent().getId() + ", game list size: " + gameList.size());
+
+                //Clear the square's display content
+                square.getChildren().clear();
+
+                //Get the piece inhabiting the corresponding location in the game
+                Piece piece = controller.getLocalPiece(square.getId());
+                //If the piece is not null, load the correct image representation of the piece
+                if (piece != null) {
+                    //Determine imageFileName for based on the piece
+                    String imageFileName = (piece.getColor()) ? "white" : "black";
+                    imageFileName += piece.getClass().getSimpleName();
+
+                    //Load corresponding image
+                    try (InputStream imageFile = GameView.class.getResourceAsStream("/resources/images/pieces/" + imageFileName + ".png")) {
+                        //Create image
+                        ImageView icon = new ImageView(new Image(imageFile));
+                        //Style image
+                        icon.setFitHeight(square.getMinHeight() - 6); //Set Height of image. Note x - 6 allows for insets of 3px
+                        icon.setPreserveRatio(true); //Maintain ratio
+                        //Add image
+                        square.setCenter(icon);
+                    } catch (IOException e) {
+                        //If image is not found, use a label to hold the piece's string representation
+                        square.getChildren().add(new Label(piece.toString()));
+                    }
                 }
             }
         });
-        return squarePane[0];
     }
 
-    //Page space creation
-    private void buildGameSelectionPrompt() {
-        //Clear page
-        page.getChildren().clear();
-
-        //Game Prompt Panel
-        VBox promptSelectionPanel = new VBox();
-        page.setCenter(promptSelectionPanel);
-
-        //New game button
-        Button newGame = new Button("New Game");
-        newGame.setOnMouseClicked(event -> buildGameBuildPrompt());
-        promptSelectionPanel.getChildren().addAll(newGame, new GameSelectionUI(controller).getPage());
+    //Display/add new content ------------------------------------------------------
+    /** displayBotMessage - displays message in chat box with "botMessage" style
+     * @param msg - message to display
+     */
+    public void displayBotMessage(String msg){
+        Label curr = new Label(msg);
+        curr.getStyleClass().addAll("chatMessage","botMessage");
+        chatContent.getChildren().add(curr);
     }
-
-    private void buildGameBuildPrompt() {
-        //Clear page
-        page.getChildren().clear();
-
-        //Game Prompt Panel
-        VBox promptSelectionPanel = new VBox();
-        page.setCenter(promptSelectionPanel);
-
-        //Select Color
-        promptSelectionPanel.getChildren().add(new Label("Select color:"));
-        char[] colorSelection = new char[1];
-        colorSelection[0] = '0'; //w for white, b for black, r for random
-        ToggleGroup colorOptions = new ToggleGroup();
-        String[] colorOptionList = {"white", "black", "random"};
-
-        for (String option : colorOptionList) {
-            RadioButton curr = new RadioButton(option);
-            curr.setOnAction(event -> colorSelection[0] = option.charAt(0));
-            curr.setToggleGroup(colorOptions);
-            promptSelectionPanel.getChildren().add(curr);
+    
+    /** addToNotationBoard - Add a new move to the notation board
+     * @param move - coordinate notation move (e.g., e2e4 or e7e8Q)
+     * @param playerTurn - true means it's white's turn, false means it's black's turn
+     * @param gameMove - the move number according to standard chess notation (each play gest a first, second, ...  move)
+     */
+    public void addToNotationBoard(String move, Boolean playerTurn, int gameMove) {
+        //Expanded notation string
+        String expandedMove = move.substring(0, 2) + "-" + move.substring(2, 4)
+                + ((move.length() == 4) ? "" : ("=" + move.substring(4))); //add promotion info if needed
+        //Place notation one the notation board
+        if (playerTurn) { //White just moved
+            notationContent.add(new Label(Integer.toString(gameMove)), 0, gameMove); //Add new turn label
+            notationContent.add(new Label(expandedMove), 1, gameMove); //Add white move
+        } else { //Black just moved
+            notationContent.add(new Label(expandedMove), 2, gameMove); //Add black move
         }
-
-        //Challenge friend: list friends in radio buttons
-        promptSelectionPanel.getChildren().add(new Label("Challenge friend:"));
-        Friend[] friendSelection = new Friend[1];
-        friendSelection[0] = null;
-        ToggleGroup friendOptions = new ToggleGroup();
-
-        controller.getFriendList().forEach(friend -> {
-            RadioButton curr = new RadioButton(friend.getUsername());
-            curr.setOnAction(event -> friendSelection[0] = friend);
-            curr.setToggleGroup(friendOptions);
-            promptSelectionPanel.getChildren().add(curr);
-        });
-
-        //Create game button
-        Button createGame = new Button("Request Game");
-        createGame.setOnMouseClicked(event -> {
-            if (colorSelection[0] != '0' && friendSelection[0] != null){
-                //Determine color
-                boolean playerColor;
-                switch (colorSelection[0]) {
-                    case 'w' -> playerColor = true; //white
-                    case 'b' -> playerColor = false; // black
-                    default -> playerColor = new Random().nextBoolean(); //random
-                }
-
-                //Create new game
-                controller.sendGameRequest(playerColor, friendSelection[0]);
-                buildGameSelectionPrompt();
-            }
-            
-        });
-        promptSelectionPanel.getChildren().add(createGame);
-        
-    }
-
-    public void buildGamePage() {
-        //Clear page
-        page.getChildren().clear();
-
-        //Create spaces
-        createGameBoard(controller.getPlayerColor());
-        
-        //Page layout
-        page.setCenter(gameBoard);
-        page.setLeft(createChatSpace());
-        page.setRight(createNotationSpace());    
-    }
-
-    private void createGameBoard(boolean isWhitePerspective) {
-        //Create chessBoard
-        gameBoard = new GridPane();
-        gameBoard.getStyleClass().add("chessBoard");
-
-        //Layout chess board within chessBoard =================================
-        for (int row = 0; row < 8; row++) {
-            //Create notation labels for the board -----------------------------
-            //Collumn labels:   a, b, c, d, e, f, g, h
-            Label colLabel = new Label(String.valueOf((char) ('a' + row))); //Create label
-            gameBoard.add(colLabel, (isWhitePerspective) ? row + 1 : 8 - row, 8); //Add label to chessBoard
-            GridPane.setHalignment(colLabel, HPos.CENTER); //specify label alignment
-
-            //Row labels:       8, 7, 6, 5, 4, 3, 2, 1
-            Label rowLabel = new Label(String.valueOf(8 - row)); //Create label
-            gameBoard.add(rowLabel, 0, (isWhitePerspective) ? row : 7 - row); //Add label to chessBoard
-            //specify label alignment
-            GridPane.setValignment(rowLabel, VPos.CENTER);
-            GridPane.setHalignment(rowLabel, HPos.RIGHT);
-            
-            //Styles
-            colLabel.getStyleClass().add("boardLabel");
-            rowLabel.getStyleClass().add("boardLabel");
-            //------------------------------------------------------------------
-
-            //Create each board square in the row ------------------------------
-            for (int col = 0; col < 8; col++) {
-                //Create new pane to represent square
-                BorderPane square = new BorderPane();
-                //Set square ID to notational square name (e.g., b4, c6, h1, etc.)
-                square.setId("" + (char) ('a' + col) + (row + 1));
-
-                //Give squares a class based on color to create checkered pattern
-                if ((row + col) % 2 != 0) {
-                    square.getStyleClass().add("white");
-                } else {
-                    square.getStyleClass().add("black");
-                }
-
-                //Square styles
-                //Specify size for square
-                int squareSize = 50;
-                square.setMinHeight(squareSize);
-                square.setMinWidth(squareSize);
-                //Align square
-                GridPane.setValignment(square, VPos.CENTER);
-                GridPane.setHalignment(square, HPos.CENTER);
-
-                //Add functionality to pressing a square
-                square.setOnMouseClicked(event -> boardInteraction((BorderPane) event.getSource()));
-
-                //Add square to chessBoard
-                gameBoard.add(square, (isWhitePerspective) ? col + 1 : 8 - col, (isWhitePerspective) ? 7 - row : row);
-            }
-        }
-        //----------------------------------------------------------------------
-    }
-
-    private VBox createChatSpace() {
-        //Create Chat space
-        VBox chatSpace = new VBox();
-        chatContent = new VBox(); //global variable to allow direct and easy manipulation for new mgs
-        TextField msgInput = new TextField();
-        
-        //ScrollPanes contain the chat contents to prevent chat page overflow
-        ScrollPane scroll = new ScrollPane(chatContent);
-        //ScrollPane policies
-        scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        //scroll.setMaxWidth(Double.MAX_VALUE);
-        VBox.setVgrow(scroll, Priority.ALWAYS);
-        chatSpace.setMaxWidth(200);
-        scroll.setPrefWidth(Double.MAX_VALUE);
-        scroll.setMaxWidth(Double.MAX_VALUE);
-        
-        chatContent.setMaxWidth(170);
-        chatContent.setAlignment(Pos.TOP_LEFT);
-
-        //chat space components
-        chatSpace.getChildren().addAll(scroll, msgInput);
-        
-        //Styles ---------------------------------------------------------------
-        scroll.getStyleClass().add("chatBox");
-        chatContent.getStyleClass().add("chatBox");
-//        chatContent.setPrefHeight(2 * page.getHeight() -  msgInput.getHeight());
-
-        // ---------------------------------------------------------------------
-        //Function
-        msgInput.setOnAction(event -> {
-            //Formulate message
-            String msg = msgInput.getText();
-
-            //Send msg to database
-            controller.sendChatMessage(msg);
-
-            //Clear input
-            msgInput.setText("");
-        });
-
-        scroll.setPrefHeight(gameBoard.getHeight());
-        scroll.setMinHeight(100);
-        chatContent.setAlignment(Pos.BOTTOM_CENTER);
-        
-        return chatSpace;
-    }
-
-    private VBox createNotationSpace() {
-        //Create notation space
-        VBox notationSpace = new VBox();
-        GridPane notationLabel = new GridPane();
-        notationContent = new GridPane(); //global variable to allow direct and easy manipulation
-        
-        //ScrollPanes contain the chat contents to prevent page overflow
-        ScrollPane scroll = new ScrollPane(notationContent);
-        //ScrollPane policies
-        scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scroll.setMaxWidth(Double.MAX_VALUE);
-        VBox.setVgrow(scroll, Priority.ALWAYS);
-        
-        
-        //notation space components
-        notationSpace.getChildren().addAll(notationLabel, scroll);
-        
-        //Create notation space
-        notationLabel.add(new Label("White"), 1, 0);
-        notationLabel.add(new Label("Black"), 2, 0);
-        //Hold space 
-        Label newLabel = new Label();
-        newLabel.setMinWidth(25);
-        notationLabel.add(newLabel,0,0);
-
-        return notationSpace;
     }
 }

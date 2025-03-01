@@ -9,7 +9,6 @@ import chessGame.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.stream.Stream;
 
 public class GameModel {
     //Chess game state
@@ -34,10 +33,10 @@ public class GameModel {
     public ArrayList<String> getMoveListForLocalPiece(String square){return game.getMoveListForLocalPiece(square);}
     public Boolean getPlayerTurn(){return game.getPlayerTurn();}
     public Boolean getPlayerColor(){return playerColor;}
-    public void printBoard(){game.printBoard();}
     public String getEndMessage(){return game.checkEnd();}
    
     //Other Methods
+    public void printBoard(){game.printBoard();} //Used for debugging
     /**MakePlayerMove  - updates chess game and model information in response to a move
      * 
      * @param notation - Coordinate notation in the format e2e4 or e2e1Q (promotion)
