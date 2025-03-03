@@ -26,6 +26,9 @@ public class GameView {
     private VBox chatContent;
     private GridPane notationContent;
     private VBox msgBoard = new VBox();
+    
+    private ScrollPane chatScroll;
+    private ScrollPane notationScroll;
 
     private String selectedSquare = null;
 
@@ -146,6 +149,8 @@ public class GameView {
         scroll.setMaxWidth(Double.MAX_VALUE);
         scroll.setPrefHeight(gameBoard.getHeight());
         chatContent.setAlignment(Pos.TOP_LEFT);
+        scroll.setVvalue(1.0); 
+        chatContent.heightProperty().addListener(observable -> scroll.setVvalue(1D));
 
         //chat space components
         chatSpace.getChildren().addAll(scroll, msgInput);
@@ -183,6 +188,8 @@ public class GameView {
         scroll.setMaxWidth(Double.MAX_VALUE);
         scroll.setPrefHeight(gameBoard.getHeight());
         notationContent.setAlignment(Pos.TOP_LEFT);
+        scroll.setVvalue(1.0); 
+        notationContent.heightProperty().addListener(observable -> scroll.setVvalue(1D));
         
         //Style
         notationSpace.getStyleClass().add("notationBoard");
