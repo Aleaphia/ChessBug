@@ -5,7 +5,7 @@
  */
 package chessBug.game;
 
-import chessBug.misc.IGameSelectionController;
+import chessBug.misc.*;
 import chessGame.*;
 import chessBug.network.*;
 import java.util.*;
@@ -17,13 +17,16 @@ import javafx.util.Duration;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 
-public class GameController implements IGameSelectionController{
+public class GameController implements IGameSelectionController, IGameCreationController{
     //Database Connection
     private Client client;
     private Match match = null;
     private Chat chat;
-    
+    //Page
+    private Pane page = new Pane();
     //MVC
     private GameModel model;
     private GameView view;
@@ -34,7 +37,12 @@ public class GameController implements IGameSelectionController{
         client = player;
         
         //Create view
-        view = new GameView(this);
+        //Game Prompt Panel
+        VBox promptSelectionPanel = new VBox();
+        page.getChildren().add(promptSelectionPanel);
+
+        //New game button
+        promptSelectionPanel.getChildren().addAll(new GameCreationUI(this).getPage(), new GameSelectionUI(this).getPage());
     }
     public GameController(Client player, Match match){ //selected match
         this(player);
@@ -60,12 +68,11 @@ public class GameController implements IGameSelectionController{
     }
     
     //Getter Methods ===========================================================
-    public BorderPane getPage(){return view.getPage();}
+    public Pane getPage(){return page;}
     
     //Database information
     public Stream<Message> getChatMessages(){return chat.poll(client);}
     public Stream<String> getMatchMoves(){return match.poll(client);}
-    public List<Friend> getFriendList(){return client.getFriends();}
     
     //Model information
     public Piece getLocalPiece(String square){return model.getLocalPiece(square);}
@@ -73,8 +80,9 @@ public class GameController implements IGameSelectionController{
     public Boolean isGameComplete(){return model.getGameComplete();}
     public Boolean isThisPlayersTurn(){return (model.getPlayerTurn() && model.getPlayerColor()) ||
             (!model.getPlayerTurn() && !model.getPlayerColor());}
-    public Boolean getPlayerTurn(){return model.getPlayerTurn();}
+    public Boolean getPlayerTurnBoolean(){return model.getPlayerTurn();}
     public Boolean getPlayerColor(){return model.getPlayerColor();}
+    public User getPlayerTurnUser(){return (model.getPlayerTurn())? match.getWhite() : match.getBlack();}
 
 
     //Overriden methods ========================================================
@@ -87,6 +95,19 @@ public class GameController implements IGameSelectionController{
     @Override public void forfitMatch(Match match){ client.setMatchStatus(match, getUsername().equals(match.getWhite().getUsername()) ? 
             Match.Status.BLACK_WIN.toString() : Match.Status.WHITE_TURN.toString());} //If the user who forfit is white -> black wins, otherwise white wins
     @Override public void selectGame(Match newMatch){internalSelectGame(newMatch);}
+    
+    //IGameCreationController methods
+    @Override public List<Friend> getFriendList(){return client.getFriends();}
+    @Override public void sendGameRequest(Boolean playerColor, User opponent){
+        // Send new match request in database for opponent
+        try{
+            client.sendMatchRequest(opponent, playerColor);
+        }
+        catch( Exception e){
+            System.out.println("Error: Unable to create new match");
+            e.printStackTrace();
+        }
+    }
     
     //Other Methods ============================================================
     /** sendChatMessage - sends chat message to database
@@ -138,6 +159,11 @@ public class GameController implements IGameSelectionController{
             //Add notation to view
             view.addToNotationBoard(notation, !model.getPlayerTurn(), model.getTurnNumber());
             
+            //Display player turn
+            String msg = ((getPlayerTurnBoolean())? "White" : "Black") + "'s turn: " +
+                ((isThisPlayersTurn())? "Your move!" : "Waiting on " + getPlayerTurnUser().getUsername());
+            view.displayBotMessage(msg);
+            
             //At end of game, display end message
             if (model.getGameComplete()){
                 view.displayBotMessage(model.getEndMessage());
@@ -150,38 +176,25 @@ public class GameController implements IGameSelectionController{
     /** internalSelectGame - guild model and view for a selected match
      * @param newMatch - chess match to display
      */
-    private void internalSelectGame(Match newMatch){
+    private void internalSelectGame(Match match){
         //Cache match and chat
-        match = newMatch;
-        chat = match.getChat();
-                
+        this.match = match;
+        chat = this.match.getChat();
+                        
         //Build model
-        boolean playerColor = match.getWhite().equals(client.getOwnUser()); //Assumes player is valid player in match
+        boolean playerColor = this.match.getWhite().equals(client.getOwnUser()); //Assumes player is valid player in match
         model = new GameModel(playerColor);
-        
+                
         //Build game page
-        view.buildGamePage();
-        
+        view = new GameView(this);
+        page.getChildren().clear();
+        page.getChildren().add(view.getPage());
+                
         //Update chat/match status
-        match.poll(client).forEach((move) -> internalPlayerMove(move));
+        this.match.poll(client).forEach((move) -> internalPlayerMove(move));
         view.refresh(client);
         
         //Check database
         continueDatabaseChecks();
-    }
-    
-    /** sendGameRequest - sends new game request to database
-     * @param - playerColor : what color is the player requesting
-     * @param - opponent: who are they playing against
-     */
-    public void sendGameRequest(Boolean playerColor, User opponent){
-        // Send new match request in database for opponent
-        try{
-            client.sendMatchRequest(opponent, playerColor);
-        }
-        catch( Exception e){
-            System.out.println("Error: Unable to create new match");
-            e.printStackTrace();
-        }
     }
 }

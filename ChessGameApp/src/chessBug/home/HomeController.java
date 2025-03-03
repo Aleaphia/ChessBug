@@ -28,7 +28,7 @@ public class HomeController implements IGameSelectionController, IFriendRequestC
         page.getChildren().add(view.getPage());
     }
     
-    public Node getPage(){ return page;}
+    public Pane getPage(){ return page;}
     public String getUserName(){return client.getOwnUser().getUsername();}
     public List<Friend> getFriends(){return client.getFriends();}
     

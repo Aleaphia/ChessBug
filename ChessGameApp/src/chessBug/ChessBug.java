@@ -26,6 +26,7 @@ import chessBug.network.Client;
 import chessBug.network.ClientAuthException;
 import chessBug.preferences.PreferencesController;
 import chessBug.profile.ProfileController;
+import chessBug.login.LoginUI;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -40,7 +41,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.GridPane;
-import javafx.scene.Node;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.Priority;
@@ -60,11 +60,11 @@ public class ChessBug extends Application {
         createLoginPage(); //Set up loginPane
         //Scene and Stage
         primaryStage.setTitle("ChessBug"); //Name for application stage
-        mainScene = new Scene(loginPane, 800, 600); //Add loginPane to the mainScene
+        mainScene = new Scene(loginPane, 950, 600); //Add loginPane to the mainScene
         primaryStage.setScene(mainScene);//Add mainScene to primaryStage
         
         //Style
-        mainScene.getStylesheets().add("Styles.css");
+        mainScene.getStylesheets().addAll("login.css", "Styles.css");
        
         //Display
         primaryStage.show();
@@ -136,19 +136,28 @@ public class ChessBug extends Application {
         // Add items to the sidebar
         sidebar.getChildren().addAll(
                 logo,
-                createSideBarButton("Home.png", event -> changePage(new HomeController(client).getPage())),
-                createSideBarButton("Chess.png", event -> changePage(new GameController(client).getPage())),
+                createSideBarButton("Home.png", event -> changePage(new HomeController(client).getPage(), "home")),
+                createSideBarButton("Chess.png", event -> changePage(new GameController(client).getPage(), "game")),
                 createSideBarButton("Gear.png", event -> changePage(new PreferencesController().getPage())),
-                createSideBarButton("User.png", event -> changePage(new ProfileController(client).getPage())),
-                createSideBarButton("Logout.png", event -> mainScene.setRoot(loginPane))
-                );
+                createSideBarButton("User.png", event -> changePage(new ProfileController(client).getPage(), "profile")),
+                createSideBarButton("Logout.png", event -> {
+                    mainScene.setRoot(loginPane);
+                    mainScene.getStylesheets().add("login.css");
+                }));
     
         return sidebar;
     }
-    private void changePage(Node newPage){
+    private void changePage(Pane newPage){
         //Clear and add new page
         page.getChildren().clear();
         page.getChildren().add(newPage);
+        mainScene.getStylesheets().clear();
+        mainScene.getStylesheets().add("Styles.css");
+    }
+     private void changePage(Pane newPage, String stylePage){
+        //Clear and add new page
+        changePage(newPage);
+        mainScene.getStylesheets().add(stylePage + ".css");
     }
 
     private Button createSideBarButton(String imageFileName, EventHandler<ActionEvent> eventHandler) {

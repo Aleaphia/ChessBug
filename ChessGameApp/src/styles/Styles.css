@@ -1,0 +1,205 @@
+/* ====================== GLOBAL STYLES ====================== */
+
+/* Background */
+.background {
+    -fx-background-color: rgb(212, 215, 223);
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: contain;
+    -fx-background-position: center center;
+}
+
+/* Labels */
+.label {
+    -fx-text-fill: white;
+}
+
+.header {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+/* ====================== BUTTON STYLES ====================== */
+
+.button, .file-chooser-button, .change-password-button {
+    -fx-font-size: 14px;
+    -fx-padding: 10px 20px;
+    -fx-border-radius: 5px;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+    -fx-transition: background-color 0.3s ease;
+}
+
+.button, .file-chooser-button {
+    -fx-background-color: #5c6bc0;
+}
+
+.button:hover, .file-chooser-button:hover {
+    -fx-background-color: #3f51b5;
+}
+
+.change-password-button {
+    -fx-background-color: #f44336;
+}
+
+.change-password-button:hover {
+    -fx-background-color: #d32f2f;
+}
+
+/* ====================== FORM ELEMENTS ====================== */
+
+.combo-box, .check-box {
+    -fx-font-size: 14px;
+    -fx-pref-width: 200px;
+    -fx-padding: 10px;
+}
+
+.combo-box {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #ccc;
+    -fx-border-width: 1;
+    -fx-background-insets: 0;
+    -fx-text-fill: #333;
+}
+
+/* ====================== CHAT BOX STYLES ====================== */
+
+.chatBox {
+    -fx-background-color: rgb(43, 42, 40);
+    -fx-font: 15px Tahoma;
+    -fx-padding: 5;
+}
+
+.chatMessage {
+    -fx-text-fill: white;
+    -fx-wrap-text: true;
+    -fx-text-alignment: left;
+    -fx-max-width: Infinity;
+}
+
+.chatPfp {
+    -fx-padding: 5;
+    -fx-alignment: top-left;
+}
+
+/* ====================== LOGIN PAGE ====================== 
+
+.login-error { 
+    -fx-border-color: #ff0000;
+}
+
+.loginPane {
+    -fx-background-color: rgba(54, 57, 63, 0.8);
+    -fx-text-fill: white;
+}
+
+/* ====================== HOME PAGE ====================== */
+
+.home-page {
+    -fx-background-color: #36393f;
+    -fx-text-fill: white;
+    -fx-padding: 20px;
+}
+
+.home-page .welcome-message {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+.home-page .section-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.home-page .activity-feed, .home-page .stats-section {
+    -fx-background-color: #2a2d34;
+    -fx-padding: 10px;
+    -fx-border-radius: 8px;
+}
+
+/* ====================== CHESS BOARD ====================== */
+
+.boardLabel {
+    -fx-text-alignment: center;
+    -fx-label-padding: 5;
+    -fx-wrap-text: true;
+}
+
+.chessBoard {
+    -fx-font: 30px Tahoma;
+    -fx-padding: 20;
+    -fx-alignment: center;
+}
+
+/* Chess Square Styles */
+.black { -fx-background-color: rgb(111, 115, 172); }
+.white { -fx-background-color: rgb(197, 194, 188); }
+
+/* Square Interaction */
+.selected, .possibleMove {
+    -fx-border-width: 3;
+    -fx-border-insets: 0;
+}
+
+.selected { -fx-border-color: rgb(3, 255, 95); }
+.possibleMove { -fx-border-color: rgb(255, 238, 3); }
+
+/* Notation baord*/
+.notationBoard{
+    -fx-background-color: rgb(41, 39, 42);
+    -fx-hgap: 5;
+    -fx-vgap: 1;
+    -fx-padding: 15px;
+}
+.notationLabel{
+    -fx-label-padding: 5 , 0;
+}
+
+/* Player Turn Indicator */
+.whiteTurn, .yourMove {
+    -fx-background-color: darkgreen;
+    -fx-padding: 10px;
+    -fx-text-fill: white;
+}
+
+/* ====================== PROFILE PAGE ====================== */
+
+.profilePage {
+    -fx-background-color: #f7f7f7;
+    -fx-padding: 20px;
+}
+
+/* Profile Picture */
+.profile-picture {
+    -fx-border-radius: 50%;
+    -fx-border-color: #b0bec5;
+    -fx-border-width: 2px;
+    -fx-padding: 10px;
+    -fx-background-color: #ffffff;
+}
+
+/* Username and Email */
+.usernameLabel, .emailLabel {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333;
+    -fx-padding: 5px;
+}
+
+/* ====================== GENERAL LAYOUT ====================== */
+
+.layout, .profile-layout {
+    -fx-spacing: 15px;
+    -fx-alignment: center;
+    -fx-padding: 10px;
+}
+
+/* ====================== RESPONSIVE DESIGN ====================== */
+
+@media screen and (max-width: 800px) {
+    .background {
+        -fx-background-color: #2f3136;
+    }
+    .sidebar {
+        -fx-width: 150px;
+    }
+}

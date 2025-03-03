@@ -30,10 +30,10 @@ public class GameSelectionUI {
             //Reload game info
             //Game requests
             gameRequests.getChildren().clear();
-            controller.receiveMatchRequest().forEach(match -> displayMatch(match, gameRequests));
+            controller.receiveMatchRequest().forEach(match -> displayMatch(match, gameRequests, true));
             //Games in progress
             gamesInProgress.getChildren().clear();
-            controller.getOpenMatchList().forEach(match -> displayMatch(match, gamesInProgress));
+            controller.getOpenMatchList().forEach(match -> displayMatch(match, gamesInProgress, false));
             // =================================================================
         }));
         timeline.setCycleCount(Timeline.INDEFINITE);
@@ -52,16 +52,16 @@ public class GameSelectionUI {
         
         //List Games
         //Game requests
-        controller.receiveMatchRequest().forEach(match -> displayMatch(match, gameRequests));
+        controller.receiveMatchRequest().forEach(match -> displayMatch(match, gameRequests, true));
         //Games in progress
-        controller.getOpenMatchList().forEach(match -> displayMatch(match, gamesInProgress));
-    }
+        controller.getOpenMatchList().forEach(match -> displayMatch(match, gamesInProgress, false));
+    }    
     
-    private void displayMatch(Match match, VBox pane){
+    private void displayMatch(Match match, VBox pane, Boolean isRequest){
         //Layout
         HBox hbox = new HBox();
         Button matchButton = new Button(match.toString());
-        Button endButton = new Button((match.getStatus().substring(5).equals("Turn"))? "Forfiet" : "Deny");
+        Button endButton = new Button((isRequest)? "Forfiet" : "Deny");
         
         //Determine current turn
         String currTurn = "";
@@ -69,21 +69,17 @@ public class GameSelectionUI {
             case "WhiteTurn" -> currTurn = match.getWhite().getUsername();
             case "BlackTurn" -> currTurn = match.getBlack().getUsername();
         }
-        if (currTurn.equals(controller.getUsername())){
+        if (!isRequest && currTurn.equals(controller.getUsername())){
             matchButton.getStyleClass().add("yourMove");
         }
-            
-        
         
         hbox.getChildren().addAll(matchButton,endButton);
         pane.getChildren().add(hbox);
         
         matchButton.setOnAction(event -> {
             //If the match is requested, accept the Match
-            if(match.getStatus().equals(Match.Status.BLACK_REQUESTED.toString())
-                    || match.getStatus().equals(Match.Status.WHITE_REQUESTED.toString())){
+            if(isRequest)
                 controller.acceptMatchRequest(match);
-            }
                             
             //Create loading screen
             //TODO
@@ -94,8 +90,7 @@ public class GameSelectionUI {
         });
         
         endButton.setOnAction(event -> {
-            if(match.getStatus().equals(Match.Status.BLACK_REQUESTED.toString()) ||
-                    match.getStatus().equals(Match.Status.WHITE_REQUESTED.toString()))
+            if(isRequest)
                 controller.denyMatchRequest(match);
             else
                 controller.forfitMatch(match);

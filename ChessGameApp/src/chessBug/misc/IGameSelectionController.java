@@ -5,11 +5,8 @@
 package chessBug.misc;
 
 import chessBug.network.Match;
+import chessBug.network.Friend;
 import java.util.List;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
-import javafx.event.ActionEvent;
-import javafx.util.Duration;
 
 public interface IGameSelectionController {
     public String getUsername();
@@ -19,6 +16,4 @@ public interface IGameSelectionController {
     public void acceptMatchRequest(Match match);
     public void denyMatchRequest(Match match);
     public void forfitMatch(Match match);
-    //TODO public void forfeitGame(Match match);
-
 }

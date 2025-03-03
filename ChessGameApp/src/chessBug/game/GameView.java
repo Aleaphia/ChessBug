@@ -4,7 +4,6 @@
  */
 package chessBug.game;
 
-import chessBug.misc.GameSelectionUI;
 import chessGame.*;
 import chessBug.network.*;
 import java.io.*;
@@ -15,9 +14,7 @@ import javafx.geometry.*;
 import javafx.scene.layout.*;
 import javafx.scene.control.*;
 import javafx.scene.image.*;
-import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.AnchorPane;
 
 public class GameView {
 
@@ -28,13 +25,14 @@ public class GameView {
     private GridPane gameBoard;
     private VBox chatContent;
     private GridPane notationContent;
+    private VBox msgBoard = new VBox();
 
     private String selectedSquare = null;
 
     //Constructors
     public GameView(GameController controller) {
         this.controller = controller;
-        buildGameSelectionPrompt();
+        buildGamePage();
     }
 
     //Getter/Setters ===========================================================
@@ -57,80 +55,9 @@ public class GameView {
     
     //Other Methods ============================================================
     //Builder methods ----------------------------------------------------------
-    //Game selection and creation prompts
-    private void buildGameSelectionPrompt() {
-        //Clear page
-        page.getChildren().clear();
-
-        //Game Prompt Panel
-        VBox promptSelectionPanel = new VBox();
-        page.setCenter(promptSelectionPanel);
-
-        //New game button
-        Button newGame = new Button("New Game");
-        newGame.setOnMouseClicked(event -> buildGameCreationPrompt());
-        promptSelectionPanel.getChildren().addAll(newGame, new GameSelectionUI(controller).getPage());
-    }
-    private void buildGameCreationPrompt() {
-        //Clear page
-        page.getChildren().clear();
-
-        //Game Prompt Panel
-        VBox promptSelectionPanel = new VBox();
-        page.setCenter(promptSelectionPanel);
-
-        //Select Color
-        promptSelectionPanel.getChildren().add(new Label("Select color:"));
-        char[] colorSelection = new char[1];
-        colorSelection[0] = '0'; //w for white, b for black, r for random
-        ToggleGroup colorOptions = new ToggleGroup();
-        String[] colorOptionList = {"white", "black", "random"};
-
-        for (String option : colorOptionList) {
-            RadioButton curr = new RadioButton(option);
-            curr.setOnAction(event -> colorSelection[0] = option.charAt(0));
-            curr.setToggleGroup(colorOptions);
-            promptSelectionPanel.getChildren().add(curr);
-        }
-
-        //Challenge friend: list friends in radio buttons
-        promptSelectionPanel.getChildren().add(new Label("Challenge friend:"));
-        Friend[] friendSelection = new Friend[1];
-        friendSelection[0] = null;
-        ToggleGroup friendOptions = new ToggleGroup();
-        
-        controller.getFriendList().forEach(friend -> {
-            RadioButton curr = new RadioButton(friend.getUsername());
-            curr.setOnAction(event -> friendSelection[0] = friend);
-            curr.setToggleGroup(friendOptions);
-            promptSelectionPanel.getChildren().add(curr);
-        });
-
-        //Create game button
-        Button createGame = new Button("Request Game");
-        createGame.setOnMouseClicked(event -> {
-            if (colorSelection[0] != '0' && friendSelection[0] != null){
-                //Determine color
-                boolean playerColor;
-                switch (colorSelection[0]) {
-                    case 'w' -> playerColor = true; //white
-                    case 'b' -> playerColor = false; // black
-                    default -> playerColor = new Random().nextBoolean(); //random
-                }
-
-                //Create new game
-                controller.sendGameRequest(playerColor, friendSelection[0]);
-                buildGameSelectionPrompt();
-            }
-            
-        });
-        promptSelectionPanel.getChildren().add(createGame);
-    }
-    
-    //Game page
     /** buildGamePage - creates the page layout to display match, chat, and notation
      */
-    public void buildGamePage() {
+    private void buildGamePage() {
         //Clear page
         page.getChildren().clear();
 
@@ -140,7 +67,10 @@ public class GameView {
         //Page layout
         page.setCenter(gameBoard);
         page.setLeft(createChatSpace());
-        page.setRight(createNotationSpace());    
+        page.setRight(createNotationSpace());        
+        //Style
+        page.getStyleClass().add("page");
+        
     }
     
     //Assistant methods to build the differnt portions of the game page
@@ -200,6 +130,7 @@ public class GameView {
             }
         }
         //----------------------------------------------------------------------
+        gameBoard.add(msgBoard, 0, 9, 9, 1); //Add msgBoard
     }
     private VBox createChatSpace() {
         //Create Chat space
@@ -209,16 +140,11 @@ public class GameView {
         
         //ScrollPanes contain the chat contents to prevent chat page overflow
         ScrollPane scroll = new ScrollPane(chatContent);
-        //ScrollPane policies
-        scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        //scroll.setMaxWidth(Double.MAX_VALUE);
+        
         VBox.setVgrow(scroll, Priority.ALWAYS);
         chatSpace.setMaxWidth(200);
-        scroll.setPrefWidth(Double.MAX_VALUE);
         scroll.setMaxWidth(Double.MAX_VALUE);
-        
-        chatContent.setMaxWidth(170);
+        scroll.setPrefHeight(gameBoard.getHeight());
         chatContent.setAlignment(Pos.TOP_LEFT);
 
         //chat space components
@@ -227,7 +153,6 @@ public class GameView {
         //Styles ---------------------------------------------------------------
         scroll.getStyleClass().add("chatBox");
         chatContent.getStyleClass().add("chatBox");
-//        chatContent.setPrefHeight(2 * page.getHeight() -  msgInput.getHeight());
 
         // ---------------------------------------------------------------------
         //Function
@@ -241,10 +166,6 @@ public class GameView {
             //Clear input
             msgInput.setText("");
         });
-
-        scroll.setPrefHeight(gameBoard.getHeight());
-        scroll.setMinHeight(100);
-        chatContent.setAlignment(Pos.BOTTOM_CENTER);
         
         return chatSpace;
     }
@@ -257,22 +178,33 @@ public class GameView {
         //ScrollPanes contain the chat contents to prevent page overflow
         ScrollPane scroll = new ScrollPane(notationContent);
         //ScrollPane policies
-        scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scroll.setMaxWidth(Double.MAX_VALUE);
         VBox.setVgrow(scroll, Priority.ALWAYS);
+        notationContent.setMaxWidth(200);
+        scroll.setMaxWidth(Double.MAX_VALUE);
+        scroll.setPrefHeight(gameBoard.getHeight());
+        notationContent.setAlignment(Pos.TOP_LEFT);
         
+        //Style
+        notationSpace.getStyleClass().add("notationBoard");
+        notationLabel.getStyleClass().addAll("notationGrid", "notationBoard");
+        notationContent.getStyleClass().addAll("notationGrid", "notationBoard");
         
         //notation space components
         notationSpace.getChildren().addAll(notationLabel, scroll);
         
         //Create notation space
-        notationLabel.add(new Label("White"), 1, 0);
-        notationLabel.add(new Label("Black"), 2, 0);
+        Label labelW = new Label("White");
+        Label labelB = new Label("Black");
+        notationLabel.add(labelW, 1, 0);
+        notationLabel.add(labelB, 2, 0);
         //Hold space 
         Label newLabel = new Label();
-        newLabel.setMinWidth(25);
+        newLabel.setMinWidth(20);
         notationLabel.add(newLabel,0,0);
+        
+        //Style
+        labelW.getStyleClass().addAll("notationLabel", "header");
+        labelB.getStyleClass().addAll("notationLabel", "header");
 
         return notationSpace;
     }
@@ -315,7 +247,7 @@ public class GameView {
                 - a piece of the correct color has been selected
              */
             if (localPiece != null //A piece has been selected
-                    && localPiece.getColor() == controller.getPlayerTurn() //Check that piece color matches players turn's color
+                    && localPiece.getColor() == controller.getPlayerTurnBoolean() //Check that piece color matches players turn's color
                     ) {
                 //Select Square
                 //Add square to selectedSquareList at the corresponding index
@@ -359,7 +291,7 @@ public class GameView {
     //Handling Promotion Moves: Create form for promotion piece selection
     private void promote(BorderPane square, String potentialMove) {
         //Determine icons to display
-        String color = (controller.getPlayerTurn()) ? "white" : "black";
+        String color = (controller.getPlayerTurnBoolean()) ? "white" : "black";
         String[] choices = {"Queen", "Rook", "Bishop", "Knight"};
         //Determine location to display them
         String locationName = square.getId();
@@ -408,18 +340,22 @@ public class GameView {
     
     //Private methdos
     private void internalRefreshMessageBoard(Client client) {
+        
         //Get any new messages, add each message to the chat
         controller.getChatMessages().forEach(msg -> {
+            long time = System.currentTimeMillis(); //DEBUG
             HBox messageContainer = new HBox();
-
+            System.out.println(System.currentTimeMillis() - time); //DEBUG
             //Build content
             //profile picture
             ImageView pfpView = new ImageView(new Image(client.getUserProfilePictureURL(msg.getAuthor())));
+            System.out.println(System.currentTimeMillis() - time); //DEBUG
             StackPane pfpViewContainer = new StackPane(pfpView);
             
             pfpView.setFitWidth(32);
             pfpView.setFitHeight(32);
             pfpViewContainer.getStyleClass().add("chatPfp");
+            System.out.println(System.currentTimeMillis() - time);
             
             //Message
             Label label = new Label(msg.getAuthor() + ": " + msg.getContent());
@@ -428,10 +364,12 @@ public class GameView {
                     //Test if the client player sent this message and add appropriate style class
                     (msg.getAuthor().equals(controller.getUsername()))? 
                             "thisPlayerMessage": "otherPlayerMessage");
+            System.out.println(System.currentTimeMillis() - time);
             
             //Add contents to chat container
             messageContainer.getChildren().addAll(pfpViewContainer, label);
             chatContent.getChildren().add(messageContainer);
+            System.out.println(System.currentTimeMillis() - time);
         });
     }
     private void refreshGameDisplay() {
@@ -480,8 +418,9 @@ public class GameView {
      */
     public void displayBotMessage(String msg){
         Label curr = new Label(msg);
-        curr.getStyleClass().addAll("chatMessage","botMessage");
-        chatContent.getChildren().add(curr);
+        curr.getStyleClass().addAll("botMessage");
+        msgBoard.getChildren().clear();
+        msgBoard.getChildren().add(curr);
     }
     
     /** addToNotationBoard - Add a new move to the notation board
@@ -493,12 +432,22 @@ public class GameView {
         //Expanded notation string
         String expandedMove = move.substring(0, 2) + "-" + move.substring(2, 4)
                 + ((move.length() == 4) ? "" : ("=" + move.substring(4))); //add promotion info if needed
+        Label newLabel = new Label(expandedMove);
         //Place notation one the notation board
         if (playerTurn) { //White just moved
-            notationContent.add(new Label(Integer.toString(gameMove)), 0, gameMove); //Add new turn label
-            notationContent.add(new Label(expandedMove), 1, gameMove); //Add white move
+            Label gameMoveLabel = new Label(Integer.toString(gameMove));
+            gameMoveLabel.setMinWidth(20);
+            
+            notationContent.add(gameMoveLabel, 0, gameMove); //Add new turn label
+            notationContent.add(newLabel, 1, gameMove); //Add white move
         } else { //Black just moved
-            notationContent.add(new Label(expandedMove), 2, gameMove); //Add black move
+            notationContent.add(newLabel, 2, gameMove); //Add black move
         }
+        GridPane.setVgrow(newLabel, Priority.ALWAYS);
+        GridPane.setHgrow(newLabel, Priority.ALWAYS);
+        newLabel.setMinHeight(30);
+        
+        //Style
+        newLabel.getStyleClass().add("notationLabel");
     }
 }
