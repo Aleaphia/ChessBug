@@ -16,7 +16,8 @@ import javafx.util.Duration;
 
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
-import javafx.scene.layout.BorderPane;
+import javafx.geometry.Pos;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
@@ -26,7 +27,7 @@ public class GameController implements IGameSelectionController, IGameCreationCo
     private Match match = null;
     private Chat chat;
     //Page
-    private Pane page = new Pane();
+    private StackPane page = new StackPane();
     //MVC
     private GameModel model;
     private GameView view;
@@ -40,6 +41,8 @@ public class GameController implements IGameSelectionController, IGameCreationCo
         //Game Prompt Panel
         VBox promptSelectionPanel = new VBox();
         page.getChildren().add(promptSelectionPanel);
+        StackPane.setAlignment(promptSelectionPanel, Pos.CENTER);
+        page.getStyleClass().add("page");
 
         //New game button
         promptSelectionPanel.getChildren().addAll(new GameCreationUI(this).getPage(), new GameSelectionUI(this).getPage());

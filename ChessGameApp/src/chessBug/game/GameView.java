@@ -26,9 +26,6 @@ public class GameView {
     private VBox chatContent;
     private GridPane notationContent;
     private VBox msgBoard = new VBox();
-    
-    private ScrollPane chatScroll;
-    private ScrollPane notationScroll;
 
     private String selectedSquare = null;
 
@@ -70,9 +67,11 @@ public class GameView {
         //Page layout
         page.setCenter(gameBoard);
         page.setLeft(createChatSpace());
-        page.setRight(createNotationSpace());        
+        page.setRight(createNotationSpace());  
+                
         //Style
         page.getStyleClass().add("page");
+        msgBoard.getStyleClass().add("page");
         
     }
     
@@ -144,13 +143,16 @@ public class GameView {
         //ScrollPanes contain the chat contents to prevent chat page overflow
         ScrollPane scroll = new ScrollPane(chatContent);
         
-        VBox.setVgrow(scroll, Priority.ALWAYS);
+        //Placement properties
         chatSpace.setMaxWidth(200);
+        
+        VBox.setVgrow(scroll, Priority.ALWAYS);
         scroll.setMaxWidth(Double.MAX_VALUE);
         scroll.setPrefHeight(gameBoard.getHeight());
-        chatContent.setAlignment(Pos.TOP_LEFT);
         scroll.setVvalue(1.0); 
         chatContent.heightProperty().addListener(observable -> scroll.setVvalue(1D));
+        
+        chatContent.setAlignment(Pos.TOP_LEFT);
 
         //chat space components
         chatSpace.getChildren().addAll(scroll, msgInput);
@@ -182,14 +184,17 @@ public class GameView {
         
         //ScrollPanes contain the chat contents to prevent page overflow
         ScrollPane scroll = new ScrollPane(notationContent);
-        //ScrollPane policies
+        
+        //Placement properties
+        notationSpace.setMaxWidth(200);
+        
         VBox.setVgrow(scroll, Priority.ALWAYS);
-        notationContent.setMaxWidth(200);
         scroll.setMaxWidth(Double.MAX_VALUE);
         scroll.setPrefHeight(gameBoard.getHeight());
-        notationContent.setAlignment(Pos.TOP_LEFT);
         scroll.setVvalue(1.0); 
         notationContent.heightProperty().addListener(observable -> scroll.setVvalue(1D));
+        
+        notationContent.setAlignment(Pos.TOP_LEFT);
         
         //Style
         notationSpace.getStyleClass().add("notationBoard");

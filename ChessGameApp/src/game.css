@@ -5,10 +5,8 @@
     -fx-padding: 30px;
 
 }
-.whiteTurn, .yourMove {
-    -fx-background-color: darkgreen;
-    -fx-padding: 10px;
-    -fx-text-fill: white;
+.notYourMove {
+    -fx-background-color: #868ebd;
 }
 .scroll-pane{
     -fx-fit-to-width: true;

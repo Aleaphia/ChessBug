@@ -4,10 +4,12 @@ import chessBug.network.Match;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.util.Duration;
 
 public class GameSelectionUI {
@@ -45,9 +47,14 @@ public class GameSelectionUI {
     private void buildGameSelectionPrompt() {
         //Clear page
         page.getChildren().clear();
+        
+        //Add nodes
+        Label header1 = new Label("Game requests");
+        Label header2 = new Label("Games in progress");
+        
         page.getChildren().addAll(
-                new Label("Game requests"), gameRequests,
-                new Label("Games in progress"), gamesInProgress
+                header1, gameRequests,
+                header2, gamesInProgress
                 );
         
         //List Games
@@ -55,22 +62,25 @@ public class GameSelectionUI {
         controller.receiveMatchRequest().forEach(match -> displayMatch(match, gameRequests, true));
         //Games in progress
         controller.getOpenMatchList().forEach(match -> displayMatch(match, gamesInProgress, false));
+        
+        //Style
+        page.setAlignment(Pos.CENTER);
+        page.getStyleClass().add("page");
+        header1.getStyleClass().add("header");
+        header2.getStyleClass().add("header");
     }    
     
     private void displayMatch(Match match, VBox pane, Boolean isRequest){
         //Layout
         HBox hbox = new HBox();
         Button matchButton = new Button(match.toString());
-        Button endButton = new Button((isRequest)? "Forfiet" : "Deny");
+        Button endButton = new Button((isRequest)? "Deny" : "Forfiet");
         
         //Determine current turn
         String currTurn = "";
         switch(match.getStatus()){
             case "WhiteTurn" -> currTurn = match.getWhite().getUsername();
             case "BlackTurn" -> currTurn = match.getBlack().getUsername();
-        }
-        if (!isRequest && currTurn.equals(controller.getUsername())){
-            matchButton.getStyleClass().add("yourMove");
         }
         
         hbox.getChildren().addAll(matchButton,endButton);
@@ -96,7 +106,13 @@ public class GameSelectionUI {
                 controller.forfitMatch(match);
         });
         
-
+        //Style
+        HBox.setHgrow(matchButton, Priority.ALWAYS);
+        matchButton.setPrefWidth(200);
+        if (!isRequest && !currTurn.equals(controller.getUsername())){
+            matchButton.getStyleClass().add("notYourMove");
+            endButton.getStyleClass().add("notYourMove");
+        }
             
     }
 }
