@@ -102,7 +102,7 @@ public class PreferencesController {
         System.out.println("Theme changed to: " + theme);
         
         // Determine the theme file
-        String themeFile = theme.equals("Dark") ? "src/resources/styles/dark-theme.css" : "src/resources/styles/light-theme.css";
+        String themeFile = theme.equals("Dark") ? "src/styles/dark-theme.css" : "src/styles/light-theme.css";
     
         // Ensure the scene exists
         Scene scene = soundCheckBox.getScene();

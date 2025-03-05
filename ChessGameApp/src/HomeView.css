@@ -1,0 +1,93 @@
+/* General page styling */
+.root {
+    -fx-background-color: #2b2d31;
+    -fx-padding: 10px;
+}
+
+/* User Stats Section */
+.user-stats {
+    -fx-background-color: #1e1f22;
+    -fx-padding: 20px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-text-fill: white;
+    -fx-pref-width: 250px;
+}
+
+.welcome-message {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.user-info {
+    -fx-font-size: 18px;
+    -fx-text-fill: #b9bbbe;
+}
+
+.stats-section {
+    -fx-background-color: #232428;
+    -fx-padding: 10px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-text-fill: white;
+}
+
+.stats-label {
+    -fx-font-size: 16px;
+    -fx-text-fill: #b9bbbe;
+}
+
+/* Friends Section */
+.friends-space {
+    -fx-background-color: #1e1f22;
+    -fx-padding: 20px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-pref-width: 250px;
+}
+
+.section-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.friend-label {
+    -fx-font-size: 16px;
+    -fx-text-fill: #b9bbbe;
+}
+
+.send-request-section {
+    -fx-background-color: #232428;
+    -fx-padding: 10px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+}
+
+/* Main Content Section */
+.current-content {
+    -fx-background-color: #1e1f22;
+    -fx-padding: 20px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-text-fill: white;
+}
+
+/* Buttons */
+.button {
+    -fx-background-color: #5865f2;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-padding: 5px 10px;
+}
+
+.button:hover {
+    -fx-background-color: #4752c4;
+}
+
+.separator {
+    -fx-background-color: #36393f;
+}
