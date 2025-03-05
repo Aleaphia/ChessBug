@@ -9,15 +9,26 @@
     -fx-background-position: center center;
 }
 
+/* Scroll Panes*/
+.scroll-pane{
+    -fx-fit-to-width: true;
+    -fx-fit-to-height: true;
+    -fx-hbar-policy: never;
+    -fx-vbar-policy: as-needed;
+}
+
 /* Labels */
 .label {
     -fx-text-fill: white;
+    -fx-background-color: rgba(0, 0, 0, 0);
 }
 
 .header {
     -fx-font-size: 16px;
     -fx-font-weight: bold;
+    -fx-text-alignment: center;
 }
+
 
 /* ====================== BUTTON STYLES ====================== */
 

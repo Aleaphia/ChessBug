@@ -200,9 +200,9 @@ public class GameView {
         notationContent.setAlignment(Pos.TOP_LEFT);
         
         //Style
-        notationSpace.getStyleClass().add("notationBoard");
-        notationLabel.getStyleClass().addAll("notationGrid", "notationBoard");
-        notationContent.getStyleClass().addAll("notationGrid", "notationBoard");
+        notationSpace.getStyleClass().add("scrollBackground");
+        notationLabel.getStyleClass().addAll("notationGrid");
+        notationContent.getStyleClass().addAll("notationGrid", "scrollBackground");
         
         //notation space components
         notationSpace.getChildren().addAll(notationLabel, scroll);

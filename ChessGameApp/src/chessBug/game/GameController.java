@@ -17,9 +17,12 @@ import javafx.util.Duration;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 import javafx.geometry.Pos;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 
 public class GameController implements IGameSelectionController, IGameCreationController{
     //Database Connection
@@ -27,7 +30,7 @@ public class GameController implements IGameSelectionController, IGameCreationCo
     private Match match = null;
     private Chat chat;
     //Page
-    private StackPane page = new StackPane();
+    private HBox page = new HBox();
     //MVC
     private GameModel model;
     private GameView view;
@@ -39,14 +42,19 @@ public class GameController implements IGameSelectionController, IGameCreationCo
         
         //Create view
         //Game Prompt Panel
-        VBox promptSelectionPanel = new VBox();
-        page.getChildren().add(promptSelectionPanel);
-        StackPane.setAlignment(promptSelectionPanel, Pos.CENTER);
+        GridPane promptSelectionPanel = new GridPane();
+        Region leftRegion = new Region();
+        Region rightRegion = new Region();
+        
+        page.getChildren().addAll(leftRegion,promptSelectionPanel,rightRegion);
         page.getStyleClass().add("padding");
+        HBox.setHgrow(leftRegion, Priority.ALWAYS);
+        HBox.setHgrow(rightRegion, Priority.ALWAYS);
         promptSelectionPanel.getStyleClass().add("page");
 
-        //New game button
-        promptSelectionPanel.getChildren().addAll(new GameCreationUI(this).getPage(), new GameSelectionUI(this).getPage());
+        //Add selection panel components
+        promptSelectionPanel.add(new GameCreationUI(this).getPage(), 1, 0, 1, 1);
+        promptSelectionPanel.add(new GameSelectionUI(this).getPage(), 0, 1, 2, 1);
     }
     public GameController(Client player, Match match){ //selected match
         this(player);

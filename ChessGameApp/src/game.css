@@ -11,11 +11,19 @@
     -fx-background-color: #868ebd;
 }
 .scroll-pane{
-    -fx-fit-to-width: true;
-    -fx-fit-to-height: true;
-    -fx-hbar-policy: never;
-    -fx-vbar-policy: as-needed;
-    -fx-background-color: rgba(54, 57, 63, 0.8);
+    -fx-background-color: rgba(54, 57, 63, 0);
+}
+.scrollBackground{
+    -fx-background-color: rgb(41, 39, 42);
+}
+.grid{
+    -fx-hgap: 5;
+    -fx-vgap: 1;
+}
+.button{
+    -fx-border-color: #20243f;
+    -fx-border-width: 2px;
+
 }
 
 /*Chess board ----------------------------------------*/
@@ -41,9 +49,6 @@
 .possibleMove { -fx-border-color: rgb(255, 238, 3); }
 
 /*Notation board --------------------------------------*/
-.notationBoard{
-    -fx-background-color: rgb(41, 39, 42);
-}
 .notationGrid{
     -fx-hgap: 5;
     -fx-vgap: 1;
