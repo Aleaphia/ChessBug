@@ -65,7 +65,6 @@ public class GameSelectionUI {
         
         //Style
         page.setAlignment(Pos.CENTER);
-        page.getStyleClass().add("page");
         header1.getStyleClass().add("header");
         header2.getStyleClass().add("header");
     }    

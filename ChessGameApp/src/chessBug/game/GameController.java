@@ -42,7 +42,8 @@ public class GameController implements IGameSelectionController, IGameCreationCo
         VBox promptSelectionPanel = new VBox();
         page.getChildren().add(promptSelectionPanel);
         StackPane.setAlignment(promptSelectionPanel, Pos.CENTER);
-        page.getStyleClass().add("page");
+        page.getStyleClass().add("padding");
+        promptSelectionPanel.getStyleClass().add("page");
 
         //New game button
         promptSelectionPanel.getChildren().addAll(new GameCreationUI(this).getPage(), new GameSelectionUI(this).getPage());

@@ -32,6 +32,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.HPos;
+import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -41,6 +42,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.Priority;
@@ -48,11 +50,11 @@ import javafx.stage.Stage;
 
 public class ChessBug extends Application {
     //Global variables
-    Scene mainScene;
-    Pane page = new VBox(); // space to change with page details
-    HBox mainPane = new HBox();
-    GridPane loginPane;
-    Client client;
+    private Scene mainScene;
+    final private StackPane page = new StackPane(); // space to change with page details
+    private HBox mainPane = new HBox();
+    private GridPane loginPane;
+    private Client client;
     
     @Override
     public void start(Stage primaryStage) {
@@ -65,7 +67,8 @@ public class ChessBug extends Application {
         
         //Style
         mainScene.getStylesheets().addAll("login.css", "Styles.css");
-       
+        HBox.setHgrow(page, Priority.ALWAYS); //Makes page take up all avaiable space
+        
         //Display
         primaryStage.show();
     }

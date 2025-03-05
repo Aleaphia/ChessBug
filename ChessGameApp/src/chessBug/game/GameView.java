@@ -17,6 +17,7 @@ import javafx.scene.image.*;
 import javafx.scene.control.ScrollPane;
 
 public class GameView {
+    private double sectionWidth = 225;
 
     private final GameController controller;
 
@@ -144,7 +145,8 @@ public class GameView {
         ScrollPane scroll = new ScrollPane(chatContent);
         
         //Placement properties
-        chatSpace.setMaxWidth(200);
+        chatSpace.setPrefWidth(sectionWidth);
+        chatSpace.setMaxWidth(sectionWidth);
         
         VBox.setVgrow(scroll, Priority.ALWAYS);
         scroll.setMaxWidth(Double.MAX_VALUE);
@@ -186,7 +188,8 @@ public class GameView {
         ScrollPane scroll = new ScrollPane(notationContent);
         
         //Placement properties
-        notationSpace.setMaxWidth(200);
+        notationSpace.setPrefWidth(sectionWidth);
+        notationSpace.setMaxWidth(sectionWidth);
         
         VBox.setVgrow(scroll, Priority.ALWAYS);
         scroll.setMaxWidth(Double.MAX_VALUE);
@@ -217,6 +220,10 @@ public class GameView {
         //Style
         labelW.getStyleClass().addAll("notationLabel", "header");
         labelB.getStyleClass().addAll("notationLabel", "header");
+        GridPane.setVgrow(labelW, Priority.ALWAYS);
+        GridPane.setHgrow(labelW, Priority.ALWAYS);
+        GridPane.setVgrow(labelB, Priority.ALWAYS);
+        GridPane.setHgrow(labelB, Priority.ALWAYS);
 
         return notationSpace;
     }
@@ -455,6 +462,7 @@ public class GameView {
         } else { //Black just moved
             notationContent.add(newLabel, 2, gameMove); //Add black move
         }
+        
         GridPane.setVgrow(newLabel, Priority.ALWAYS);
         GridPane.setHgrow(newLabel, Priority.ALWAYS);
         newLabel.setMinHeight(30);
