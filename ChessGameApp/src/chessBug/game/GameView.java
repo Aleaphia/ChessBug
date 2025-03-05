@@ -216,7 +216,7 @@ public class GameView {
         Label newLabel = new Label();
         newLabel.setMinWidth(20);
         notationLabel.add(newLabel,0,0);
-        
+               
         //Style
         labelW.getStyleClass().addAll("notationLabel", "header");
         labelB.getStyleClass().addAll("notationLabel", "header");
@@ -224,6 +224,7 @@ public class GameView {
         GridPane.setHgrow(labelW, Priority.ALWAYS);
         GridPane.setVgrow(labelB, Priority.ALWAYS);
         GridPane.setHgrow(labelB, Priority.ALWAYS);
+        notationContent.setAlignment(Pos.TOP_CENTER); //test
 
         return notationSpace;
     }
@@ -452,15 +453,22 @@ public class GameView {
         String expandedMove = move.substring(0, 2) + "-" + move.substring(2, 4)
                 + ((move.length() == 4) ? "" : ("=" + move.substring(4))); //add promotion info if needed
         Label newLabel = new Label(expandedMove);
+        VBox box = new VBox(newLabel);
         //Place notation one the notation board
         if (playerTurn) { //White just moved
+            //Move number label
             Label gameMoveLabel = new Label(Integer.toString(gameMove));
-            gameMoveLabel.setMinWidth(20);
+            VBox boxMove = new VBox(gameMoveLabel);
+            boxMove.setAlignment(Pos.CENTER);
+            boxMove.setMinWidth(20);
             
-            notationContent.add(gameMoveLabel, 0, gameMove); //Add new turn label
-            notationContent.add(newLabel, 1, gameMove); //Add white move
-        } else { //Black just moved
-            notationContent.add(newLabel, 2, gameMove); //Add black move
+            //Add notation to 
+            notationContent.add(boxMove, 0, gameMove); //Add new turn label
+            notationContent.add(box, 1, gameMove); //Add white move
+        }
+        else { //Black just moved
+            notationContent.add(box, 2, gameMove); //Add black move
+
         }
         
         GridPane.setVgrow(newLabel, Priority.ALWAYS);
@@ -469,5 +477,6 @@ public class GameView {
         
         //Style
         newLabel.getStyleClass().add("notationLabel");
+        GridPane.setHgrow(box, Priority.ALWAYS);
     }
 }
