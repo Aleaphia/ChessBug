@@ -11,23 +11,40 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
 import javafx.util.Duration;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
+
 
 public class HomeView {
     
     private HomeController controller;
-    private BorderPane page = new BorderPane();
+    private HBox page = new HBox();
+    private BorderPane pageLayout = new BorderPane();
     private VBox currentContent;
     private VBox friendsListContent;
     
     protected HomeView(HomeController controller){
         this.controller = controller;
         
+        //Create view
+        //Game Prompt Panel
+        Region leftRegion = new Region();
+        Region rightRegion = new Region();
+        
+        page.getChildren().addAll(leftRegion,pageLayout,rightRegion);
+        page.getStyleClass().add("padding");
+        HBox.setHgrow(leftRegion, Priority.ALWAYS);
+        HBox.setHgrow(rightRegion, Priority.ALWAYS);
+                
         VBox userStats = buildUserStats();
         VBox friends = buildFriends();
 
@@ -41,18 +58,18 @@ public class HomeView {
 
         VBox.setVgrow(currentContent, Priority.ALWAYS);
         
-        BorderPane.setMargin(userStats, new Insets(10));
-        BorderPane.setMargin(friends, new Insets(10));
-        BorderPane.setMargin(currentContent, new Insets(10));
+//        BorderPane.setMargin(userStats, new Insets(10));
+//        BorderPane.setMargin(friends, new Insets(10));
+//        BorderPane.setMargin(currentContent, new Insets(10));
+//        
+//        BorderPane.setAlignment(userStats, javafx.geometry.Pos.CENTER_LEFT);
+//        BorderPane.setAlignment(friends, javafx.geometry.Pos.CENTER_RIGHT);
         
-        BorderPane.setAlignment(userStats, javafx.geometry.Pos.CENTER_LEFT);
-        BorderPane.setAlignment(friends, javafx.geometry.Pos.CENTER_RIGHT);
-        
-        page.setLeft(userStats);
-        page.setRight(friends);
-        page.setCenter(currentContent);
-        page.getStylesheets().add(getClass().getResource("/HomeView.css").toExternalForm());
-        
+        pageLayout.setLeft(userStats);
+        pageLayout.setRight(friends);
+        pageLayout.setCenter(currentContent);
+        pageLayout.getStylesheets().add(getClass().getResource("/HomeView.css").toExternalForm());        
+                
         continueDatabaseChecks();
     }
     private void continueDatabaseChecks(){
@@ -67,8 +84,8 @@ public class HomeView {
         timeline.play();
     }
     
-    public BorderPane getPage(){return page;}
-    public void setPage(BorderPane page){this.page = page;}
+    public HBox getPage(){return page;}
+    public void setPage(BorderPane pageLayout){this.pageLayout = pageLayout;}
     
     private VBox buildUserStats(){
         VBox userStatsSpace = new VBox(20);

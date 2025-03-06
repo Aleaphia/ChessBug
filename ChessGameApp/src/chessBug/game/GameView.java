@@ -71,6 +71,7 @@ public class GameView {
         page.setRight(createNotationSpace());  
                 
         //Style
+        page.getStylesheets().add(getClass().getResource("/game.css").toExternalForm());
         page.getStyleClass().add("page");
         msgBoard.getStyleClass().add("page");
         

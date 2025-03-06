@@ -12,9 +12,11 @@
 }
 .scroll-pane{
     -fx-background-color: rgba(54, 57, 63, 0);
+    -fx-fill: transparent;
 }
 .scrollBackground{
     -fx-background-color: rgb(41, 39, 42);
+    -fx-fill: transparent;
 }
 .grid{
     -fx-hgap: 5;
