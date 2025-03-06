@@ -368,7 +368,7 @@ public class GameView {
             System.out.println(System.currentTimeMillis() - time); //DEBUG
             //Build content
             //profile picture
-            ImageView pfpView = new ImageView(new Image(client.getUserProfilePictureURL(msg.getAuthor())));
+            ImageView pfpView = new ImageView(msg.getAuthor().getProfilePicture());
             System.out.println(System.currentTimeMillis() - time); //DEBUG
             StackPane pfpViewContainer = new StackPane(pfpView);
             
@@ -378,7 +378,7 @@ public class GameView {
             System.out.println(System.currentTimeMillis() - time);
             
             //Message
-            Label label = new Label(msg.getAuthor() + ": " + msg.getContent());
+            Label label = new Label(msg.getAuthor().getUsername() + ": " + msg.getContent());
             
             label.getStyleClass().addAll("chatMessage",
                     //Test if the client player sent this message and add appropriate style class
