@@ -10,31 +10,31 @@
     -fx-background-radius: 8px;
     -fx-padding: 15px;
     -fx-text-fill: #ffffff;
-    -fx-min-height: 0px;
+    /*-fx-min-height: 0px;
     -fx-max-height: 100%;
     -fx-pref-width: 100%;
     -fx-pref-height: 100%;
-    -fx-fill-height: true;
+    -fx-fill-height: true; */
     -fx-effect: dropshadow(gaussian, #000000, 10, 0, 0, 4); /* Added shadow for depth */
 }
 
 /* Ensure VBox elements scale properly */
 .user-stats, .friends-space {
-    -fx-pref-width: 20%; /* Keep the width dynamic */
-    -fx-min-width: 150px; /* Set a lower min-width to allow more flexibility */
-    -fx-max-width: 300px; /* Keep the max-width for control */
-    -fx-pref-height: 100%;
-    -fx-vgrow: always;
-    -fx-hgrow: never; /* Prevent horizontal growth */
+    /*-fx-pref-width: 20%; /* Keep the width dynamic */
+    /*-fx-min-width: 150px; /* Set a lower min-width to allow more flexibility */
+    /*-fx-max-width: 300px; /* Keep the max-width for control */
+    /*-fx-pref-height: 100%;
+    -fx-vgrow: always; */
+    /*-fx-hgrow: never; /* Prevent horizontal growth */
 }
 
 .current-content {
-    -fx-pref-width: 60%; /* Main content takes more space */
-    -fx-min-width: 400px;
+    /*-fx-pref-width: 60%; /* Main content takes more space */
+    /*-fx-min-width: 400px;
     -fx-pref-height: 100%;
     -fx-max-width: infinity; /* Allow content to scale freely horizontally */
-    -fx-hgrow: always; /* Allow it to grow horizontally */
-    -fx-vgrow: never; /* Prevent vertical growth */
+    /*-fx-hgrow: always; /* Allow it to grow horizontally */
+    /*-fx-vgrow: never; /* Prevent vertical growth */
     -fx-effect: dropshadow(gaussian, #000000, 10, 0, 0, 4); /* Added shadow for depth */
 }
 

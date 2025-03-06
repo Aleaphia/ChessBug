@@ -139,7 +139,7 @@ public class ChessBug extends Application {
         // Add items to the sidebar
         sidebar.getChildren().addAll(
                 logo,
-                createSideBarButton("Home.png", event -> changePage(new HomeController(client).getPage(), "home")),
+                createSideBarButton("Home.png", event -> changePage(new HomeController(client).getPage(), "HomeView")),
                 createSideBarButton("Chess.png", event -> changePage(new GameController(client).getPage(), "game")),
                 createSideBarButton("Gear.png", event -> changePage(new PreferencesController().getPage())),
                 createSideBarButton("User.png", event -> changePage(new ProfileController(client).getPage(), "profile")),

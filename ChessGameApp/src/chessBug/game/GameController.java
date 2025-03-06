@@ -199,8 +199,14 @@ public class GameController implements IGameSelectionController, IGameCreationCo
                 
         //Build game page
         view = new GameView(this);
+        
         page.getChildren().clear();
-        page.getChildren().add(view.getPage());
+        Region leftRegion = new Region();
+        Region rightRegion = new Region();
+        
+        page.getChildren().addAll(leftRegion,view.getPage(),rightRegion);
+        HBox.setHgrow(leftRegion, Priority.ALWAYS);
+        HBox.setHgrow(rightRegion, Priority.ALWAYS);
                 
         //Update chat/match status
         this.match.poll(client).forEach((move) -> internalPlayerMove(move));

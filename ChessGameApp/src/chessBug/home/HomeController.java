@@ -6,7 +6,11 @@ import chessBug.network.*;
 import chessBug.game.*;
 import java.util.List;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 
 
 
@@ -15,7 +19,7 @@ public class HomeController implements IGameSelectionController, IFriendRequestC
     //Database Connection
     private Client client;
     //Page
-    private Pane page = new Pane();
+    private HBox page = new HBox();
     //MVC
     private HomeView view;
     
@@ -25,7 +29,15 @@ public class HomeController implements IGameSelectionController, IFriendRequestC
         
         //Create view
         view = new HomeView(this);
-        page.getChildren().add(view.getPage());
+        
+        Region leftRegion = new Region();
+        Region rightRegion = new Region();
+        
+        page.getChildren().addAll(leftRegion,view.getPage(),rightRegion);
+        page.getStyleClass().add("padding");
+        HBox.setHgrow(leftRegion, Priority.ALWAYS);
+        HBox.setHgrow(rightRegion, Priority.ALWAYS);
+        
     }
     
     public Pane getPage(){ return page;}
@@ -46,8 +58,7 @@ public class HomeController implements IGameSelectionController, IFriendRequestC
     @Override public void acceptMatchRequest(Match match){client.setMatchStatus(match, Match.Status.WHITE_TURN.toString());}
     @Override public void denyMatchRequest(Match match){client.denyMatchRequest(match);}
     @Override public void selectGame(Match match){
-        page.getChildren().clear();
-        page.getChildren().add(new GameController(client, match).getPage());
+        page.getChildren().set(1, new GameController(client, match).getPage());
     }
     @Override public void forfitMatch(Match match){ client.setMatchStatus(match, getUserName().equals(match.getWhite().getUsername()) ? 
             Match.Status.BLACK_WIN.toString() : Match.Status.WHITE_TURN.toString());} //If the user who forfit is white -> black wins, otherwise white wins
