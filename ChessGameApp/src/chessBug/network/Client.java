@@ -12,6 +12,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Base64;
+import java.util.Map;
+import java.util.HashMap;
 
 import java.nio.file.Files;
 
@@ -27,6 +29,8 @@ import org.json.JSONException;
 public class Client {
 	// Store user information in order to log in
 	private ProfileModel profile;
+
+	private Map<Integer, User> userMap = new HashMap<>();
 
 	private Client() {}
 
@@ -67,7 +71,25 @@ public class Client {
 	}
 
 	public User getOwnUser() {
-		return new User(profile.getUserID(), profile.getUsername());
+		return getOrCreateUser(profile.getUserID(), profile.getUsername(), profile.getProfilePicURL());
+	}
+
+	public User getUserByID(int id) {
+		if(userMap.containsKey(id))
+			return userMap.get(id);
+		else return new User(0, "unknown", User.DEFAULT_PROFILE_PICTURE);
+	}
+
+	private User getOrCreateUser(int id, String username, String pfp) {
+		if(!userMap.containsKey(id))
+			userMap.put(id, new User(id, username, pfp));
+		return userMap.get(id);
+	}
+
+	private Friend getOrCreateFriend(int id, String username, String pfp, int chat) {
+		if(!userMap.containsKey(id) || !(userMap.get(id) instanceof Friend))
+			userMap.put(id, new Friend(id, username, pfp, chat));
+		return (Friend)userMap.get(id);
 	}
 
 	// Update profile with server data
@@ -124,8 +146,10 @@ public class Client {
 		JSONArray matchesReceived = matchesResponse.getJSONArray("response");
 		for(int i = 0; i < matchesReceived.length(); i++) {
 			JSONObject o = matchesReceived.getJSONObject(i);
-			//System.out.printf("DEBUG: Received match with data %d, %d, %d (%s), %d (%s)%n", o.getInt("MatchID"), o.getInt("Chat"), o.getInt("WhitePlayer"), o.getString("WhiteName"), o.getInt("BlackPlayer"), o.getString("BlackName"));
-			matches.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), new User(o.getInt("WhitePlayer"), o.getString("WhiteName")), new User(o.getInt("BlackPlayer"), o.getString("BlackName")), o.getString("Status")));
+			matches.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), 
+				getOrCreateUser(o.getInt("WhitePlayer"), o.getString("WhiteName"), o.isNull("WhitePfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("WhitePfp")), 
+				getOrCreateUser(o.getInt("BlackPlayer"), o.getString("BlackName"), o.isNull("BlackPfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("BlackPfp")), o.getString("Status")));
+
 		}
 		return matches;
 	}
@@ -144,8 +168,9 @@ public class Client {
 		JSONArray response = received.getJSONArray("response");
 		for(int i = 0; i < response.length(); i++) {
 			JSONObject o = response.getJSONObject(i);
-			//System.out.printf("DEBUG: Received match with data %d, %d, %d (%s), %d (%s)%n", o.getInt("MatchID"), o.getInt("Chat"), o.getInt("WhitePlayer"), o.getString("WhiteName"), o.getInt("BlackPlayer"), o.getString("BlackName"));
-			result.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), new User(o.getInt("WhitePlayer"), o.getString("WhiteName")), new User(o.getInt("BlackPlayer"), o.getString("BlackName")), o.getString("Status")));
+			result.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), 
+				getOrCreateUser(o.getInt("WhitePlayer"), o.getString("WhiteName"), o.isNull("WhitePfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("WhitePfp")), 
+				getOrCreateUser(o.getInt("BlackPlayer"), o.getString("BlackName"), o.isNull("BlackPfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("BlackPfp")), o.getString("Status")));
 		}
 		return result;
 	}
@@ -164,8 +189,9 @@ public class Client {
 		JSONArray response = received.getJSONArray("response");
 		for(int i = 0; i < response.length(); i++) {
 			JSONObject o = response.getJSONObject(i);
-			//System.out.printf("DEBUG: Received match with data %d, %d, %d (%s), %d (%s)%n", o.getInt("MatchID"), o.getInt("Chat"), o.getInt("WhitePlayer"), o.getString("WhiteName"), o.getInt("BlackPlayer"), o.getString("BlackName"));
-			result.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), new User(o.getInt("WhitePlayer"), o.getString("WhiteName")), new User(o.getInt("BlackPlayer"), o.getString("BlackName")), o.getString("Status")));
+			result.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), 
+				getOrCreateUser(o.getInt("WhitePlayer"), o.getString("WhiteName"), o.isNull("WhitePfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("WhitePfp")), 
+				getOrCreateUser(o.getInt("BlackPlayer"), o.getString("BlackName"), o.isNull("BlackPfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("BlackPfp")), o.getString("Status")));
 		}
 		return result;
 	}
@@ -184,7 +210,9 @@ public class Client {
 		JSONArray response = received.getJSONArray("response");
 		for(int i = 0; i < response.length(); i++) {
 			JSONObject o = response.getJSONObject(i);
-			result.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), new User(o.getInt("WhitePlayer"), o.getString("WhiteName")), new User(o.getInt("BlackPlayer"), o.getString("BlackName")), o.getString("Status")));
+			result.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), 
+				getOrCreateUser(o.getInt("WhitePlayer"), o.getString("WhiteName"), o.isNull("WhitePfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("WhitePfp")), 
+				getOrCreateUser(o.getInt("BlackPlayer"), o.getString("BlackName"), o.isNull("BlackPfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("BlackPfp")), o.getString("Status")));
 		}
 		return result;
 	}
@@ -254,7 +282,7 @@ public class Client {
 		JSONArray friendsReceived = friendsResponse.getJSONArray("response");
 		for(int i = 0; i < friendsReceived.length(); i++) {
 			JSONObject o = friendsReceived.getJSONObject(i);
-			friends.add(new Friend(o.getInt("UserID"), o.getString("Name"), o.getInt("Chat")));
+			friends.add(getOrCreateFriend(o.getInt("UserID"), o.getString("Name"), o.isNull("pfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("pfp"), o.getInt("Chat")));
 		}
 
 		return friends;
@@ -341,7 +369,7 @@ public class Client {
 		JSONArray response = received.getJSONArray("response");
 		for(int i = 0; i < response.length(); i++) {
 			JSONObject o = response.getJSONObject(i);
-			result.add(new User(o.getInt("UserID"), o.getString("Name")));
+			result.add(getOrCreateUser(o.getInt("UserID"), o.getString("Name"), o.isNull("pfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("pfp")));
 		}
 
 		return result;
@@ -375,7 +403,7 @@ public class Client {
 		return response.getString("response");
 	}
 
-	public String getUserProfilePictureURL(String username) {
+	/*public String getUserProfilePictureURL(String username) {
 		JSONObject sendData = new JSONObject();
 		sendData.put("target", username);
 
@@ -390,9 +418,9 @@ public class Client {
 			return ProfileModel.DEFAULT_PROFILE_PICTURE;	
 
 		return "https://www.zandgall.com/chessbug/content/" + received.getString("response");
-	}
+	}*/
 
-	public String getUserProfilePictureURL(User u) { return getUserProfilePictureURL(u.getUsername()); }
+	/*public String getUserProfilePictureURL(User u) { return getUserProfilePictureURL(u.getUsername()); }*/
 
 	public void uploadProfilePicture(File file) {
 		JSONObject send = new JSONObject();

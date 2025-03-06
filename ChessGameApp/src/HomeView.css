@@ -60,6 +60,10 @@
     -fx-background-color: #5b6eae;
     -fx-effect: dropshadow(gaussian, #000000, 4, 0, 0, 4); /* Shadow on hover for buttons */
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 770cf94d5c94377a21c14d2c18ca01e679d5065e
 
 .separator {
     -fx-background-color: #36393f;
