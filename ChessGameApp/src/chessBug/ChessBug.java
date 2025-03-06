@@ -128,17 +128,19 @@ public class ChessBug extends Application {
 
     private VBox createSidebar() {
         VBox sidebar = new VBox(10); // Vertical layout for sidebar
-        sidebar.setPadding(new Insets(20, 10, 20, 10));
+        sidebar.setPadding(new Insets(10, 10, 10, 10));
         sidebar.setStyle("-fx-background-color: #2f3136; -fx-text-fill: white;");
     
         // Add logo or image to the sidebar
-        ImageView logo = new ImageView(new Image("file:logo.png")); // Will need to be replaced
-        logo.setFitHeight(50);
-        logo.setFitWidth(50);
+        ImageView logo = new ImageView(new Image(ChessBug.class.getResourceAsStream("/resources/images/GoldCrown.png"))); // Will need to be replaced
+        logo.setFitHeight(53);
+        logo.setFitWidth(60);
+        StackPane logoHolder = new StackPane(logo);
+        logoHolder.getStyleClass().add("logoImage");
     
         // Add items to the sidebar
         sidebar.getChildren().addAll(
-                logo,
+                logoHolder,
                 createSideBarButton("Home.png", event -> changePage(new HomeController(client).getPage(), "home")),
                 createSideBarButton("Chess.png", event -> changePage(new GameController(client).getPage(), "game")),
                 createSideBarButton("Gear.png", event -> changePage(new PreferencesController().getPage())),
