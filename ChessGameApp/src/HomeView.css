@@ -1,7 +1,6 @@
-
 .root {
     -fx-background-color: #2c2f33;
-    -fx-padding: 10px;
+    -fx-padding: 20px;
 }
 
 /* Sidebars and main sections */
@@ -16,6 +15,7 @@
     -fx-pref-width: 100%;
     -fx-pref-height: 100%;
     -fx-fill-height: true;
+    -fx-effect: dropshadow(gaussian, #000000, 10, 0, 0, 4); /* Added shadow for depth */
 }
 
 /* Ensure VBox elements scale properly */
@@ -35,7 +35,9 @@
     -fx-max-width: infinity; /* Allow content to scale freely horizontally */
     -fx-hgrow: always; /* Allow it to grow horizontally */
     -fx-vgrow: never; /* Prevent vertical growth */
+    -fx-effect: dropshadow(gaussian, #000000, 10, 0, 0, 4); /* Added shadow for depth */
 }
+
 /* User Stats Section */
 .user-stats {
     -fx-background-color: #1e1f22;
@@ -112,10 +114,14 @@
     -fx-font-weight: bold;
     -fx-border-radius: 4px;
     -fx-background-radius: 4px;
+    -fx-effect: dropshadow(gaussian, #000000, 4, 0, 0, 2); /* Added shadow to buttons */
+}
 }
 
 .button:hover {
     -fx-background-color: #5b6eae;
+    -fx-effect: dropshadow(gaussian, #000000, 4, 0, 0, 4); /* Shadow on hover for buttons */
+}
 }
 
 .separator {
