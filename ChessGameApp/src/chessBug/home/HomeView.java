@@ -32,6 +32,14 @@ public class HomeView {
         VBox friends = buildFriends();
 
         buildCurrentContent();
+
+        VBox leftContainer = new VBox(userStats);
+        VBox rightContainer = new VBox(friends);
+        
+        VBox.setVgrow(leftContainer, Priority.ALWAYS);
+        VBox.setVgrow(rightContainer, Priority.ALWAYS);
+
+        VBox.setVgrow(currentContent, Priority.ALWAYS);
         
         BorderPane.setMargin(userStats, new Insets(10));
         BorderPane.setMargin(friends, new Insets(10));

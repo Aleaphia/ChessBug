@@ -1,9 +1,41 @@
-/* General page styling */
+/* Global styles for a Discord-like aesthetic */
 .root {
-    -fx-background-color: #2b2d31;
+    -fx-background-color: #2c2f33;
     -fx-padding: 10px;
 }
 
+/* Sidebars and main sections */
+.user-stats, .friends-space, .current-content {
+    -fx-background-color: #23272a;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 15px;
+    -fx-text-fill: #ffffff;
+    -fx-min-height: 0px;
+    -fx-max-height: 100%;
+    -fx-pref-width: 100%;
+    -fx-pref-height: 100%;
+    -fx-fill-height: true;
+}
+
+/* Ensure VBox elements scale properly */
+.user-stats, .friends-space {
+    -fx-pref-width: 20%; /* Keep the width dynamic */
+    -fx-min-width: 150px; /* Set a lower min-width to allow more flexibility */
+    -fx-max-width: 300px; /* Keep the max-width for control */
+    -fx-pref-height: 100%;
+    -fx-vgrow: always;
+    -fx-hgrow: never; /* Prevent horizontal growth */
+}
+
+.current-content {
+    -fx-pref-width: 60%; /* Main content takes more space */
+    -fx-min-width: 400px;
+    -fx-pref-height: 100%;
+    -fx-max-width: infinity; /* Allow content to scale freely horizontally */
+    -fx-hgrow: always; /* Allow it to grow horizontally */
+    -fx-vgrow: never; /* Prevent vertical growth */
+}
 /* User Stats Section */
 .user-stats {
     -fx-background-color: #1e1f22;
@@ -11,7 +43,6 @@
     -fx-border-radius: 8px;
     -fx-background-radius: 8px;
     -fx-text-fill: white;
-    -fx-pref-width: 250px;
 }
 
 .welcome-message {
@@ -44,17 +75,16 @@
     -fx-padding: 20px;
     -fx-border-radius: 8px;
     -fx-background-radius: 8px;
-    -fx-pref-width: 250px;
+    -fx-vgrow: always;
 }
 
 .section-title {
-    -fx-font-size: 18px;
+    -fx-font-size: 16px;
     -fx-font-weight: bold;
     -fx-text-fill: white;
 }
 
 .friend-label {
-    -fx-font-size: 16px;
     -fx-text-fill: #b9bbbe;
 }
 
@@ -76,16 +106,16 @@
 
 /* Buttons */
 .button {
-    -fx-background-color: #5865f2;
+    -fx-background-color: #7289da;
     -fx-text-fill: white;
+    -fx-font-size: 14px;
     -fx-font-weight: bold;
-    -fx-border-radius: 5px;
-    -fx-background-radius: 5px;
-    -fx-padding: 5px 10px;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
 }
 
 .button:hover {
-    -fx-background-color: #4752c4;
+    -fx-background-color: #5b6eae;
 }
 
 .separator {
