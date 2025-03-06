@@ -110,18 +110,18 @@ public class GameView {
         controller.getChatMessages().forEach(x -> {
             HBox messageContainer = new HBox();
 
-            Image pfp = new Image(client.getUserProfilePictureURL(x.getAuthor()));
+            Image pfp = x.getAuthor().getProfilePicture();
             ImageView pfpView = new ImageView(pfp);
             pfpView.setFitWidth(32);
             pfpView.setFitHeight(32);
             StackPane pfpViewContainer = new StackPane(pfpView);
             pfpViewContainer.getStyleClass().add("chatPfp");
             
-            String msg = x.getAuthor() + ": " + x.getContent();
+            String msg = x.getAuthor().getUsername() + ": " + x.getContent();
             Label label = new Label(msg);
             label.getStyleClass().addAll("chatMessage",
                     //Test if the client player sent this message and add appropriate style class
-                    (x.getAuthor().equals(controller.getUserName()))? 
+                    (x.getAuthor().getUsername().equals(controller.getUserName()))? 
                             "thisPlayerMessage": "otherPlayerMessage");
             
             messageContainer.getChildren().addAll(pfpViewContainer, label);

@@ -8,9 +8,9 @@ public class Message {
 	private int senderID;
 	private Timestamp timestamp;
 	private int chat;
-	private String author;
+	private User author;
 	
-	protected Message(int id, String content, int senderID, Timestamp timestamp, int chat, String author) {
+	protected Message(int id, String content, int senderID, Timestamp timestamp, int chat, User author) {
 		this.id = id;
 		this.content = content;
 		this.senderID = senderID;
@@ -30,7 +30,7 @@ public class Message {
 		return timestamp;
 	}
 
-	public String getAuthor() {
+	public User getAuthor() {
 		return author;
 	}
 }

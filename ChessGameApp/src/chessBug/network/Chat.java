@@ -56,7 +56,7 @@ public class Chat {
 		JSONArray retrievedMessages = getMessagesResponse.getJSONArray("response");
 		for(int i = 0; i < currentNumber - messageNumber; i++) {
 			JSONObject o = retrievedMessages.getJSONObject(i);
-			messages.add(new Message(o.getInt("MessageID"), o.getString("Content"), o.getInt("Sender"), Timestamp.valueOf(o.getString("Time")), o.getInt("Chat"), o.getString("Author")));
+			messages.add(new Message(o.getInt("MessageID"), o.getString("Content"), o.getInt("Sender"), Timestamp.valueOf(o.getString("Time")), o.getInt("Chat"), client.getUserByID(o.getInt("Sender"))));
 		}
 
 		// Return a stream of all new messages
