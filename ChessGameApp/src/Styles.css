@@ -29,6 +29,9 @@
     -fx-text-alignment: center;
 }
 
+.logoImage {
+    -fx-padding-left: 15px;
+}
 
 /* ====================== BUTTON STYLES ====================== */
 
