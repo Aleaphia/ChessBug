@@ -26,43 +26,54 @@ import chessBug.network.Client;
 import chessBug.network.ClientAuthException;
 import chessBug.preferences.PreferencesController;
 import chessBug.profile.ProfileController;
+import chessBug.login.LoginUI;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.HPos;
+import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
-/**
- *
- * @author shosh
- */
+
 public class ChessBug extends Application {
     //Global variables
-    Scene mainScene;
-    Pane page = new VBox(); // space to change with page details
-    HBox mainPane;
-    GridPane loginPane;
-    Client client;
-
-    LoginUI loginUI;
+    private Scene mainScene;
+    final private StackPane page = new StackPane(); // space to change with page details
+    private HBox mainPane = new HBox();
+    private GridPane loginPane;
+    private Client client;
     
     @Override
     public void start(Stage primaryStage) {
-    //Create stage layout ======================================================
-
+        //Create stage layout
+        createLoginPage(); //Set up loginPane
+        //Scene and Stage
+        primaryStage.setTitle("ChessBug"); //Name for application stage
+        mainScene = new Scene(loginPane, 950, 600); //Add loginPane to the mainScene
+        primaryStage.setScene(mainScene);//Add mainScene to primaryStage
+        
+        //Style
+        mainScene.getStylesheets().addAll("login.css", "Styles.css");
+        HBox.setHgrow(page, Priority.ALWAYS); //Makes page take up all avaiable space
+        
+        //Display
+        primaryStage.show();
+    }
+    
+    private void createLoginPage(){
         loginPane = new GridPane();
         loginPane.getStyleClass().addAll("background", "login");
 
@@ -74,7 +85,7 @@ public class ChessBug extends Application {
                       columnMain = new ColumnConstraints(300, 300, 300);
         loginPane.getColumnConstraints().addAll(column, columnMain, column);
 
-         loginUI = new LoginUI(
+         LoginUI loginUI = new LoginUI(
             (String username, String password) -> { // Handle login
                 JSONObject out = new JSONObject();
                 try {
@@ -83,6 +94,7 @@ public class ChessBug extends Application {
                     //Create Menu
                     mainPane.getChildren().clear();
                     mainPane.getChildren().addAll(createSidebar(), page);
+                    mainPane.getStyleClass().addAll("background");
                     mainScene.setRoot(mainPane);
                 } catch (ClientAuthException e) {
                     e.printStackTrace();
@@ -112,24 +124,6 @@ public class ChessBug extends Application {
 
         // mainPane.getChildren().add(loginUI.getPage());
         loginPane.add(loginUI.getPage(), 1, 1);
-
-        //Main pane
-        mainPane = new HBox();
-        mainPane.getStyleClass().addAll("background");
-
-        //Scene and Stage ------------------------------------------------------
-        primaryStage.setTitle("ChessBug"); //Name for application stage
-        mainScene = new Scene(loginPane, 800, 600); //Add mainPane to the mainScene
-        primaryStage.setScene(mainScene);//Add mainScene to primaryStage
-        
-        //Style
-        mainScene.getStylesheets().add("Styles.css");
-       
-        //Display
-        primaryStage.show();
-        //-----------------------------------------------------------------------
-
-        //======================================================================
     }
 
     private VBox createSidebar() {
@@ -142,17 +136,31 @@ public class ChessBug extends Application {
         logo.setFitHeight(50);
         logo.setFitWidth(50);
     
-        // Sidebar buttons 
-        Button homeButton = createSideBarButton("Home.png", event -> changePage("Dash Board!"));
-        Button gamesButton = createSideBarButton("Chess.png", event -> changePage("Games"));
-        Button settingsButton = createSideBarButton("Gear.png", event -> changePage("Preferences"));
-        Button profileButton = createSideBarButton("User.png", event -> changePage("User Profile"));
-        Button logoutButton = createSideBarButton("Logout.png", event -> changePage("Log Out"));
-    
         // Add items to the sidebar
-        sidebar.getChildren().addAll(logo, homeButton, gamesButton, settingsButton, profileButton, logoutButton);
+        sidebar.getChildren().addAll(
+                logo,
+                createSideBarButton("Home.png", event -> changePage(new HomeController(client).getPage(), "home")),
+                createSideBarButton("Chess.png", event -> changePage(new GameController(client).getPage(), "game")),
+                createSideBarButton("Gear.png", event -> changePage(new PreferencesController().getPage())),
+                createSideBarButton("User.png", event -> changePage(new ProfileController(client).getPage(), "profile")),
+                createSideBarButton("Logout.png", event -> {
+                    mainScene.setRoot(loginPane);
+                    mainScene.getStylesheets().add("login.css");
+                }));
     
         return sidebar;
+    }
+    private void changePage(Pane newPage){
+        //Clear and add new page
+        page.getChildren().clear();
+        page.getChildren().add(newPage);
+        mainScene.getStylesheets().clear();
+        mainScene.getStylesheets().add("Styles.css");
+    }
+     private void changePage(Pane newPage, String stylePage){
+        //Clear and add new page
+        changePage(newPage);
+        mainScene.getStylesheets().add(stylePage + ".css");
     }
 
     private Button createSideBarButton(String imageFileName, EventHandler<ActionEvent> eventHandler) {
@@ -177,40 +185,14 @@ public class ChessBug extends Application {
         imageView.setPreserveRatio(true);
 
         button.setGraphic(imageView);
-
+        
+        //Create function
         button.setOnAction(eventHandler);
 
         button.setStyle("-fx-border-width: 0;");
 
         return button;
-    }
-    
-    private void changePage(String newPage) {
-        page.getChildren().clear(); // Clear the current page content
-
-        // Change the content based on the menu item clicked
-        switch (newPage) {
-            case "Games":
-                page.getChildren().add(new GameController(client).getPage()); // Load New Game Page
-                break;
-            case "Preferences":
-                page.getChildren().add(new PreferencesController().getPage()); // Load Preferences Page
-                break;
-            case "User Profile":
-                page.getChildren().add(new ProfileController(client).getPage()); // Load User Profile Page
-                break;
-            case "Dash Board!":  // Home page
-                page.getChildren().add(new HomeController(client).getPage());
-                break;
-            case "Log Out":
-                mainScene.setRoot(loginPane);
-                break;
-            default:
-                page.getChildren().add(new Label("Welcome to ChessBug!"));
-        }
-    }
-   
-    
+    }    
     public static void main(String[] args) {
         Application.launch(args);
     }

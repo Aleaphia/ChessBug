@@ -146,10 +146,10 @@ public class Client {
 		JSONArray matchesReceived = matchesResponse.getJSONArray("response");
 		for(int i = 0; i < matchesReceived.length(); i++) {
 			JSONObject o = matchesReceived.getJSONObject(i);
-			System.out.printf("Received match with data %d, %d, %d (%s), %d (%s)%n", o.getInt("MatchID"), o.getInt("Chat"), o.getInt("WhitePlayer"), o.getString("WhiteName"), o.getInt("BlackPlayer"), o.getString("BlackName"));
 			matches.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), 
 				getOrCreateUser(o.getInt("WhitePlayer"), o.getString("WhiteName"), o.isNull("WhitePfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("WhitePfp")), 
 				getOrCreateUser(o.getInt("BlackPlayer"), o.getString("BlackName"), o.isNull("BlackPfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("BlackPfp")), o.getString("Status")));
+
 		}
 		return matches;
 	}
@@ -168,7 +168,6 @@ public class Client {
 		JSONArray response = received.getJSONArray("response");
 		for(int i = 0; i < response.length(); i++) {
 			JSONObject o = response.getJSONObject(i);
-			System.out.printf("Received match with data %d, %d, %d (%s), %d (%s)%n", o.getInt("MatchID"), o.getInt("Chat"), o.getInt("WhitePlayer"), o.getString("WhiteName"), o.getInt("BlackPlayer"), o.getString("BlackName"));
 			result.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), 
 				getOrCreateUser(o.getInt("WhitePlayer"), o.getString("WhiteName"), o.isNull("WhitePfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("WhitePfp")), 
 				getOrCreateUser(o.getInt("BlackPlayer"), o.getString("BlackName"), o.isNull("BlackPfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("BlackPfp")), o.getString("Status")));
@@ -190,7 +189,6 @@ public class Client {
 		JSONArray response = received.getJSONArray("response");
 		for(int i = 0; i < response.length(); i++) {
 			JSONObject o = response.getJSONObject(i);
-			System.out.printf("Received match with data %d, %d, %d (%s), %d (%s)%n", o.getInt("MatchID"), o.getInt("Chat"), o.getInt("WhitePlayer"), o.getString("WhiteName"), o.getInt("BlackPlayer"), o.getString("BlackName"));
 			result.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), 
 				getOrCreateUser(o.getInt("WhitePlayer"), o.getString("WhiteName"), o.isNull("WhitePfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("WhitePfp")), 
 				getOrCreateUser(o.getInt("BlackPlayer"), o.getString("BlackName"), o.isNull("BlackPfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("BlackPfp")), o.getString("Status")));
@@ -225,7 +223,7 @@ public class Client {
 	public boolean sendMatchRequest(String username, boolean playingAsWhite) {
 		JSONObject send = new JSONObject();
 		send.put("target", username);
-		send.put("request", (playingAsWhite)? Match.Status.WHITE_REQUESTED : Match.Status.BLACK_REQUESTED);
+		send.put("request", (playingAsWhite)? Match.Status.WHITE_REQUESTED.toString() : Match.Status.BLACK_REQUESTED.toString());
 		JSONObject received = post("sendMatchRequest", send);
 
 		// Return none if error in response

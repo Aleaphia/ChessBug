@@ -1,4 +1,4 @@
-package chessBug;
+package chessBug.login;
 
 import org.json.JSONObject;
 
@@ -45,11 +45,14 @@ public class LoginUI {
         TextField usernameField = new TextField();
         usernameField.setPromptText("Email or Username");
         usernameField.setStyle("-fx-background-color: #40444B; -fx-text-fill: white; -fx-border-radius: 5px; -fx-padding: 10px;");
-
+        
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Password");
         passwordField.setStyle("-fx-background-color: #40444B; -fx-text-fill: white; -fx-border-radius: 5px; -fx-padding: 10px;");
 
+        //Jump from username to password filds
+        usernameField.setOnAction(event -> passwordField.requestFocus());
+        
         // Login Button
         Button loginButton = new Button("Login");
         loginButton.setStyle("-fx-background-color: #5865F2; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5px;");

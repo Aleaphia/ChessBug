@@ -4,11 +4,16 @@ import chessBug.network.Match;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.Priority;
 import javafx.util.Duration;
+import javafx.scene.layout.Region;
 
 public class GameSelectionUI {
     private VBox page = new VBox();
@@ -30,38 +35,56 @@ public class GameSelectionUI {
             //Reload game info
             //Game requests
             gameRequests.getChildren().clear();
-            controller.receiveMatchRequest().forEach(match -> displayMatch(match, gameRequests));
+            controller.receiveMatchRequest().forEach(match -> displayMatch(match, true));
             //Games in progress
             gamesInProgress.getChildren().clear();
-            controller.getOpenMatchList().forEach(match -> displayMatch(match, gamesInProgress));
+            controller.getOpenMatchList().forEach(match -> displayMatch(match, false));
             // =================================================================
         }));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
     }
     
-    public VBox getPage(){return page;}
+    public Pane getPage(){return page;}
     
     private void buildGameSelectionPrompt() {
         //Clear page
         page.getChildren().clear();
+        
+        //Add nodes
+        Label header1 = new Label("Game requests");
+        Label header2 = new Label("Games in progress");
+        ScrollPane scroll1 = new ScrollPane(gameRequests);
+        ScrollPane scroll2 = new ScrollPane(gamesInProgress);
+        
         page.getChildren().addAll(
-                new Label("Game requests"), gameRequests,
-                new Label("Games in progress"), gamesInProgress
+                header1, scroll1,
+                header2, scroll2
                 );
         
         //List Games
         //Game requests
-        controller.receiveMatchRequest().forEach(match -> displayMatch(match, gameRequests));
+        controller.receiveMatchRequest().forEach(match -> displayMatch(match, true));
         //Games in progress
-        controller.getOpenMatchList().forEach(match -> displayMatch(match, gamesInProgress));
-    }
+        controller.getOpenMatchList().forEach(match -> displayMatch(match, false));
+        
+        //Style
+        page.setAlignment(Pos.CENTER);
+        page.setPrefWidth(300);
+        gameRequests.getStyleClass().add("scrollBackground");
+        gamesInProgress.getStyleClass().add("scrollBackground");
+        header1.getStyleClass().add("header");
+        header2.getStyleClass().add("header");
+    }    
     
-    private void displayMatch(Match match, VBox pane){
+    private void displayMatch(Match match, Boolean isRequest){
         //Layout
         HBox hbox = new HBox();
         Button matchButton = new Button(match.toString());
-        Button endButton = new Button((match.getStatus().substring(5).equals("Turn"))? "Forfiet" : "Deny");
+        Button endButton = new Button((isRequest)? "Deny" : "Forfiet");
+        
+        hbox.getChildren().addAll(matchButton, endButton);
+        ((isRequest)? gameRequests : gamesInProgress).getChildren().add(hbox);
         
         //Determine current turn
         String currTurn = "";
@@ -69,22 +92,12 @@ public class GameSelectionUI {
             case "WhiteTurn" -> currTurn = match.getWhite().getUsername();
             case "BlackTurn" -> currTurn = match.getBlack().getUsername();
         }
-        System.out.println(currTurn + ".vs " + controller.getUsername());
-        if (currTurn.equals(controller.getUsername())){
-            matchButton.getStyleClass().add("yourMove");
-        }
-            
-        
-        
-        hbox.getChildren().addAll(matchButton,endButton);
-        pane.getChildren().add(hbox);
         
         matchButton.setOnAction(event -> {
             //If the match is requested, accept the Match
-            if(match.getStatus().equals(Match.Status.BLACK_REQUESTED.toString())
-                    || match.getStatus().equals(Match.Status.WHITE_REQUESTED.toString()))
+            if(isRequest)
                 controller.acceptMatchRequest(match);
-            
+                            
             //Create loading screen
             //TODO
             page.getChildren().clear();
@@ -94,13 +107,20 @@ public class GameSelectionUI {
         });
         
         endButton.setOnAction(event -> {
-            if(!match.getStatus().equals("InProgress"))
+            if(isRequest)
                 controller.denyMatchRequest(match);
-            else{}
-                //TODO
+            else
+                controller.forfitMatch(match);
         });
         
-
+        //Style
+        matchButton.setPrefWidth(200);
+        HBox.setHgrow(endButton, Priority.ALWAYS);
+        hbox.setStyle("-fx-background-color: rgba(54, 57, 63, 0);");
+        if (!isRequest && !currTurn.equals(controller.getUsername())){
+            matchButton.getStyleClass().add("notYourMove");
+            endButton.getStyleClass().add("notYourMove");
+        }
             
     }
 }

@@ -102,19 +102,19 @@ public class PreferencesController {
         System.out.println("Theme changed to: " + theme);
         
         // Determine the theme file
-        String themeFile = theme.equals("Dark") ? "/styles/dark-theme.css" : "/styles/light-theme.css";
+        String themeFile = theme.equals("Dark") ? "src/styles/dark-theme.css" : "src/styles/light-theme.css";
     
         // Ensure the scene exists
         Scene scene = soundCheckBox.getScene();
         if (scene != null) {
             try {
                 // Load and apply the new theme
-                String cssPath = getClass().getResource(themeFile).toExternalForm();
-                System.out.println("Applying theme from: " + cssPath);
+                // String cssPath = getClass().getResource(themeFile).toExternalForm();
+                // System.out.println("Applying theme from: " + cssPath);
     
                 // Clear existing styles and apply the new one
                 scene.getStylesheets().clear();
-                scene.getStylesheets().add(cssPath);
+                //scene.getStylesheets().add(cssPath);
     
                 // Force layout update
                 scene.getRoot().requestLayout();
