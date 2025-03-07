@@ -143,7 +143,7 @@ public class ChessBug extends Application {
                 logoHolder,
                 createSideBarButton("Home.png", event -> changePage(new HomeController(client).getPage(), "HomeView")),
                 createSideBarButton("Chess.png", event -> changePage(new GameController(client).getPage(), "game")),
-                createSideBarButton("Gear.png", event -> changePage(new PreferencesController().getPage())),
+                createSideBarButton("Gear.png", event -> changePage(new PreferencesController(client).getPage())),
                 createSideBarButton("User.png", event -> changePage(new ProfileController(client).getPage(), "profile")),
                 createSideBarButton("Logout.png", event -> {
                     mainScene.setRoot(loginPane);
