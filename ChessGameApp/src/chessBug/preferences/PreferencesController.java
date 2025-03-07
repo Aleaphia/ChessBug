@@ -12,6 +12,9 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.VBox;
 
+import chessBug.network.Client;
+import chessBug.network.NetworkException;
+
 public class PreferencesController {
 
     // Instance fields for preferences controls
@@ -19,9 +22,16 @@ public class PreferencesController {
     private ComboBox<String> themeComboBox;
     private CheckBox autoSaveCheckBox;
     private ComboBox<String> timeControlComboBox;
+
+    // Handle communication with Server in order to change password
+    private Client client;
     
     // Preferences object to store user settings persistently
     private Preferences preferences = Preferences.userNodeForPackage(PreferencesController.class);
+
+    public PreferencesController(Client client) {
+        this.client = client;
+    }
 
     public VBox getPage() {
         // Main container for preferences page
@@ -150,6 +160,11 @@ public class PreferencesController {
         passwordDialog.showAndWait().ifPresent(newPassword -> {
             // Implement password validation and updating logic here
             System.out.println("Password changed to: " + newPassword);
+            try {
+                client.updatePassword(newPassword);
+            } catch(NetworkException e) {
+                e.printStackTrace();
+            }
         });
     }
 

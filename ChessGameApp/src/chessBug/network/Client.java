@@ -132,6 +132,17 @@ public class Client {
 		profile.setPassword(newPassword);
 	}
 
+	public void updatePassword(String newPassword) throws NetworkException {
+		JSONObject send = new JSONObject();
+		send.put("newPassword", newPassword);
+
+		JSONObject received = post("updatePassword", send);
+		if(received.getBoolean("error"))
+			throw new NetworkException(received.opt("response").toString());
+
+		profile.setPassword(newPassword);
+	}
+
 	public List<Match> getMatches() {
 		ArrayList<Match> matches = new ArrayList<>();
 		JSONObject matchesResponse = post("getMatches", new JSONObject());
