@@ -25,25 +25,9 @@ public class PreferencesController {
         return preferences.get(key, defaultValue);
     }
 
-    // Handle sound preference change
-    public void handleSoundPreference(boolean isEnabled) {
-        System.out.println("Sound preference changed: " + (isEnabled ? "Enabled" : "Disabled"));
-    }
-
-    // Handle theme change
-    public void handleThemeChange(String theme) {
-        System.out.println("Theme changed to: " + theme);
-        preferences.put("theme", theme);
-    }
-
     // Handle auto-save preference change
     public void handleAutoSave(boolean isEnabled) {
         System.out.println("Auto-Save preference changed: " + (isEnabled ? "Enabled" : "Disabled"));
-    }
-
-    // Handle game time control
-    public void handleTimeControl(String timeControl) {
-        System.out.println("Time control set to: " + timeControl);
     }
 
     // Handle password change
@@ -61,12 +45,9 @@ public class PreferencesController {
         });
     }
 
-    // Save all preferences
-    public void savePreferences(boolean soundEnabled, String theme, boolean autoSaveEnabled, String timeControl) {
-        preferences.putBoolean("soundEnabled", soundEnabled);
-        preferences.put("theme", theme);
+    // Save all preferences (only auto-save for now)
+    public void savePreferences(boolean autoSaveEnabled) {
         preferences.putBoolean("autoSaveEnabled", autoSaveEnabled);
-        preferences.put("timeControl", timeControl);
 
         System.out.println("Preferences saved!");
 
