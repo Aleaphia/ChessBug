@@ -91,11 +91,7 @@ public class ChessBug extends Application {
                 try {
                     client = new Client(username, password);
                     out.put("error", false);
-                    //Create Menu
-                    mainPane.getChildren().clear();
-                    mainPane.getChildren().addAll(createSidebar(), page);
-                    mainPane.getStyleClass().addAll("background");
-                    mainScene.setRoot(mainPane);
+                    successfulLogin();
                 } catch (ClientAuthException e) {
                     e.printStackTrace();
                     out.put("error", true);
@@ -108,10 +104,7 @@ public class ChessBug extends Application {
                 try {
                     client = Client.createAccount(username, password, "placeholder@email.com");
                     out.put("error", false);
-                    //Create Menu
-                    mainPane.getChildren().clear();
-                    mainPane.getChildren().addAll(createSidebar(), page);
-                    mainScene.setRoot(mainPane);
+                    successfulLogin();
                 } catch(ClientAuthException e){
                     e.printStackTrace();
                     out.put("error", true);
@@ -125,11 +118,23 @@ public class ChessBug extends Application {
         // mainPane.getChildren().add(loginUI.getPage());
         loginPane.add(loginUI.getPage(), 1, 1);
     }
+    
+    private void successfulLogin(){
+        //Create Menu
+        mainPane.getChildren().clear();
+        mainPane.getChildren().addAll(createSidebar(), page);
+        mainPane.getStyleClass().addAll("background");
+        mainScene.setRoot(mainPane);
+        //Open page
+        changePage(new HomeController(client).getPage(), "HomeView");
+    }
 
     private VBox createSidebar() {
         VBox sidebar = new VBox(10); // Vertical layout for sidebar
         sidebar.setPadding(new Insets(10, 10, 10, 10));
-        sidebar.setStyle("-fx-background-color: #2f3136; -fx-text-fill: white;");
+        sidebar.getStylesheets().add(getClass().getResource("/menu.css").toExternalForm());
+        sidebar.getStyleClass().add("sideBar");
+
     
         // Add logo or image to the sidebar
         ImageView logo = new ImageView(new Image(ChessBug.class.getResourceAsStream("/resources/images/GoldCrown.png"))); // Will need to be replaced
@@ -193,8 +198,6 @@ public class ChessBug extends Application {
         
         //Create function
         button.setOnAction(eventHandler);
-
-        button.setStyle("-fx-border-width: 0;");
 
         return button;
     }    

@@ -1,11 +1,5 @@
 /* Main sections */
 .user-stats, .friends-space, .current-content {
-    -fx-background-color: rgba(54, 57, 63, 0.8);
-    -fx-text-fill: #ffffff;
-    -fx-effect: dropshadow(gaussian, #000000, 10, 0, 0, 4); /* Added shadow for depth */
-    -fx-padding: 20px;
-    -fx-border-radius: 8px;
-    -fx-background-radius: 8px;
     -fx-min-width: 150px;
     -fx-max-width: 300px;
 }
@@ -17,18 +11,7 @@
 
 /* Buttons */
 .button {
-    -fx-background-color: #7289da;
-    -fx-text-fill: white;
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-    -fx-border-radius: 4px;
-    -fx-background-radius: 4px;
     -fx-effect: dropshadow(gaussian, #000000, 4, 0, 0, 2); /* Added shadow to buttons */
-}
-
-.button:hover {
-    -fx-background-color: #5b6eae;
-    -fx-effect: dropshadow(gaussian, #000000, 4, 0, 0, 4); /* Shadow on hover for buttons */
 }
 
 .separator {

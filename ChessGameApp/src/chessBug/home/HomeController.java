@@ -43,6 +43,8 @@ public class HomeController implements IGameSelectionController, IFriendRequestC
     public Pane getPage(){ return page;}
     public String getUserName(){return client.getOwnUser().getUsername();}
     public List<Friend> getFriends(){return client.getFriends();}
+    public int getCompleteGamesNumber(){return client.getClosedMatches().size();}
+    public int getCurrentGamesNumber(){return client.getOpenMatches().size();}
     
     //Overriden Methods
     //IFriendRequestController methods

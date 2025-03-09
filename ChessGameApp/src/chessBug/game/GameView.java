@@ -72,8 +72,8 @@ public class GameView {
                 
         //Style
         page.getStylesheets().add(getClass().getResource("/game.css").toExternalForm());
-        page.getStyleClass().add("page");
-        msgBoard.getStyleClass().add("page");
+        page.getStyleClass().add("section");
+        msgBoard.getStyleClass().add("section");
         
     }
     
@@ -219,8 +219,8 @@ public class GameView {
         notationLabel.add(newLabel,0,0);
                
         //Style
-        labelW.getStyleClass().addAll("notationLabel", "header");
-        labelB.getStyleClass().addAll("notationLabel", "header");
+        labelW.getStyleClass().addAll("notationLabel", "h2");
+        labelB.getStyleClass().addAll("notationLabel", "h2");
         GridPane.setVgrow(labelW, Priority.ALWAYS);
         GridPane.setHgrow(labelW, Priority.ALWAYS);
         GridPane.setVgrow(labelB, Priority.ALWAYS);

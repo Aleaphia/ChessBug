@@ -13,7 +13,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.Priority;
 import javafx.util.Duration;
-import javafx.scene.layout.Region;
 
 public class GameSelectionUI {
     private VBox page = new VBox();
@@ -36,9 +35,13 @@ public class GameSelectionUI {
             //Game requests
             gameRequests.getChildren().clear();
             controller.receiveMatchRequest().forEach(match -> displayMatch(match, true));
+            if(gameRequests.getChildren().isEmpty())
+                gameRequests.getChildren().add(new Label("No pending game requests"));
             //Games in progress
             gamesInProgress.getChildren().clear();
             controller.getOpenMatchList().forEach(match -> displayMatch(match, false));
+            if(gamesInProgress.getChildren().isEmpty())
+                gamesInProgress.getChildren().add(new Label("No current games"));
             // =================================================================
         }));
         timeline.setCycleCount(Timeline.INDEFINITE);
@@ -68,13 +71,18 @@ public class GameSelectionUI {
         //Games in progress
         controller.getOpenMatchList().forEach(match -> displayMatch(match, false));
         
+        if(gameRequests.getChildren().isEmpty())
+            gameRequests.getChildren().add(new Label("No pending requests"));
+        if(gamesInProgress.getChildren().isEmpty())
+            gamesInProgress.getChildren().add(new Label("No current games"));
+        
         //Style
         page.setAlignment(Pos.CENTER);
         page.setPrefWidth(300);
         gameRequests.getStyleClass().add("scrollBackground");
         gamesInProgress.getStyleClass().add("scrollBackground");
-        header1.getStyleClass().add("header");
-        header2.getStyleClass().add("header");
+        header1.getStyleClass().add("h2");
+        header2.getStyleClass().add("h2");
     }    
     
     private void displayMatch(Match match, Boolean isRequest){
@@ -114,9 +122,14 @@ public class GameSelectionUI {
         });
         
         //Style
-        matchButton.setPrefWidth(200);
+        hbox.setMaxWidth(Double.MAX_VALUE);
+        
+        HBox.setHgrow(matchButton, Priority.ALWAYS);
         HBox.setHgrow(endButton, Priority.ALWAYS);
-        hbox.setStyle("-fx-background-color: rgba(54, 57, 63, 0);");
+        matchButton.setMaxWidth(Double.MAX_VALUE);
+        endButton.setMaxWidth(Double.MAX_VALUE);
+        matchButton.setPrefWidth(200);   
+
         if (!isRequest && !currTurn.equals(controller.getUsername())){
             matchButton.getStyleClass().add("notYourMove");
             endButton.getStyleClass().add("notYourMove");

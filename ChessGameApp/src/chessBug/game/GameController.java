@@ -42,7 +42,7 @@ public class GameController implements IGameSelectionController, IGameCreationCo
         
         //Create view
         //Game Prompt Panel
-        GridPane promptSelectionPanel = new GridPane();
+        VBox promptSelectionPanel = new VBox();
         Region leftRegion = new Region();
         Region rightRegion = new Region();
         
@@ -50,11 +50,10 @@ public class GameController implements IGameSelectionController, IGameCreationCo
         page.getStyleClass().add("padding");
         HBox.setHgrow(leftRegion, Priority.ALWAYS);
         HBox.setHgrow(rightRegion, Priority.ALWAYS);
-        promptSelectionPanel.getStyleClass().add("page");
+        promptSelectionPanel.getStyleClass().add("section");
 
         //Add selection panel components
-        promptSelectionPanel.add(new GameCreationUI(this).getPage(), 1, 0, 1, 1);
-        promptSelectionPanel.add(new GameSelectionUI(this).getPage(), 0, 1, 2, 1);
+        promptSelectionPanel.getChildren().addAll(new GameCreationUI(this).getPage(), new GameSelectionUI(this).getPage());
     }
     public GameController(Client player, Match match){ //selected match
         this(player);

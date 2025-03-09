@@ -8,6 +8,16 @@
     -fx-background-size: contain;
     -fx-background-position: center center;
 }
+.section{
+    -fx-background-color: rgba(54, 57, 63, 0.8);
+    -fx-padding: 30px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-effect: dropshadow(gaussian, #000000, 10, 0, 0, 4); /* Added shadow for depth */
+}
+.padding{
+    -fx-padding: 30px;
+}
 
 /* Scroll Panes*/
 .scroll-pane{
@@ -15,6 +25,8 @@
     -fx-fit-to-height: true;
     -fx-hbar-policy: never;
     -fx-vbar-policy: as-needed;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
 }
 .scrollBackground{
     -fx-background-color: rgb(41, 39, 42);
@@ -27,8 +39,18 @@
     -fx-background-color: rgba(0, 0, 0, 0);
 }
 
-.header {
+.h1 {
     -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-alignment: center;
+}
+.h2 {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-alignment: center;
+}
+.h3 {
+    -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-text-alignment: center;
 }
@@ -53,11 +75,11 @@
 }
 
 .button, .file-chooser-button {
-    -fx-background-color: #5c6bc0;
+    -fx-background-color: #3f51b5;
 }
 
 .button:hover, .file-chooser-button:hover {
-    -fx-background-color: #3f51b5;
+    -fx-background-color: #5c6bc0;
 }
 
 .change-password-button {
@@ -66,6 +88,9 @@
 
 .change-password-button:hover {
     -fx-background-color: #d32f2f;
+}
+.notYourMove {
+    -fx-background-color: #5b6186;
 }
 
 /* ====================== FORM ELEMENTS ====================== */

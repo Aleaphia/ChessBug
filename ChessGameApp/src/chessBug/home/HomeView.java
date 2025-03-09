@@ -15,48 +15,39 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.layout.HBox;
 import javafx.util.Duration;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
 
 
 public class HomeView {
     
     private HomeController controller;
-    private HBox page = new HBox();
-    private BorderPane pageLayout = new BorderPane();
+    private BorderPane page = new BorderPane();
     private VBox currentContent;
     private VBox friendsListContent;
+    
+    private Label gamesPlayed;
+    private Label currentGames;
+    private Label wins;
+    private Label losses;
+    
     
     protected HomeView(HomeController controller){
         this.controller = controller;
         
         //Create view
-        //Game Prompt Panel
-        Region leftRegion = new Region();
-        Region rightRegion = new Region();
-        
-        page.getChildren().addAll(leftRegion, pageLayout, rightRegion);
-        
-      
-        //Layout page
         VBox userStats = buildUserStats();
         VBox friends = buildFriends();
         buildCurrentContent();
         
-        pageLayout.setLeft(userStats);
-        pageLayout.setRight(friends);
-        pageLayout.setCenter(currentContent);
+        page.setLeft(userStats);
+        page.setRight(friends);
+        page.setCenter(currentContent);
 
         //Style
-        page.getStyleClass().add("padding");
+        page.getStyleClass().add("section");
         page.getStylesheets().add(getClass().getResource("/HomeView.css").toExternalForm());
-        HBox.setHgrow(leftRegion, Priority.ALWAYS);
-        HBox.setHgrow(rightRegion, Priority.ALWAYS);
                 
         continueDatabaseChecks();
     }
@@ -66,14 +57,17 @@ public class HomeView {
             //Add repeated database checks here ================================
             //Reload friend list
             populateFriendsContent();
+            gamesPlayed.setText("Games Played: " + controller.getCompleteGamesNumber());
+            currentGames.setText("Games In Progress: " + controller.getCurrentGamesNumber());
+            
             // =================================================================
         }));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
     }
     
-    public HBox getPage(){return page;}
-    public void setPage(BorderPane pageLayout){this.pageLayout = pageLayout;}
+    public BorderPane getPage(){return page;}
+    public void setPage(BorderPane page){this.page = page;}
     
     private VBox buildUserStats(){
         VBox userStatsSpace = new VBox(20);
@@ -82,10 +76,10 @@ public class HomeView {
         VBox.setVgrow(userStatsSpace, Priority.ALWAYS);
         
         Label welcomeMessage = new Label("Welcome to ChessBug!");
-        welcomeMessage.getStyleClass().addAll("welcome-message", "header");
+        welcomeMessage.getStyleClass().addAll("welcome-message", "h1");
         
         Label userInfo = new Label("User: " + controller.getUserName());
-        userInfo.getStyleClass().add("user-info");
+        userInfo.getStyleClass().addAll("h2", "user-info");
         
         userStatsSpace.getChildren().addAll(welcomeMessage, userInfo, new Separator());
         
@@ -93,13 +87,12 @@ public class HomeView {
         statsSection.getStyleClass().add("stats-section");
         
         Label statsTitle = new Label("Recent Game Statistics");
-        statsTitle.getStyleClass().add("section-title");
+        statsTitle.getStyleClass().addAll("h3","section-title");
         
-        Label gamesPlayed = new Label("Games Played: " + controller.getOpenMatchList().size());
-        Label wins = new Label("Wins: 10");
-        Label losses = new Label("Losses: 5");
+        gamesPlayed = new Label("Games Played: " + controller.getCompleteGamesNumber());
+        currentGames = new Label("Games In Progress: " + controller.getCurrentGamesNumber());
         
-        statsSection.getChildren().addAll(statsTitle, gamesPlayed, wins, losses);
+        statsSection.getChildren().addAll(statsTitle, gamesPlayed, currentGames);
         userStatsSpace.getChildren().add(statsSection);
         
         return userStatsSpace;
@@ -112,7 +105,7 @@ public class HomeView {
         VBox.setVgrow(friendsSpace, Priority.ALWAYS);
         
         Label header = new Label("Friends");
-        header.getStyleClass().add("header");
+        header.getStyleClass().add("h1");
         
         friendsListContent = new VBox(5);
         populateFriendsContent();
@@ -135,15 +128,15 @@ public class HomeView {
     
     private void buildCurrentContent() {
         currentContent = new VBox(10);
-        currentContent.setPadding(new Insets(20));
+        currentContent.setAlignment(Pos.TOP_CENTER);
         currentContent.getStyleClass().add("current-content");
         VBox.setVgrow(currentContent, Priority.ALWAYS);
         
         Label sectionTitle = new Label("Game & Requests");
-        sectionTitle.getStyleClass().add("header");
+        sectionTitle.getStyleClass().add("h1");
         
         currentContent.getChildren().addAll(
-            sectionTitle,
+            sectionTitle, new Separator(),
             new ReceiveFriendRequestUI(controller).getPage(),
             new GameSelectionUI(controller).getPage()
         );

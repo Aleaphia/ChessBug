@@ -185,8 +185,8 @@ public class Client {
 		}
 		return result;
 	}
-
-	public List<Match> getClosedMatches() {
+        
+        public List<Match> getClosedMatches() {
 		ArrayList<Match> result = new ArrayList<>();
 		JSONObject received = post("getOpenMatches", new JSONObject());
 
