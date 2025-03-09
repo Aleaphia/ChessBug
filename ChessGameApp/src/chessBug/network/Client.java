@@ -247,21 +247,21 @@ public class Client {
 		return received.getBoolean("response");
 	}
 
-	public boolean acceptMatchRequest(Match match) {
-		JSONObject send = new JSONObject();
-		send.put("match", match.getID());
-		JSONObject received = post("acceptMatchRequest", send);
-
-		// Return none if error in response
-		if(received.getBoolean("error")) {
-			System.err.println("Could not accept match request for #" + match.getID() + " to \"" + profile.getUsername() + "\"");
-			System.err.println(received.opt("response"));
-			return false;
-		}
-
-		return received.getBoolean("response");
-	}
-
+//	public boolean acceptMatchRequest(Match match) {
+//		JSONObject send = new JSONObject();
+//		send.put("match", match.getID());
+//		JSONObject received = post("acceptMatchRequest", send);
+//
+//		// Return none if error in response
+//		if(received.getBoolean("error")) {
+//			System.err.println("Could not accept match request for #" + match.getID() + " to \"" + profile.getUsername() + "\"");
+//			System.err.println(received.opt("response"));
+//			return false;
+//		}
+//
+//		return received.getBoolean("response");
+//	}
+//
 	public boolean denyMatchRequest(Match match) {
 		JSONObject send = new JSONObject();
 		send.put("match", match.getID());
@@ -386,7 +386,32 @@ public class Client {
 		return result;
 	}
 
-	public void setMatchStatus(Match match, String status) {
+	public void acceptMatchRequest(Match match){
+            setMatchStatus(match, Match.Status.WHITE_TURN.toString());
+        }
+        public void forfitMatch(Match match){
+            setMatchStatus(match, getOwnUser().getUsername().equals(match.getWhite().getUsername())?
+                Match.Status.BLACK_WIN.toString() :     //If the user who forfit is white -> black wins
+                Match.Status.WHITE_WIN.toString()       //Otherwise white wins
+            );
+        }
+        public void setGameTurn(Match match, Boolean turn){
+            setMatchStatus(match,turn ? //set game status
+                Match.Status.WHITE_TURN.toString() :
+                Match.Status.BLACK_TURN.toString()
+            );
+        }
+        public void setGameWinner(Match match, Boolean winner){
+            setMatchStatus(match,winner ? //set game status
+                Match.Status.WHITE_WIN.toString() :
+                Match.Status.BLACK_WIN.toString()
+            );
+        }
+        public void setGameDraw(Match match){
+            setMatchStatus(match, Match.Status.DRAW.toString());
+        }
+        
+        private void setMatchStatus(Match match, String status) {
 		JSONObject sendData = new JSONObject();
 		match.setStatus(status);
 		sendData.put("match", match.getID());

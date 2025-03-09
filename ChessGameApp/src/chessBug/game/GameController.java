@@ -102,10 +102,9 @@ public class GameController implements IGameSelectionController, IGameCreationCo
     @Override public String getUsername(){return client.getOwnUser().getUsername();}
     @Override public List<Match> getOpenMatchList(){return client.getOpenMatches();}
     @Override public List<Match> receiveMatchRequest(){return client.getMatchRequests();}
-    @Override public void acceptMatchRequest(Match match){client.setMatchStatus(match, Match.Status.WHITE_TURN.toString());}
+    @Override public void acceptMatchRequest(Match match){client.acceptMatchRequest(match);}
     @Override public void denyMatchRequest(Match match){client.denyMatchRequest(match);}
-    @Override public void forfitMatch(Match match){ client.setMatchStatus(match, getUsername().equals(match.getWhite().getUsername()) ? 
-            Match.Status.BLACK_WIN.toString() : Match.Status.WHITE_TURN.toString());} //If the user who forfit is white -> black wins, otherwise white wins
+    @Override public void forfitMatch(Match match){client.forfitMatch(match);}
     @Override public void selectGame(Match newMatch){internalSelectGame(newMatch);}
     
     //IGameCreationController methods
@@ -137,9 +136,7 @@ public class GameController implements IGameSelectionController, IGameCreationCo
         if (internalPlayerMove(notation)){
             //Update database
             match.makeMove(client, notation); //Add move
-            client.setMatchStatus(match, model.getPlayerTurn() ? //set game status
-                    Match.Status.WHITE_TURN.toString() :
-                    Match.Status.BLACK_TURN.toString());
+            client.setGameTurn(match, model.getPlayerTurn()); //set game status
             
             //Update view
             view.deselectSquare();
@@ -151,10 +148,10 @@ public class GameController implements IGameSelectionController, IGameCreationCo
                 String endMsg = model.getEndMessage();
                 if (endMsg.charAt(11) == 'C'){ //Check for "Checkmate" vs "Draw" or "Stalemate"
                     boolean winner = (endMsg.charAt(22) == 'w'); // Check for  "...white" vs "...black"
-                    client.setMatchStatus(match, (winner) ? Match.Status.WHITE_WIN.toString(): Match.Status.BLACK_WIN.toString());
+                    client.setGameWinner(match,winner);
                 }
                 else //If there is no winner, than the game is a draw
-                    client.setMatchStatus(match, Match.Status.DRAW.toString());
+                    client.setGameDraw(match);
             }
         }
     }
