@@ -36,7 +36,7 @@ public class Client {
 
 	public Client(String username, String password) throws ClientAuthException {
 		// Call "login" function from the server
-		profile = new ProfileModel(0, username, password, "", ProfileModel.DEFAULT_PROFILE_PICTURE);
+		profile = new ProfileModel(0, username, password, "", User.DEFAULT_PROFILE_PICTURE);
 		JSONObject loginMessage = post("login", new JSONObject());
 
 		// If the server returns an error, throw an exception
@@ -103,7 +103,7 @@ public class Client {
 		// We need to send correct username and password to retrieve information so no need to update those variables
 		profile.setEmail(profileData.getJSONObject("response").getString("EmailAddress"));
 		if(!profileData.getJSONObject("response").isNull("pfp"))
-			profile.setProfilePicURL("https://www.zandgall.com/chessbug/content/"+profileData.getJSONObject("response").getString("pfp"));
+			profile.setProfilePicURL(profileData.getJSONObject("response").getString("pfp"));
 		profile.setUserID(profileData.getJSONObject("response").getInt("UserID"));
 
 		return profile;

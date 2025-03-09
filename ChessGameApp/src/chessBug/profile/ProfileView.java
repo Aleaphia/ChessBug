@@ -51,12 +51,7 @@ public class ProfileView extends VBox {
 
     private void createProfileUI(Client client) {
         // Profile Picture
-        profileImageView = new ImageView();
-        if (model.getProfilePicURL() != null && !model.getProfilePicURL().isEmpty()) {
-            Image profileImage = new Image(model.getProfilePicURL());
-            profileImageView.setImage(profileImage);
-            System.out.println("Set profile picture to " + model.getProfilePicURL());
-        }
+        profileImageView = new ImageView(client.getOwnUser().getProfilePicture());
         profileImageView.setFitWidth(100);
         profileImageView.setFitHeight(100);
     

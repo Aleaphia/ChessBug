@@ -1,0 +1,10 @@
+/* ====================== LOGIN PAGE ====================== */
+
+.login-error { 
+    -fx-border-color: #ff0000;
+}
+
+.loginPane {
+    -fx-background-color: rgba(255, 57, 63, 0.8);
+    -fx-text-fill: black;
+}

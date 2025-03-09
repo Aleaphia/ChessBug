@@ -1,8 +1,6 @@
 package chessBug.profile;
 
 public class ProfileModel {
-    public static final String DEFAULT_PROFILE_PICTURE = "https://www.zandgall.com/chessbug/content/chessbug";
-
     private int userID;
     private String username;
     private String password; // It's okay to keep this in memory

@@ -1,0 +1,5 @@
+/* ====================== LOGIN PAGE ====================== */
+.loginPane {
+    -fx-background-color: rgba(54, 57, 255, 0.8);
+    -fx-text-fill: red;
+}

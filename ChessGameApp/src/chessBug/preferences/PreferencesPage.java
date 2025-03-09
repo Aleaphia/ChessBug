@@ -1,5 +1,6 @@
 package chessBug.preferences;
 
+import chessBug.network.Client;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -21,11 +22,11 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
 public class PreferencesPage {
-    private final PreferencesController controller;
+    private final Client client;
     private VBox root;
 
-    public PreferencesPage(PreferencesController controller) {
-        this.controller = controller;
+    public PreferencesPage(Client client) {
+        this.client = client;
     }
 
     public VBox getPage() {
@@ -41,11 +42,7 @@ public class PreferencesPage {
 
             // Profile Picture
             ImageView profileImageView = new ImageView();
-            String profilePicURL = controller.getProfilePicURL();
-            if (profilePicURL != null && !profilePicURL.isEmpty()) {
-                Image profileImage = new Image(profilePicURL);
-                profileImageView.setImage(profileImage);
-            }
+            profileImageView.setImage(client.getOwnUser().getProfilePicture());
 
             profileImageView.setFitWidth(90);
             profileImageView.setFitHeight(90);
@@ -53,7 +50,7 @@ public class PreferencesPage {
             profileImageView.setStyle("-fx-border-radius: 50%; -fx-border-color: white; -fx-border-width: 2px;");
 
             // Username Label
-            String username = controller.getUsername();
+            String username = client.getOwnUser().getUsername();
             Label usernameLabel = new Label(username);
             usernameLabel.setFont(Font.font("Roboto", FontWeight.BOLD, 18));
             usernameLabel.setTextFill(Color.web("#FFFFFF"));
@@ -68,21 +65,21 @@ public class PreferencesPage {
             gameSettingsLabel.setTextFill(Color.web("#FFFFFF"));
 
             // Auto-Save Checkbox
-            CheckBox autoSaveCheckBox = new CheckBox("Enable Auto-Save");
-            autoSaveCheckBox.setSelected(controller.getPreference("autoSaveEnabled", true));
-            autoSaveCheckBox.setOnAction(event -> controller.handleAutoSave(autoSaveCheckBox.isSelected()));
+            CheckBox autoSaveCheckBox = new CheckBox("Enable Auto-Save");  
+            autoSaveCheckBox.setSelected(PreferencesController.isAutoSaveEnabled());
+            autoSaveCheckBox.setOnAction(event -> PreferencesController.handleAutoSave(autoSaveCheckBox.isSelected()));
             autoSaveCheckBox.setTextFill(Color.web("#B0B0B0"));
 
             // Show Move Hints Checkbox
             CheckBox moveHintsCheckBox = new CheckBox("Show Move Hints");
-            moveHintsCheckBox.setSelected(controller.getPreference("showMoveHints", true));
-            moveHintsCheckBox.setOnAction(event -> controller.handleMoveHints(moveHintsCheckBox.isSelected()));
+            moveHintsCheckBox.setSelected(PreferencesController.isShowMoveHintsEnabled());
+            moveHintsCheckBox.setOnAction(event -> PreferencesController.handleShowMoveHints(moveHintsCheckBox.isSelected()));
             moveHintsCheckBox.setTextFill(Color.web("#B0B0B0"));
 
             // Confirm Moves Checkbox
             CheckBox confirmMovesCheckBox = new CheckBox("Confirm Moves Before Playing");
-            confirmMovesCheckBox.setSelected(controller.getPreference("confirmMoves", false));
-            confirmMovesCheckBox.setOnAction(event -> controller.handleConfirmMoves(confirmMovesCheckBox.isSelected()));
+            confirmMovesCheckBox.setSelected(PreferencesController.isConfirmMovesEnabled());
+            confirmMovesCheckBox.setOnAction(event -> PreferencesController.handleConfirmMoves(confirmMovesCheckBox.isSelected()));
             confirmMovesCheckBox.setTextFill(Color.web("#B0B0B0"));
 
             // Slider for Volume
@@ -112,20 +109,29 @@ public class PreferencesPage {
 
             ComboBox<String> languageComboBox = new ComboBox<>();
             languageComboBox.getItems().addAll("English", "Spanish", "French", "German");
-            languageComboBox.setValue(controller.getPreference("language", "English"));
-            languageComboBox.setOnAction(event -> controller.handleLanguageChange(languageComboBox.getValue()));
+            languageComboBox.setValue(PreferencesController.getLanguage());
+            languageComboBox.setOnAction(event -> PreferencesController.handleLanguageChange(languageComboBox.getValue()));
 
             languageContainer.getChildren().addAll(languageLabel, languageComboBox);
+
+            // Theme selection
+            VBox themeContainer = new VBox(15);
+            themeContainer.setPadding(new Insets(10));
+            Label themeLabel = new Label("theme:");
+            themeLabel.setFont(Font.font("Roboto", FontWeight.BOLD, 16));
+            themeLabel.setTextFill(Color.web("#FFFFFF"));
+
+            ComboBox<String> themeComboBox = new ComboBox<>();
+            themeComboBox.getItems().addAll("Light", "Dark");
+            themeComboBox.setValue(PreferencesController.getTheme());
+            themeComboBox.setOnAction(event -> PreferencesController.handleThemeChange(themeComboBox.getValue(), themeComboBox.getScene()));
+
+            themeContainer.getChildren().addAll(themeLabel, themeComboBox);
 
             // Save Preferences Button
             Button savePreferencesButton = new Button("Save Preferences");
             savePreferencesButton.setStyle("-fx-background-color: #7289DA; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 20px; -fx-background-radius: 5px;");
-            savePreferencesButton.setOnAction(event -> controller.savePreferences(
-                autoSaveCheckBox.isSelected(),
-                moveHintsCheckBox.isSelected(),
-                confirmMovesCheckBox.isSelected(),
-                languageComboBox.getValue()
-            ));
+            savePreferencesButton.setOnAction(event -> PreferencesController.savePreferences());
 
             // Hover Effect for Save Button
             savePreferencesButton.setOnMouseEntered(e -> savePreferencesButton.setStyle("-fx-background-color: #5C6A8B; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 20px; -fx-background-radius: 5px;"));
@@ -138,6 +144,7 @@ public class PreferencesPage {
                 gameSettingsContainer,
                 new Separator(),
                 languageContainer,
+                themeContainer,
                 new Separator(),
                 savePreferencesButton
             );

@@ -1,0 +1,96 @@
+/* ====================== GLOBAL STYLES ====================== */
+
+/* Background */
+.background {
+    -fx-background-color: rgb(212, 215, 223);
+    -fx-background-image: url("../images/BugBackground.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: contain;
+    -fx-background-position: center center;
+}
+
+/* Scroll Panes*/
+.scroll-pane{
+    -fx-fit-to-width: true;
+    -fx-fit-to-height: true;
+    -fx-hbar-policy: never;
+    -fx-vbar-policy: as-needed;
+}
+
+/* Labels */
+.label {
+    -fx-text-fill: white;
+    -fx-background-color: rgba(0, 0, 0, 0);
+}
+
+.header {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-alignment: center;
+}
+
+.logoImage {
+    -fx-padding-left: 15px;
+}
+
+/* ====================== BUTTON STYLES ====================== */
+
+.button, .file-chooser-button, .change-password-button {
+    -fx-font-size: 14px;
+    -fx-padding: 10px 20px;
+    -fx-border-radius: 5px;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+    -fx-transition: background-color 0.3s ease;
+}
+
+.button, .file-chooser-button {
+    -fx-background-color: #5c6bc0;
+}
+
+.button:hover, .file-chooser-button:hover {
+    -fx-background-color: #3f51b5;
+}
+
+.change-password-button {
+    -fx-background-color: #f44336;
+}
+
+.change-password-button:hover {
+    -fx-background-color: #d32f2f;
+}
+
+/* ====================== FORM ELEMENTS ====================== */
+
+.combo-box, .check-box {
+    -fx-font-size: 14px;
+    -fx-pref-width: 200px;
+    -fx-padding: 10px;
+}
+
+.combo-box {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #ccc;
+    -fx-border-width: 1;
+    -fx-background-insets: 0;
+    -fx-text-fill: #333;
+}
+
+/* ====================== GENERAL LAYOUT ====================== */
+
+.layout, .profile-layout {
+    -fx-spacing: 15px;
+    -fx-alignment: center;
+    -fx-padding: 10px;
+}
+
+/* ====================== RESPONSIVE DESIGN ====================== */
+
+@media screen and (max-width: 800px) {
+    .background {
+        -fx-background-color: #2f3136;
+    }
+    .sidebar {
+        -fx-width: 150px;
+    }
+}
