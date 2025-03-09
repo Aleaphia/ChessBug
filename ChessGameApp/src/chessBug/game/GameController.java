@@ -5,6 +5,7 @@
  */
 package chessBug.game;
 
+import chessBug.ChessBug;
 import chessBug.misc.*;
 import chessGame.*;
 import chessBug.network.*;
@@ -29,6 +30,7 @@ public class GameController implements IGameSelectionController, IGameCreationCo
     private Client client;
     private Match match = null;
     private Chat chat;
+    private DatabaseCheckList databaseCheckList;
     //Page
     private HBox page = new HBox();
     //MVC
@@ -36,9 +38,10 @@ public class GameController implements IGameSelectionController, IGameCreationCo
     private GameView view;
     
     //Constructors
-    public GameController(Client player){ //No selected match
+    public GameController(Client player, DatabaseCheckList databaseCheckList){ //No selected match
         //Connect to database
         client = player;
+        this.databaseCheckList = databaseCheckList;
         
         //Create view
         //Game Prompt Panel
@@ -55,27 +58,24 @@ public class GameController implements IGameSelectionController, IGameCreationCo
         //Add selection panel components
         promptSelectionPanel.getChildren().addAll(new GameCreationUI(this).getPage(), new GameSelectionUI(this).getPage());
     }
-    public GameController(Client player, Match match){ //selected match
-        this(player);
+    public GameController(Client player, DatabaseCheckList databaseCheckList, Match match){ //selected match
+        //Connect to database
+        client = player;
+        this.databaseCheckList = databaseCheckList;
+        
         internalSelectGame(match);
     }
     
     //Database check loop
-    private void continueDatabaseChecks(){
-        //Check database
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (ActionEvent event) -> {
-            //Add repeated database checks here ================================
-            if(!isThisPlayersTurn()){ //While waiting for other player's move check database and update boardstate
-                match.poll(client).forEach((move) -> internalPlayerMove(move));
-                view.refresh(client);
-            }
-            else{ // during this player's turn just refresh chat
-                view.refreshMessageBoard(client);
-            }
-            // =================================================================
-        }));
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
+    private void databaseChecks(){
+        //System.out.println("Debug: GameController DatabaseCheck" );
+        if(!isThisPlayersTurn()){ //While waiting for other player's move check database and update boardstate
+            match.poll(client).forEach((move) -> internalPlayerMove(move));
+            view.refresh(client);
+        }
+        else{ // during this player's turn just refresh chat
+            view.refreshMessageBoard(client);
+        }
     }
     
     //Getter Methods ===========================================================
@@ -97,6 +97,8 @@ public class GameController implements IGameSelectionController, IGameCreationCo
 
 
     //Overriden methods ========================================================
+    //IDatabaseCheckInterface methods
+    @Override public void addToDatabaseCheckList(DatabaseCheck item){databaseCheckList.add(item);}
     //IGameSelectionController methods
     @Override public String getUsername(){return client.getOwnUser().getUsername();}
     @Override public List<Match> getOpenMatchList(){return client.getOpenMatches();}
@@ -209,6 +211,6 @@ public class GameController implements IGameSelectionController, IGameCreationCo
         view.refresh(client);
         
         //Check database
-        continueDatabaseChecks();
+        addToDatabaseCheckList(()->databaseChecks());
     }
 }

@@ -20,6 +20,8 @@ import java.io.InputStream;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import chessBug.game.GameController;
 import chessBug.home.HomeController;
 import chessBug.login.LoginUI;
@@ -28,6 +30,10 @@ import chessBug.network.ClientAuthException;
 import chessBug.preferences.PreferencesController;
 import chessBug.preferences.PreferencesPage;
 import chessBug.profile.ProfileController;
+import chessBug.network.DatabaseCheckList;
+import chessBug.network.DatabaseCheck;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -36,6 +42,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
@@ -47,6 +54,7 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 public class ChessBug extends Application {
     //Global variables
@@ -55,6 +63,7 @@ public class ChessBug extends Application {
     private HBox mainPane = new HBox();
     private GridPane loginPane;
     private Client client;
+    private DatabaseCheckList databaseCheckList = new DatabaseCheckList(); 
     
     @Override
     public void start(Stage primaryStage) {
@@ -71,6 +80,18 @@ public class ChessBug extends Application {
         
         //Display
         primaryStage.show();
+        
+        continueDatabaseChecks();
+    }
+    
+    private void continueDatabaseChecks(){
+        //Check database
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (ActionEvent event) -> {
+            //System.out.println("DEBUG: " + databaseCheckList.size() + "--------------" + databaseCheckList);
+            databaseCheckList.preformChecks();
+        }));
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
     }
     
     private void createLoginPage(){
@@ -126,7 +147,7 @@ public class ChessBug extends Application {
         mainPane.getStyleClass().addAll("background");
         mainScene.setRoot(mainPane);
         //Open page
-        changePage(new HomeController(client).getPage(), "HomeView");
+        changePage(new HomeController(client,databaseCheckList).getPage(), "HomeView");
     }
 
     private VBox createSidebar() {
@@ -149,11 +170,24 @@ public class ChessBug extends Application {
         // Add items to the sidebar
         sidebar.getChildren().addAll(
                 logoHolder,
-                createSideBarButton("Home.png", event -> changePage(new HomeController(client).getPage(), "HomeView")),
-                createSideBarButton("Chess.png", event -> changePage(new GameController(client).getPage(), "game")),
-                createSideBarButton("Gear.png", event -> changePage(preferencesPage.getPage())),
-                createSideBarButton("User.png", event -> changePage(new ProfileController(client).getPage(), "profile")),
+                createSideBarButton("Home.png", event -> {
+                    databaseCheckList.clear();
+                    changePage(new HomeController(client, databaseCheckList).getPage(), "HomeView");
+                }),
+                createSideBarButton("Chess.png", event -> {
+                    databaseCheckList.clear();
+                    changePage(new GameController(client, databaseCheckList).getPage(), "game");
+                }),
+                createSideBarButton("Gear.png", event -> {
+                    databaseCheckList.clear();
+                    changePage(preferencesPage.getPage());
+                }),
+                createSideBarButton("User.png", event -> {
+                    databaseCheckList.clear();
+                    changePage(new ProfileController(client).getPage(), "profile");
+                }),
                 createSideBarButton("Logout.png", event -> {
+                    databaseCheckList.clear();
                     mainScene.setRoot(loginPane);
                     mainScene.getStylesheets().add("login.css");
                 }));
