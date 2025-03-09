@@ -16,6 +16,10 @@
     -fx-hbar-policy: never;
     -fx-vbar-policy: as-needed;
 }
+.scrollBackground{
+    -fx-background-color: rgb(41, 39, 42);
+    -fx-fill: transparent;
+}
 
 /* Labels */
 .label {
@@ -24,13 +28,17 @@
 }
 
 .header {
-    -fx-font-size: 16px;
+    -fx-font-size: 20px;
     -fx-font-weight: bold;
     -fx-text-alignment: center;
 }
 
 .logoImage {
     -fx-padding-left: 15px;
+}
+/**/
+.region{
+    -fx-min-width: 10px;
 }
 
 /* ====================== BUTTON STYLES ====================== */
