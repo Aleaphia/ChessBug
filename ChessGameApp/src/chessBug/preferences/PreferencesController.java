@@ -1,5 +1,6 @@
 package chessBug.preferences;
 
+import java.net.URL;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -16,21 +17,14 @@ public class PreferencesController {
     private static Preferences preferences = Preferences.userNodeForPackage(PreferencesController.class);
 
     private Pane page;
-    PreferencesView view;
+    PreferencesPage view;
 
     public PreferencesController(Client client) {
-        view = new PreferencesView(client);
+        view = new PreferencesPage(client);
         page = view.getPage();
     }
 
     public Pane getPage() { return page; }
-
-    // Handle the sound preference change
-    protected static void handleSoundPreference(boolean isEnabled) {
-        preferences.putBoolean("soundEnabled", isEnabled);
-        System.out.println("Sound preference changed: " + (isEnabled ? "Enabled" : "Disabled"));
-        // TODO: Add actual logic for handling sound settings (e.g., enable or disable sound in the game)
-    }
 
     // Handle the theme change
     protected static void handleThemeChange(String theme, Scene scene) {
@@ -40,9 +34,8 @@ public class PreferencesController {
         // Ensure the scene exists
         if (scene != null) {
             try {  
-                // Clear existing styles and apply the new one
-                scene.getStylesheets().clear();
-                scene.getStylesheets().add(getStyle("Styles"));
+                // Clear existing styles and apply the new ones
+                applyStyles(scene, "Styles", "Preferences");
                 // Force layout update
                 scene.getRoot().requestLayout();
     
@@ -60,14 +53,23 @@ public class PreferencesController {
     protected static void handleAutoSave(boolean isEnabled) {
         preferences.putBoolean("autoSaveEnabled", isEnabled); 
         System.out.println("Auto-Save preference changed: " + (isEnabled ? "Enabled" : "Disabled"));
-        // TODO: Add actual logic for handling auto-save settings in the game
     }
 
-    // Handle the time control selection for the game
-    protected static void handleTimeControl(String timeControl) {
-        preferences.put("timeControl", timeControl); 
-        System.out.println("Time control set to: " + timeControl);
-        // TODO: Add actual logic for handling game time control (e.g., configure game clock settings)
+    protected static void handleShowMoveHints(boolean isEnabled) {
+        preferences.putBoolean("showMoveHints", isEnabled); 
+        System.out.println("Move Hints preference changed: " + (isEnabled ? "Enabled" : "Disabled")); 
+    }
+
+    // Handle confirm moves preference change
+    protected static void handleConfirmMoves(boolean isEnabled) {
+        preferences.putBoolean("confirmMoves", isEnabled);
+        System.out.println("Confirm Moves preference changed: " + (isEnabled ? "Enabled" : "Disabled"));
+    }
+
+    // Handle language change
+    protected static void handleLanguageChange(String language) {
+        preferences.put("language", language);
+        System.out.println("Language changed to: " + language);
     }
 
     // Save preferences to persistent storage
@@ -85,11 +87,6 @@ public class PreferencesController {
         alert.setContentText("Your preferences have been saved successfully.");
         alert.showAndWait();
     }
-
-    public static boolean isSoundEnabled() {
-        return preferences.getBoolean("soundEnabled", true);
-    }
-
     public static boolean isAutoSaveEnabled() {
         return preferences.getBoolean("autoSaveEnabled", true);
     }
@@ -98,14 +95,25 @@ public class PreferencesController {
         return preferences.get("theme", "Light");
     }
 
-    public static String getTimeControl() {
-        return preferences.get("timeControl", "None");
+    public static String getLanguage() {
+        return preferences.get("language", "English");
     }
 
-    public static String getStyle(String type) {
-        System.out.println(PreferencesController.class.getResourceAsStream("/resources/styles/" + getTheme() + "/" + type + ".css") == null);
-        System.out.println(PreferencesController.class.getResource("/resources/styles/" + getTheme() + "/" + type + ".css").toExternalForm());
-        // return "/resources/styles/" + getTheme() + "/" + type + ".css";
-        return PreferencesController.class.getResource("/resources/styles/" + getTheme() + "/" + type + ".css").toExternalForm();
+    public static boolean isShowMoveHintsEnabled() {
+        return preferences.getBoolean("showMoveHints", true);
+    }
+
+    public static boolean isConfirmMovesEnabled() {
+        return preferences.getBoolean("confirmMoves", false);
+    }
+
+    public static void applyStyles(Scene scene, String... styles) {
+        scene.getStylesheets().clear();
+        for(String style : styles) {
+            scene.getStylesheets().add(PreferencesController.class.getResource("/resources/styles/" + style + ".css").toExternalForm());
+            URL theme = PreferencesController.class.getResource("/resources/styles/" + getTheme() + "/" + style + ".css");
+            if(theme != null)
+                scene.getStylesheets().add(theme.toExternalForm());
+        }
     }
 }

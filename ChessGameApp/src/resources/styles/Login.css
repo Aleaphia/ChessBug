@@ -1,0 +1,17 @@
+/* ====================== LOGIN PAGE ====================== */
+
+.login-error { 
+    -fx-border-color: #ff0000;
+}
+
+.loginPane {
+    -fx-background-color: rgba(54, 57, 63, 0.8);
+    -fx-text-fill: white;
+}
+
+.background.login {
+    -fx-background-image: url("../images/BugBackground.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: contain;
+    -fx-background-position: center center;
+}

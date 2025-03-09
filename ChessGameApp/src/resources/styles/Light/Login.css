@@ -5,13 +5,6 @@
 }
 
 .loginPane {
-    -fx-background-color: rgba(54, 57, 63, 0.8);
-    -fx-text-fill: white;
-}
-
-.background.login {
-    -fx-background-image: url("resources/images/BugBackground.png");
-    -fx-background-repeat: no-repeat;
-    -fx-background-size: contain;
-    -fx-background-position: center center;
+    -fx-background-color: rgba(255, 57, 63, 0.8);
+    -fx-text-fill: black;
 }
