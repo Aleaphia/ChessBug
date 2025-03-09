@@ -75,7 +75,7 @@ public class ChessBug extends Application {
         primaryStage.setScene(mainScene);//Add mainScene to primaryStage
         
         //Style
-        PreferencesController.applyStyles(mainScene, "Styles", "Login");
+        mainScene.getStylesheets().addAll("login.css", "Styles.css");
         HBox.setHgrow(page, Priority.ALWAYS); //Makes page take up all avaiable space
         
         //Display
@@ -164,6 +164,9 @@ public class ChessBug extends Application {
         StackPane logoHolder = new StackPane(logo);
         logoHolder.getStyleClass().add("logoImage");
 
+        PreferencesController preferencesController = new PreferencesController(client);
+        PreferencesPage preferencesPage = new PreferencesPage(preferencesController);
+    
         // Add items to the sidebar
         sidebar.getChildren().addAll(
                 logoHolder,
@@ -173,20 +176,20 @@ public class ChessBug extends Application {
                 }),
                 createSideBarButton("Chess.png", event -> {
                     databaseCheckList.clear();
-                    changePage(new GameController(client, databaseCheckList).getPage(), "Game");
+                    changePage(new GameController(client, databaseCheckList).getPage(), "game");
                 }),
                 createSideBarButton("Gear.png", event -> {
                     databaseCheckList.clear();
-                    changePage(new PreferencesPage(client).getPage(), "Preferences");
+                    changePage(preferencesPage.getPage());
                 }),
                 createSideBarButton("User.png", event -> {
                     databaseCheckList.clear();
-                    changePage(new ProfileController(client).getPage(), "Profile");
+                    changePage(new ProfileController(client).getPage(), "profile");
                 }),
                 createSideBarButton("Logout.png", event -> {
                     databaseCheckList.clear();
                     mainScene.setRoot(loginPane);
-                    PreferencesController.applyStyles(mainScene, "Styles", "Login");
+                    mainScene.getStylesheets().add("login.css");
                 }));
     
         return sidebar;
@@ -195,13 +198,13 @@ public class ChessBug extends Application {
         //Clear and add new page
         page.getChildren().clear();
         page.getChildren().add(newPage);
-        PreferencesController.applyStyles(mainScene, "Styles");
+        mainScene.getStylesheets().clear();
+        mainScene.getStylesheets().add("Styles.css");
     }
      private void changePage(Pane newPage, String stylePage){
         //Clear and add new page
-        page.getChildren().clear();
-        page.getChildren().add(newPage);
-        PreferencesController.applyStyles(mainScene, "Styles", stylePage); 
+        changePage(newPage);
+        mainScene.getStylesheets().add(stylePage + ".css");
     }
 
     private Button createSideBarButton(String imageFileName, EventHandler<ActionEvent> eventHandler) {

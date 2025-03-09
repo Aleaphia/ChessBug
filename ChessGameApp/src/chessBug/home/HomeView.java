@@ -48,22 +48,14 @@ public class HomeView {
         //Style
         page.getStyleClass().add("section");
         page.getStylesheets().add(getClass().getResource("/HomeView.css").toExternalForm());
-                
-        continueDatabaseChecks();
-    }
-    private void continueDatabaseChecks(){
-        //Check database
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (ActionEvent event) -> {
-            //Add repeated database checks here ================================
+        
+        controller.addToDatabaseCheckList(() -> {
+            //System.out.println("Debug: GameSelectionUI DatabaseCheck" );
             //Reload friend list
             populateFriendsContent();
             gamesPlayed.setText("Games Played: " + controller.getCompleteGamesNumber());
             currentGames.setText("Games In Progress: " + controller.getCurrentGamesNumber());
-            
-            // =================================================================
-        }));
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
+        });
     }
     
     public BorderPane getPage(){return page;}

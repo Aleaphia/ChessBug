@@ -22,20 +22,8 @@ public class ReceiveFriendRequestUI {
     
     public ReceiveFriendRequestUI(IFriendRequestController controller){
         this.controller = controller;
-        
         buildRequestField();
-        continueDatabaseChecks();
-    }
-    private void continueDatabaseChecks(){
-        //Check database
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (ActionEvent event) -> {
-            //Add repeated database checks here ================================
-            //Reload game info
-            updateRequestField();
-            // =================================================================
-        }));
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
+        this.controller.addToDatabaseCheckList(() -> updateRequestField()); //Continued database checks
     }
     
     public VBox getPage(){return page;}
@@ -54,6 +42,7 @@ public class ReceiveFriendRequestUI {
     }
     
     private void updateRequestField(){
+        //System.out.println("Debug: ReceiveFriendRequestUI DatabaseCheck" );
         friendRequests.getChildren().clear();
         List<User> friendRequestsList = controller.receiveFriendRequest();
         //System.out.println("DEBUG: " + friendRequestsList.isEmpty());

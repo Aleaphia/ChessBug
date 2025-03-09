@@ -167,22 +167,29 @@ public class ChessBug extends Application {
         // Add items to the sidebar
         sidebar.getChildren().addAll(
                 logoHolder,
+<<<<<<< HEAD
+                createSideBarButton("Home.png", event -> changePage(new HomeController(client).getPage(), "HomeView")),
+                createSideBarButton("Chess.png", event -> changePage(new GameController(client).getPage(), "Game")),
+                createSideBarButton("Gear.png", event -> changePage(new PreferencesPage(client).getPage(), "Preferences")),
+                createSideBarButton("User.png", event -> changePage(new ProfileController(client).getPage(), "Profile")),
+=======
                 createSideBarButton("Home.png", event -> {
                     databaseCheckList.clear();
                     changePage(new HomeController(client, databaseCheckList).getPage(), "HomeView");
                 }),
                 createSideBarButton("Chess.png", event -> {
                     databaseCheckList.clear();
-                    changePage(new GameController(client, databaseCheckList).getPage(), "Game");
+                    changePage(new GameController(client, databaseCheckList).getPage(), "game");
                 }),
                 createSideBarButton("Gear.png", event -> {
                     databaseCheckList.clear();
-                    changePage(new PreferencesPage(client).getPage(), "Preferences");
+                    changePage(preferencesPage.getPage());
                 }),
                 createSideBarButton("User.png", event -> {
                     databaseCheckList.clear();
-                    changePage(new ProfileController(client).getPage(), "Profile");
+                    changePage(new ProfileController(client).getPage(), "profile");
                 }),
+>>>>>>> preformanceCleanup
                 createSideBarButton("Logout.png", event -> {
                     databaseCheckList.clear();
                     mainScene.setRoot(loginPane);

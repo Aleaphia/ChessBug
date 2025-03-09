@@ -1,9 +1,7 @@
 package chessBug.misc;
 
 import chessBug.network.Match;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
-import javafx.event.ActionEvent;
+import chessBug.network.DatabaseCheck;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -12,7 +10,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.Priority;
-import javafx.util.Duration;
 
 public class GameSelectionUI {
     private VBox page = new VBox();
@@ -22,33 +19,25 @@ public class GameSelectionUI {
     
     public GameSelectionUI(IGameSelectionController controller){
         this.controller = controller;
-        
         buildGameSelectionPrompt();
-        continueDatabaseChecks();
-    }
-    
-    private void continueDatabaseChecks(){
-        //Check database
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (ActionEvent event) -> {
-            //Add repeated database checks here ================================
-            //Reload game info
-            //Game requests
-            gameRequests.getChildren().clear();
-            controller.receiveMatchRequest().forEach(match -> displayMatch(match, true));
-            if(gameRequests.getChildren().isEmpty())
-                gameRequests.getChildren().add(new Label("No pending game requests"));
-            //Games in progress
-            gamesInProgress.getChildren().clear();
-            controller.getOpenMatchList().forEach(match -> displayMatch(match, false));
-            if(gamesInProgress.getChildren().isEmpty())
-                gamesInProgress.getChildren().add(new Label("No current games"));
-            // =================================================================
-        }));
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
+        controller.addToDatabaseCheckList(()->databaseChecks());
     }
     
     public Pane getPage(){return page;}
+    
+    public void databaseChecks(){
+        //System.out.println("Debug: GameSelectionUI DatabaseCheck" );
+        //Game requests
+        gameRequests.getChildren().clear();
+        controller.receiveMatchRequest().forEach(match -> displayMatch(match, true));
+        if(gameRequests.getChildren().isEmpty())
+            gameRequests.getChildren().add(new Label("No pending game requests"));
+        //Games in progress
+        gamesInProgress.getChildren().clear();
+        controller.getOpenMatchList().forEach(match -> displayMatch(match, false));
+        if(gamesInProgress.getChildren().isEmpty())
+            gamesInProgress.getChildren().add(new Label("No current games"));
+    }
     
     private void buildGameSelectionPrompt() {
         //Clear page

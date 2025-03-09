@@ -5,8 +5,6 @@ import chessBug.misc.*;
 import chessBug.network.*;
 import chessBug.game.*;
 import java.util.List;
-import javafx.scene.Node;
-import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -18,14 +16,16 @@ import javafx.scene.layout.Region;
 public class HomeController implements IGameSelectionController, IFriendRequestController{
     //Database Connection
     private Client client;
+    private DatabaseCheckList databaseCheckList;
     //Page
     private HBox page = new HBox();
     //MVC
     private HomeView view;
     
-    public HomeController(Client client){
+    public HomeController(Client client, DatabaseCheckList databaseCheckList){
         //Connect to database
         this.client = client;
+        this.databaseCheckList = databaseCheckList;
         
         //Create view
         view = new HomeView(this);
@@ -47,6 +47,8 @@ public class HomeController implements IGameSelectionController, IFriendRequestC
     public int getCurrentGamesNumber(){return client.getOpenMatches().size();}
     
     //Overriden Methods
+    //IDatabaseCheckInterface methods
+    @Override public void addToDatabaseCheckList(DatabaseCheck item){databaseCheckList.add(item);}
     //IFriendRequestController methods
     @Override public boolean sendFriendRequest(String username){return client.sendFriendRequest(username);}
     @Override public List<User> receiveFriendRequest(){return client.getFriendRequests();}
@@ -60,7 +62,7 @@ public class HomeController implements IGameSelectionController, IFriendRequestC
     @Override public void acceptMatchRequest(Match match){client.acceptMatchRequest(match);}
     @Override public void denyMatchRequest(Match match){client.denyMatchRequest(match);}
     @Override public void selectGame(Match match){
-        page.getChildren().set(1, new GameController(client, match).getPage());
+        page.getChildren().set(1, new GameController(client, databaseCheckList, match).getPage());
     }
     @Override public void forfitMatch(Match match){client.forfitMatch(match);}
     

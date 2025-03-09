@@ -5,10 +5,9 @@
 package chessBug.misc;
 
 import chessBug.network.Match;
-import chessBug.network.Friend;
 import java.util.List;
 
-public interface IGameSelectionController {
+public interface IGameSelectionController extends IDatabaseCheckInterface{
     public String getUsername();
     public List<Match> getOpenMatchList();
     public void selectGame(Match match);
