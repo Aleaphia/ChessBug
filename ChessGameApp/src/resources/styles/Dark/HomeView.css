@@ -1,0 +1,66 @@
+.root {
+    -fx-background-color: #2c2f33;
+    -fx-padding: 20px;
+    -fx-alignment: center; /* Centering the entire layout */
+}
+
+/* Main sections */
+.user-stats, .friends-space, .current-content {
+    -fx-background-color: #23272a;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 15px;
+    -fx-text-fill: #ffffff;
+    -fx-effect: dropshadow(gaussian, #000000, 10, 0, 0, 4); /* Added shadow for depth */
+}
+
+/* User Stats Section */
+.user-stats {
+    -fx-background-color: #1e1f22;
+    -fx-padding: 20px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-text-fill: white;
+    -fx-min-width: 150px;
+    -fx-max-width: 300px;
+}
+
+/* Friends Section */
+.friends-space {
+    -fx-background-color: #1e1f22;
+    -fx-padding: 20px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-min-width: 150px;
+    -fx-max-width: 300px;
+}
+
+/* Main Content Section */
+.current-content {
+    -fx-background-color: #1e1f22;
+    -fx-padding: 20px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-text-fill: white;
+    -fx-min-width: 400px;
+}
+
+/* Buttons */
+.button {
+    -fx-background-color: #7289da;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-effect: dropshadow(gaussian, #000000, 4, 0, 0, 2); /* Added shadow to buttons */
+}
+
+.button:hover {
+    -fx-background-color: #5b6eae;
+    -fx-effect: dropshadow(gaussian, #000000, 4, 0, 0, 4); /* Shadow on hover for buttons */
+}
+
+.separator {
+    -fx-background-color: #36393f;
+}

@@ -157,12 +157,12 @@ public class ChessBug extends Application {
         page.getChildren().clear();
         page.getChildren().add(newPage);
         mainScene.getStylesheets().clear();
-        mainScene.getStylesheets().add("Styles.css");
+        mainScene.getStylesheets().add(PreferencesController.getStyle("Styles"));
     }
      private void changePage(Pane newPage, String stylePage){
         //Clear and add new page
         changePage(newPage);
-        mainScene.getStylesheets().add(stylePage + ".css");
+        mainScene.getStylesheets().add(PreferencesController.getStyle(stylePage));
     }
 
     private Button createSideBarButton(String imageFileName, EventHandler<ActionEvent> eventHandler) {
