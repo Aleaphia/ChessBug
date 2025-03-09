@@ -5,18 +5,14 @@
 .page{
     -fx-background-color: rgba(54, 57, 63, 0.8);
     -fx-padding: 30px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-effect: dropshadow(gaussian, #000000, 10, 0, 0, 4); /* Added shadow for depth */
+
 
 }
 .notYourMove {
     -fx-background-color: #868ebd;
-}
-.scroll-pane{
-    -fx-background-color: rgba(54, 57, 63, 0);
-    -fx-fill: transparent;
-}
-.scrollBackground{
-    -fx-background-color: rgb(41, 39, 42);
-    -fx-fill: transparent;
 }
 .grid{
     -fx-hgap: 5;

@@ -55,12 +55,11 @@ public class HomeController implements IGameSelectionController, IFriendRequestC
     @Override public String getUsername(){return client.getOwnUser().getUsername();}
     @Override public List<Match> getOpenMatchList(){return client.getOpenMatches();}
     @Override public List<Match> receiveMatchRequest(){return client.getMatchRequests();}
-    @Override public void acceptMatchRequest(Match match){client.setMatchStatus(match, Match.Status.WHITE_TURN.toString());}
+    @Override public void acceptMatchRequest(Match match){client.acceptMatchRequest(match);}
     @Override public void denyMatchRequest(Match match){client.denyMatchRequest(match);}
     @Override public void selectGame(Match match){
         page.getChildren().set(1, new GameController(client, match).getPage());
     }
-    @Override public void forfitMatch(Match match){ client.setMatchStatus(match, getUserName().equals(match.getWhite().getUsername()) ? 
-            Match.Status.BLACK_WIN.toString() : Match.Status.WHITE_TURN.toString());} //If the user who forfit is white -> black wins, otherwise white wins
+    @Override public void forfitMatch(Match match){client.forfitMatch(match);}
     
 }

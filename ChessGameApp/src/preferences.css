@@ -1,0 +1,29 @@
+/* preferences.css */
+.root {
+    -fx-background-color: #fff;
+    -fx-padding: 20px;
+}
+
+.label {
+    -fx-font-size: 14px;
+}
+
+.title-label {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+.check-box, .combo-box {
+    -fx-padding: 5px;
+}
+
+.button {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-padding: 10px;
+    -fx-border-radius: 5px;
+}
+
+.button:hover {
+    -fx-background-color: #45a049;
+}

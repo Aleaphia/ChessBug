@@ -55,7 +55,6 @@ public class PreferencesController {
             System.out.println("Scene is null, cannot apply theme.");
         }
     }
-    
 
     // Handle auto-save preference change
     protected static void handleAutoSave(boolean isEnabled) {
@@ -77,9 +76,9 @@ public class PreferencesController {
             preferences.flush();
         } catch (BackingStoreException e) {
             e.printStackTrace();
-        } 
+        }
 
-        // Optionally, show a confirmation dialog
+        // Show confirmation dialog
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Preferences Saved");
         alert.setHeaderText(null);

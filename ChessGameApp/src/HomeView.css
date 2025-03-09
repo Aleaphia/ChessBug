@@ -1,33 +1,8 @@
-.root {
-    -fx-background-color: #2c2f33;
-    -fx-padding: 20px;
-    -fx-alignment: center; /* Centering the entire layout */
-}
-
 /* Main sections */
 .user-stats, .friends-space, .current-content {
-    -fx-background-color: #23272a;
-    -fx-border-radius: 8px;
-    -fx-background-radius: 8px;
-    -fx-padding: 15px;
+    -fx-background-color: rgba(54, 57, 63, 0.8);
     -fx-text-fill: #ffffff;
     -fx-effect: dropshadow(gaussian, #000000, 10, 0, 0, 4); /* Added shadow for depth */
-}
-
-/* User Stats Section */
-.user-stats {
-    -fx-background-color: #1e1f22;
-    -fx-padding: 20px;
-    -fx-border-radius: 8px;
-    -fx-background-radius: 8px;
-    -fx-text-fill: white;
-    -fx-min-width: 150px;
-    -fx-max-width: 300px;
-}
-
-/* Friends Section */
-.friends-space {
-    -fx-background-color: #1e1f22;
     -fx-padding: 20px;
     -fx-border-radius: 8px;
     -fx-background-radius: 8px;
@@ -37,11 +12,6 @@
 
 /* Main Content Section */
 .current-content {
-    -fx-background-color: #1e1f22;
-    -fx-padding: 20px;
-    -fx-border-radius: 8px;
-    -fx-background-radius: 8px;
-    -fx-text-fill: white;
     -fx-min-width: 400px;
 }
 

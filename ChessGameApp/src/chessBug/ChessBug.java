@@ -22,30 +22,30 @@ import org.json.JSONObject;
 
 import chessBug.game.GameController;
 import chessBug.home.HomeController;
+import chessBug.login.LoginUI;
 import chessBug.network.Client;
 import chessBug.network.ClientAuthException;
 import chessBug.preferences.PreferencesController;
+import chessBug.preferences.PreferencesPage;
 import chessBug.profile.ProfileController;
-import chessBug.login.LoginUI;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.geometry.HPos;
-import javafx.geometry.Pos;
+import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.RowConstraints;
-import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class ChessBug extends Application {
@@ -137,13 +137,16 @@ public class ChessBug extends Application {
         logo.setFitWidth(60);
         StackPane logoHolder = new StackPane(logo);
         logoHolder.getStyleClass().add("logoImage");
+
+        PreferencesController preferencesController = new PreferencesController(client);
+        PreferencesPage preferencesPage = new PreferencesPage(preferencesController);
     
         // Add items to the sidebar
         sidebar.getChildren().addAll(
                 logoHolder,
                 createSideBarButton("Home.png", event -> changePage(new HomeController(client).getPage(), "HomeView")),
                 createSideBarButton("Chess.png", event -> changePage(new GameController(client).getPage(), "game")),
-                createSideBarButton("Gear.png", event -> changePage(new PreferencesController(client).getPage())),
+                createSideBarButton("Gear.png", event -> changePage(preferencesPage.getPage())),
                 createSideBarButton("User.png", event -> changePage(new ProfileController(client).getPage(), "profile")),
                 createSideBarButton("Logout.png", event -> {
                     mainScene.setRoot(loginPane);

@@ -40,35 +40,23 @@ public class HomeView {
         Region leftRegion = new Region();
         Region rightRegion = new Region();
         
-        page.getChildren().addAll(leftRegion,pageLayout,rightRegion);
-        page.getStyleClass().add("padding");
-        HBox.setHgrow(leftRegion, Priority.ALWAYS);
-        HBox.setHgrow(rightRegion, Priority.ALWAYS);
-                
+        page.getChildren().addAll(leftRegion, pageLayout, rightRegion);
+        
+      
+        //Layout page
         VBox userStats = buildUserStats();
         VBox friends = buildFriends();
-
         buildCurrentContent();
-
-        VBox leftContainer = new VBox(userStats);
-        VBox rightContainer = new VBox(friends);
-        
-        VBox.setVgrow(leftContainer, Priority.ALWAYS);
-        VBox.setVgrow(rightContainer, Priority.ALWAYS);
-
-        VBox.setVgrow(currentContent, Priority.ALWAYS);
-        
-//        BorderPane.setMargin(userStats, new Insets(10));
-//        BorderPane.setMargin(friends, new Insets(10));
-//        BorderPane.setMargin(currentContent, new Insets(10));
-//        
-//        BorderPane.setAlignment(userStats, javafx.geometry.Pos.CENTER_LEFT);
-//        BorderPane.setAlignment(friends, javafx.geometry.Pos.CENTER_RIGHT);
         
         pageLayout.setLeft(userStats);
         pageLayout.setRight(friends);
         pageLayout.setCenter(currentContent);
-        pageLayout.getStylesheets().add(getClass().getResource("/HomeView.css").toExternalForm());        
+
+        //Style
+        page.getStyleClass().add("padding");
+        page.getStylesheets().add(getClass().getResource("/HomeView.css").toExternalForm());
+        HBox.setHgrow(leftRegion, Priority.ALWAYS);
+        HBox.setHgrow(rightRegion, Priority.ALWAYS);
                 
         continueDatabaseChecks();
     }
@@ -94,7 +82,7 @@ public class HomeView {
         VBox.setVgrow(userStatsSpace, Priority.ALWAYS);
         
         Label welcomeMessage = new Label("Welcome to ChessBug!");
-        welcomeMessage.getStyleClass().add("welcome-message");
+        welcomeMessage.getStyleClass().addAll("welcome-message", "header");
         
         Label userInfo = new Label("User: " + controller.getUserName());
         userInfo.getStyleClass().add("user-info");
@@ -124,7 +112,7 @@ public class HomeView {
         VBox.setVgrow(friendsSpace, Priority.ALWAYS);
         
         Label header = new Label("Friends");
-        header.getStyleClass().add("section-title");
+        header.getStyleClass().add("header");
         
         friendsListContent = new VBox(5);
         populateFriendsContent();
@@ -132,7 +120,7 @@ public class HomeView {
         VBox sendRequestSection = new VBox(10, new SendFriendRequestUI(controller).getPage());
         sendRequestSection.getStyleClass().add("send-request-section");
         
-        friendsSpace.getChildren().addAll(header, friendsListContent, sendRequestSection);
+        friendsSpace.getChildren().addAll(header, new Separator(), friendsListContent, sendRequestSection);
         return friendsSpace;
     }
     
@@ -152,7 +140,7 @@ public class HomeView {
         VBox.setVgrow(currentContent, Priority.ALWAYS);
         
         Label sectionTitle = new Label("Game & Requests");
-        sectionTitle.getStyleClass().add("section-title");
+        sectionTitle.getStyleClass().add("header");
         
         currentContent.getChildren().addAll(
             sectionTitle,
