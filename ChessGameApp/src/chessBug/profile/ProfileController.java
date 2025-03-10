@@ -5,7 +5,6 @@ import chessBug.network.NetworkException;
 
 public class ProfileController {
 
-    // Client contains an instance of "UserProfileModel"
     private Client client;
     private ProfileView view;
 
@@ -18,23 +17,30 @@ public class ProfileController {
         return view;
     }
 
-   // Update user profile data (username, password, email, etc.)
+    // Update user profile data (username, password, email, profile picture)
     public void updateProfile(String newUsername, String newPassword, String newEmail, String newProfilePicURL) {
         try {
             // Update the profile on the server
             client.updateProfile(newUsername, newPassword, newEmail);
             
-            // Set the new profile picture path
+            // Set the new profile picture
             client.getProfile().setProfilePicURL(newProfilePicURL);
             
-            // After updating, refresh the view with the updated data (need to fix)
-           // view.updateProfileView(client.getProfile());  // This updates the profile UI
+            // Refresh the view with the updated data
+            if (view != null) {
+                view.updateProfileView(client.getProfile());
+            }
         } catch (NetworkException e) {
             System.err.println("Unable to update profile details");
             e.printStackTrace();
         }
-        
-        // Update the view with the new data
-        view = new ProfileView(client);
+    }
+
+    // Allow updating only the profile picture
+    public void updateProfilePicture(String newProfilePicURL) {
+        client.getProfile().setProfilePicURL(newProfilePicURL);
+        if (view != null) {
+            view.updateProfileView(client.getProfile());
+        }
     }
 }

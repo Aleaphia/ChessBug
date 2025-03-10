@@ -1,11 +1,8 @@
 package chessBug.profile;
 
-import chessBug.network.Client;
-
 import java.io.File;
-import java.util.Base64;
-import java.nio.file.Files;
 
+import chessBug.network.Client;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
@@ -13,130 +10,123 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 public class ProfileView extends VBox {
-
-    private Text usernameText;
-    private Text emailText;
+    private Text usernameText, emailText, profileDescriptionText;
     private ImageView profileImageView;
     private ProfileModel model;
-
-    private TextField usernameField;
-    private TextField emailField;
-
+    private TextField usernameField, emailField;
     private Button changeProfilePicButton;
 
     public ProfileView(Client client) {
-        this.model = client.getProfile();
+        this.model = client.getProfile(); // Get the user's profile from the client
         setSpacing(20);
         setPadding(new Insets(20));
-        setStyle("-fx-background-color:rgb(212, 215, 223); -fx-text-fill: white; -fx-border-radius: 10px;");
-
+        setStyle("-fx-background-color: rgb(212, 215, 223); -fx-border-radius: 10px;");
         setPrefSize(3840, 2160);
-        VBox.setVgrow(this, Priority.ALWAYS);
-        
-
-
         setAlignment(Pos.CENTER);
-
-        // Initialize UI components
         createProfileUI(client);
     }
 
     private void createProfileUI(Client client) {
+        // Profile Banner
+        Rectangle banner = new Rectangle(400, 100);
+        banner.setFill(new LinearGradient(0, 0, 1, 1, true, CycleMethod.NO_CYCLE,
+                new Stop(0, Color.DARKBLUE), new Stop(1, Color.PURPLE)));
+
         // Profile Picture
         profileImageView = new ImageView(client.getOwnUser().getProfilePicture());
         profileImageView.setFitWidth(100);
         profileImageView.setFitHeight(100);
-    
+        profileImageView.setClip(new Circle(50, 50, 50)); // Circular profile picture
+
+        // Profile Description Text
+        profileDescriptionText = new Text("Add a brief description about yourself...");
+        profileDescriptionText.setStyle("-fx-font-size: 14px; -fx-fill: gray; -fx-font-style: italic;");
+
         // Username and Email Text
         usernameText = new Text(model.getUsername());
         usernameText.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
         
         emailText = new Text(model.getEmail());
         emailText.setStyle("-fx-font-size: 16px; -fx-fill: gray;");
-    
-        // Editable Username and Email fields
+        
+        // Editable Fields with Placeholder Texts
         usernameField = new TextField(model.getUsername());
-        usernameField.setStyle("-fx-font-size: 24px;");
         usernameField.setMaxWidth(300);
-        HBox.setHgrow(usernameField, Priority.ALWAYS); // ✅ Expands inside HBox
-    
+        usernameField.setPromptText("Enter your new username");
+
         emailField = new TextField(model.getEmail());
-        emailField.setStyle("-fx-font-size: 16px;");
         emailField.setMaxWidth(300);
-        HBox.setHgrow(emailField, Priority.ALWAYS); // ✅ Expands inside HBox
-    
-        // Profile Header with Image and Username
-        HBox profileHeader = new HBox(20, profileImageView, usernameText);
-        profileHeader.setAlignment(Pos.CENTER_LEFT);
-        HBox.setHgrow(usernameText, Priority.ALWAYS); // ✅ Allows username to expand
-    
-        // Buttons for changing profile data
+        emailField.setPromptText("Enter your email address");
+
+        // Buttons with Updated Styles
         Button updateProfileButton = new Button("Update Profile");
         updateProfileButton.setStyle("-fx-background-color: #4e8af3; -fx-text-fill: white;");
         updateProfileButton.setOnAction(e -> updateProfile());
-    
+
         changeProfilePicButton = new Button("Change Picture");
         changeProfilePicButton.setStyle("-fx-background-color: #4e8af3; -fx-text-fill: white;");
         changeProfilePicButton.setOnAction(e -> openFileChooserForProfilePic(client));
-    
-        // User Info Section (fields and buttons)
-        VBox userInfoSection = new VBox(10, profileHeader, usernameField, emailField, updateProfileButton, changeProfilePicButton);
-        userInfoSection.setAlignment(Pos.CENTER_LEFT);
-        VBox.setVgrow(userInfoSection, Priority.ALWAYS); // ✅ Allows the section to expand in the VBox
-    
-        // Add everything to the main VBox layout
+
+        // Layout - Using VBox to stack profile image, text, fields, and buttons
+        StackPane profileStack = new StackPane(banner, profileImageView);
+        profileStack.setAlignment(Pos.CENTER);
+        profileImageView.setTranslateY(25);
+
+        // User Info Section
+        VBox userInfoSection = new VBox(10, profileStack, usernameText, emailText, profileDescriptionText, usernameField, emailField, updateProfileButton, changeProfilePicButton);
+        userInfoSection.setAlignment(Pos.CENTER);
+        userInfoSection.setSpacing(15);
+
+        // Center everything in the VBox and ensure responsiveness
         getChildren().add(userInfoSection);
+        setAlignment(Pos.CENTER);
+        setPrefWidth(600);  // Set a responsive width
     }
 
-    // Method to update profile view with new information
+    private void updateProfile() {
+        String newUsername = usernameField.getText();
+        String newEmail = emailField.getText();
+        
+        if (newUsername.isEmpty() || newEmail.isEmpty()) {
+            showError("Username and Email cannot be empty");
+            return;
+        }
+        
+        if (!newEmail.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+            showError("Invalid email format");
+            return;
+        }
+        
+        model.setUsername(newUsername);
+        model.setEmail(newEmail);
+        updateProfileView(model);
+        showConfirmation();
+    }
+
     public void updateProfileView(ProfileModel updatedProfile) {
-        // Only update the username and email if they've changed
         if (!usernameText.getText().equals(updatedProfile.getUsername())) {
             usernameText.setText(updatedProfile.getUsername());
         }
         if (!emailText.getText().equals(updatedProfile.getEmail())) {
             emailText.setText(updatedProfile.getEmail());
         }
-
-        // Only reload the image if the profile picture has changed
+        
         if (!profileImageView.getImage().getUrl().equals(updatedProfile.getProfilePicURL())) {
-            Image updatedImage = new Image(updatedProfile.getProfilePicURL());
-            profileImageView.setImage(updatedImage);
+            profileImageView.setImage(new Image(updatedProfile.getProfilePicURL()));
         }
-    }
-
-    // Method to handle updating profile data when the user clicks the "Update Profile" button
-    private void updateProfile() {
-        String newUsername = usernameField.getText();
-        String newEmail = emailField.getText();
-        
-        // Validate input
-        if (newUsername.isEmpty() || newEmail.isEmpty()) {
-            showError("Username and Email cannot be empty");
-            return;
-        }
-
-        // Optionally, use regex for email validation
-        if (!newEmail.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
-            showError("Invalid email format");
-            return;
-        }
-        
-        // Assume the model has setter methods for updating the profile info
-        model.setUsername(newUsername);
-        model.setEmail(newEmail);
-
-        // Update the view with new data
-        updateProfileView(model);
-        showConfirmation();
     }
 
     private void showError(String message) {
@@ -155,19 +145,15 @@ public class ProfileView extends VBox {
         alert.showAndWait();
     }
 
-    // Method to open file chooser for changing profile picture
     private void openFileChooserForProfilePic(Client client) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif"));
-        
         Stage stage = new Stage();
         File file = fileChooser.showOpenDialog(stage);
-        
         if (file != null) {
-            // Preview the image before saving
             Image selectedImage = new Image("file:" + file.getAbsolutePath());
             profileImageView.setImage(selectedImage);
-            client.uploadProfilePicture(file);
+            client.uploadProfilePicture(file); // Ensure client method handles the file upload
         }
     }
 }
