@@ -72,7 +72,6 @@ public class ReceiveFriendRequestUI {
         });
         
         if(friendRequests.getChildren().isEmpty()){
-            System.out.println("?");
             friendRequests.getChildren().add(new Label("No pending requests"));
         }
     }
