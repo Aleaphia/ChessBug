@@ -188,11 +188,11 @@ public class Client {
         
         public List<Match> getClosedMatches() {
 		ArrayList<Match> result = new ArrayList<>();
-		JSONObject received = post("getOpenMatches", new JSONObject());
+		JSONObject received = post("getClosedMatches", new JSONObject());
 
 		// Return none if error in response
 		if(received.getBoolean("error")) {
-			System.err.println("Could not retrieve open matches for \"" + profile.getUsername() + "\"");
+			System.err.println("Could not retrieve closed matches for \"" + profile.getUsername() + "\"");
 			System.err.println(received.opt("response"));
 			return List.of();
 		}
