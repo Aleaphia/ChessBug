@@ -25,12 +25,14 @@ import javafx.stage.Stage;
 public class ProfileView extends VBox {
     private Text usernameText, emailText, profileDescriptionText;
     private ImageView profileImageView;
-    private ProfileModel model;
+    private ProfileController controller;
     private TextField usernameField, emailField;
     private Button changeProfilePicButton;
 
-    public ProfileView(Client client) {
-        this.model = client.getProfile(); // Get the user's profile from the client
+    public ProfileView(ProfileController controller, Client client) {
+        this.controller = controller;
+
+        // Set various styling things
         setSpacing(20);
         setPadding(new Insets(20));
         setStyle("-fx-background-color: rgb(212, 215, 223); -fx-border-radius: 10px;");
@@ -56,18 +58,18 @@ public class ProfileView extends VBox {
         profileDescriptionText.setStyle("-fx-font-size: 14px; -fx-fill: gray; -fx-font-style: italic;");
 
         // Username and Email Text
-        usernameText = new Text(model.getUsername());
+        usernameText = new Text(controller.getModel().getUsername());
         usernameText.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
         
-        emailText = new Text(model.getEmail());
+        emailText = new Text(controller.getModel().getEmail());
         emailText.setStyle("-fx-font-size: 16px; -fx-fill: gray;");
         
         // Editable Fields with Placeholder Texts
-        usernameField = new TextField(model.getUsername());
+        usernameField = new TextField(controller.getModel().getUsername());
         usernameField.setMaxWidth(300);
         usernameField.setPromptText("Enter your new username");
 
-        emailField = new TextField(model.getEmail());
+        emailField = new TextField(controller.getModel().getEmail());
         emailField.setMaxWidth(300);
         emailField.setPromptText("Enter your email address");
 
@@ -111,12 +113,11 @@ public class ProfileView extends VBox {
             return;
         }
         
-        model.setUsername(newUsername);
-        model.setEmail(newEmail);
-        updateProfileView(model);
+        controller.updateProfile(newUsername, newEmail);
         showConfirmation();
     }
-//Update profile view
+
+    //Update profile view
     public void updateProfileView(ProfileModel updatedProfile) {
         if (!usernameText.getText().equals(updatedProfile.getUsername())) {
             usernameText.setText(updatedProfile.getUsername());
@@ -125,7 +126,7 @@ public class ProfileView extends VBox {
             emailText.setText(updatedProfile.getEmail());
         }
         
-        if (!profileImageView.getImage().getUrl().equals(updatedProfile.getProfilePicURL())) {
+        if (!profileImageView.getImage().getUrl().endsWith(updatedProfile.getProfilePicURL())) {
             profileImageView.setImage(new Image(updatedProfile.getProfilePicURL()));
         }
     }
@@ -145,7 +146,8 @@ public class ProfileView extends VBox {
         alert.setContentText("Your profile has been successfully updated");
         alert.showAndWait();
     }
-    //Open filer selector on system to upload new user profile picture
+
+    //Open files selector on system to upload new user profile picture
     private void openFileChooserForProfilePic(Client client) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif"));

@@ -10,21 +10,22 @@ public class ProfileController {
 
     public ProfileController(Client client) {
         this.client = client;
-        this.view = new ProfileView(client);
+        this.view = new ProfileView(this, client);
     }
 
     public ProfileView getPage() {
         return view;
     }
 
+    public ProfileModel getModel() {
+        return client.getProfile();
+    }
+
     // Update user profile data (username, password, email, profile picture)
-    public void updateProfile(String newUsername, String newPassword, String newEmail, String newProfilePicURL) {
+    public void updateProfile(String newUsername, String newEmail) {
         try {
             // Update the profile on the server
-            client.updateProfile(newUsername, newPassword, newEmail);
-            
-            // Set the new profile picture
-            client.getProfile().setProfilePicURL(newProfilePicURL);
+            client.updateProfile(newUsername, newEmail, getModel().getPassword());
             
             // Refresh the view with the updated data
             if (view != null) {
