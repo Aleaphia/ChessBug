@@ -1,3 +1,4 @@
+// An exception for when you failed to log in or create an account
 package chessBug.network;
 
 public class ClientAuthException extends Exception {

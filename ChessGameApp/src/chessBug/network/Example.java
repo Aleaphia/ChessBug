@@ -1,3 +1,5 @@
+// An example for utilizing the Client and other network functions
+
 package chessBug.network;
 
 import java.util.List;
@@ -73,9 +75,5 @@ public class Example {
 			e.printStackTrace();
 		}
 		// ~~~~~~~~~~~~~~
-
-		// TODO:
-		// User challenges friend to match
-		// Application retrieves a Chat instance from a Match
 	}
 }

@@ -1,40 +1,39 @@
+/**
+ * Store Match details, including a list of all moves
+ * Moves need to be polled with poll(Client) in order to actually retrieve new moves from the database, including after the match has been created
+ */
+
 package chessBug.network;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class Match {
-    public enum Status {
-        WHITE_WIN("WhiteWin"), BLACK_WIN("BlackWin"), DRAW("Draw"),
-        WHITE_REQUESTED("WhiteRequested"),BLACK_REQUESTED("BlackRequested"),
-        WHITE_TURN("WhiteTurn"),BLACK_TURN("BlackTurn");
-        
-        private final String stringName;
-        
-        Status(String stringName){this.stringName = stringName;}
-        @Override public String toString(){return stringName;}
-    }
-//	// Although not very distinct, gives definitive list of possible statuses
-//	public static final String WHITE_WIN = "WhiteWin";
-//	public static final String BLACK_WIN = "BlackWin";
-//	public static final String DRAW = "Draw";
-//	public static final String WHITE_REQUESTED = "WhiteRequested";
-//	public static final String BLACK_REQUESTED = "BlackRequested";
-//	public static final String WHITE_TURN = "WhiteTurn";
-//	public static final String BLACK_TURN = "BlackTurn";
+	// Represent the status of the match
+	public enum Status {
+		WHITE_WIN("WhiteWin"), BLACK_WIN("BlackWin"), DRAW("Draw"),
+		WHITE_REQUESTED("WhiteRequested"),BLACK_REQUESTED("BlackRequested"),
+		WHITE_TURN("WhiteTurn"),BLACK_TURN("BlackTurn");
+
+		private final String stringName;
+
+		Status(String stringName){this.stringName = stringName;}
+		@Override public String toString(){return stringName;}
+	}
 
 	private int matchID;
+
 	private Chat chat;
 
 	private User white, black;
 
-	private int movesNumber = 0;
-
 	private String status;
 
+	private int movesNumber = 0;
 	private ArrayList<String> moves;
 
 	public Match(int matchID, int chatID, User white, User black, String status) {
@@ -46,12 +45,10 @@ public class Match {
 		this.status = status;
 	}
 
-	//Load moves
+	//Load new moves from the server
 	public Stream<String> poll(Client client) {
 		// Ask the server how many moves exist in the current match
-		JSONObject numMovesPoll = new JSONObject();
-		numMovesPoll.put("match", matchID);
-		JSONObject numMovesResponse = client.post("getMatchMoveCount", numMovesPoll);
+		JSONObject numMovesResponse = client.post("getMatchMoveCount", Map.of("match", matchID));
 		if(numMovesResponse.getBoolean("error")) {
 			System.err.println("Could not retrieve match move count! Match: " + matchID);
 			System.err.println(numMovesResponse.opt("response"));
@@ -66,12 +63,8 @@ public class Match {
 		if(currentNumber <= movesNumber)
 			return Stream.empty();
 
-		// Ask for all new moves
-		JSONObject getMovesPoll = new JSONObject();
-		getMovesPoll.put("match", matchID);
-		getMovesPoll.put("num", currentNumber - movesNumber); // getting current number of moves minus the previous count
-
-		JSONObject getMovesResponse = client.post("getNMatchMoves", getMovesPoll);
+		// Ask for all new moves (current number of match moves minus number already retrieved)
+		JSONObject getMovesResponse = client.post("getNMatchMoves", Map.of("match", matchID, "num", currentNumber - movesNumber));
 
 		if(getMovesResponse.getBoolean("error")) {
 			System.err.println("Could not retrieve " + (currentNumber - movesNumber) + " moves from chess match: " + matchID);
@@ -127,6 +120,7 @@ public class Match {
             return movesNumber;
         }
 
+	// Make a move, update client side moves and moveNumber while also updating the server
 	public void makeMove(Client from, String move) {
                 movesNumber++; //Iterate move count
                 moves.add(move); //Add new move to the list

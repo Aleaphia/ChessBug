@@ -1,3 +1,4 @@
+// Represents a generic network exception, used whenever the server returns an error or invalid data
 package chessBug.network;
 
 public class NetworkException extends Exception {

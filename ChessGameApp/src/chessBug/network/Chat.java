@@ -1,8 +1,16 @@
+/**
+ * Holds a list of messages, and can poll new messages from the server
+ *
+ * Use poll(Client) in order to update the list of messages with any new messages received since last poll()
+ * Call poll(Client) after creating chat in order to populate the list with all preexisting messages
+ */
+
 package chessBug.network;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import org.json.JSONArray;
@@ -22,9 +30,8 @@ public class Chat {
 
 	public Stream<Message> poll(Client client) {
 		// Ask the server how many messages exist in the current chat
-		JSONObject numMessagesPoll = new JSONObject();
-		numMessagesPoll.put("chat", chatID);
-		JSONObject numMessagesResponse = client.post("getMessageCount", numMessagesPoll);
+		JSONObject numMessagesResponse = client.post("getMessageCount", Map.of("chat", chatID));
+
 		if(numMessagesResponse.getBoolean("error")) {
 			System.err.println("Could not retrieve message count! Chat: " + chatID);
 			System.err.println(numMessagesResponse.opt("response"));
@@ -39,12 +46,8 @@ public class Chat {
 		if(currentNumber <= messageNumber)
 			return Stream.empty();
 
-		// Ask for all new messages
-		JSONObject getMessagesPoll = new JSONObject();
-		getMessagesPoll.put("chat", chatID);
-		getMessagesPoll.put("num", currentNumber - messageNumber); // getting current number of messages minus the previous count
-
-		JSONObject getMessagesResponse = client.post("getNMessages", getMessagesPoll);
+		// Ask for all new messages (the current number of messages in chat, minus the ones we've already collected)
+		JSONObject getMessagesResponse = client.post("getNMessages", Map.of("chat", chatID, "num", currentNumber - messageNumber));
 
 		if(getMessagesResponse.getBoolean("error")) {
 			System.err.println("Could not retrieve " + (currentNumber - messageNumber) + " messages from chat: " + chatID);
@@ -52,9 +55,10 @@ public class Chat {
 			return Stream.empty();
 		}
 
-		// Poll through new messages
+		// Poll through list of new messages
 		JSONArray retrievedMessages = getMessagesResponse.getJSONArray("response");
 		for(int i = 0; i < currentNumber - messageNumber; i++) {
+			// Create a new Message for every JSON representation
 			JSONObject o = retrievedMessages.getJSONObject(i);
 			messages.add(new Message(o.getInt("MessageID"), o.getString("Content"), o.getInt("Sender"), Timestamp.valueOf(o.getString("Time")), o.getInt("Chat"), client.getUserByID(o.getInt("Sender"))));
 		}
@@ -74,12 +78,6 @@ public class Chat {
 	}
 
 	public void send(Client from, String content) {
-		// Force message to be handled by poll()
-                // messageNumber++;
-                // messages.add(new Message(content));
-		JSONObject message = new JSONObject();
-		message.put("chat", chatID);
-		message.put("content", content);
-		from.post("sendMessage", message);
+		from.post("sendMessage", Map.of("chat", chatID, "content", content));
 	}
 }

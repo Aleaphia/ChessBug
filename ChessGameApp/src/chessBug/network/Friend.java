@@ -1,3 +1,4 @@
+// User subtype that also includes a Chat reference (See both Chat and User)
 package chessBug.network;
 
 public class Friend extends User {

@@ -1,3 +1,4 @@
+// Simple data storing class that represents a message, with it's ID, content, id of the sender, timestamp, id of the chat it was sent it, and User author
 package chessBug.network;
 
 import java.sql.Timestamp;
@@ -5,7 +6,7 @@ import java.sql.Timestamp;
 public class Message {
 	private int id;
 	private String content;
-	private int senderID;
+	private int senderID; // A little redundant when you have 'author', but can rethink and remove at a later date
 	private Timestamp timestamp;
 	private int chat;
 	private User author;

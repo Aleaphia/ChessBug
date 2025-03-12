@@ -1,3 +1,9 @@
+/*
+ * A Class used for calling ChessBug server side Web API functions
+ * There is a method for every server side function supported
+ * Client is initialized with user login details, in order to authorize all web interactions
+ */
+
 package chessBug.network;
 
 import java.io.BufferedReader;
@@ -30,6 +36,7 @@ public class Client {
 	// Store user information in order to log in
 	private ProfileModel profile;
 
+	// Used to cache all users  TODO: partially clear cache every once in a while
 	private Map<Integer, User> userMap = new HashMap<>();
 
 	private Client() {}
@@ -57,41 +64,44 @@ public class Client {
 		Client c = new Client();
 		c.profile = new ProfileModel(0, username, password, email, "");
 
-		// Create a message to send to the server's "createAccount" function
-		JSONObject accountData = new JSONObject();
-		accountData.put("email", email); // Client automatically attaches username and password, we just need to also provide email
-		JSONObject createMessage = c.post("createAccount", accountData);
+		// Create a message to send to the server's "createAccount" function, 'c' holds password and username, need to also provide email
+		JSONObject createMessage = c.post("createAccount", Map.of("email", email));
 
 		// If the server returns an error, throw an exception
-		if(createMessage.getBoolean("error")) {
+		if(createMessage.getBoolean("error"))
 			throw new ClientAuthException(ClientAuthException.TYPE_CREATE_ACCOUNT, createMessage.opt("response").toString());
-		}
 
 		return c;
 	}
 
-	public User getOwnUser() {
-		return getOrCreateUser(profile.getUserID(), profile.getUsername(), profile.getProfilePicURL());
-	}
-
+	// Retrieve a user from cache if the user has been cached, otherwise create default unknown user
 	public User getUserByID(int id) {
 		if(userMap.containsKey(id))
 			return userMap.get(id);
 		else return new User(0, "unknown", User.DEFAULT_PROFILE_PICTURE);
 	}
 
+	// Retrieve a user from cache if exists, if not, creates one and puts it in cache
+	// TODO: Cache checking can be handled here, checking if the cached user has the right username and profile picture
 	private User getOrCreateUser(int id, String username, String pfp) {
 		if(!userMap.containsKey(id))
 			userMap.put(id, new User(id, username, pfp));
 		return userMap.get(id);
 	}
 
+	// Retrieve a friend from cache if exists and is a friend, if not, creates one and puts it in cache
+	// TODO: Create Friend(User, chat) constructor, also do cache handling
 	private Friend getOrCreateFriend(int id, String username, String pfp, int chat) {
 		if(!userMap.containsKey(id) || !(userMap.get(id) instanceof Friend))
 			userMap.put(id, new Friend(id, username, pfp, chat));
 		return (Friend)userMap.get(id);
 	}
 
+	// Retrieve user object for current user
+	public User getOwnUser() {
+		return getOrCreateUser(profile.getUserID(), profile.getUsername(), profile.getProfilePicURL());
+	}
+	
 	// Update profile with server data
 	public ProfileModel syncProfile() throws NetworkException {
 		JSONObject profileData = post("getProfileData", new JSONObject());
@@ -115,15 +125,8 @@ public class Client {
 
 	// Update profile with new data
 	public void updateProfile(String newUsername, String newEmail, String newPassword) throws NetworkException {
-
-		// Create message to send to server
-		JSONObject profileData = new JSONObject();
-		profileData.put("newUsername", newUsername);
-		profileData.put("newPassword", newPassword);
-		profileData.put("newEmail", newEmail);
-		
 		// Send to server to update profile data
-		JSONObject response = post("updateProfile", profileData);
+		JSONObject response = post("updateProfile", Map.of("newUsername", newUsername, "newPassword", newPassword, "newEmail", newEmail));
 		if(response.getBoolean("error"))
 			throw new NetworkException(response.opt("response").toString());
 
@@ -133,17 +136,16 @@ public class Client {
 	}
 
 	public void updatePassword(String newPassword) throws NetworkException {
-		JSONObject send = new JSONObject();
-		send.put("newPassword", newPassword);
-
-		JSONObject received = post("updatePassword", send);
+		JSONObject received = post("updatePassword", Map.of("newPassword", newPassword));
 		if(received.getBoolean("error"))
 			throw new NetworkException(received.opt("response").toString());
 
 		profile.setPassword(newPassword);
 	}
 
+	// Retrieve a list of all matches the user is a part of
 	public List<Match> getMatches() {
+		// Call the server function
 		ArrayList<Match> matches = new ArrayList<>();
 		JSONObject matchesResponse = post("getMatches", new JSONObject());
 
@@ -154,13 +156,14 @@ public class Client {
 			return List.of();
 		}
 
+		// Loop through all entries of received matches array, and make new Matches out of JSON representations
 		JSONArray matchesReceived = matchesResponse.getJSONArray("response");
 		for(int i = 0; i < matchesReceived.length(); i++) {
 			JSONObject o = matchesReceived.getJSONObject(i);
-			matches.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), 
-				getOrCreateUser(o.getInt("WhitePlayer"), o.getString("WhiteName"), o.isNull("WhitePfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("WhitePfp")), 
-				getOrCreateUser(o.getInt("BlackPlayer"), o.getString("BlackName"), o.isNull("BlackPfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("BlackPfp")), o.getString("Status")));
-
+			// Retrieve player users from data
+			User whitePlayer = getOrCreateUser(o.getInt("WhitePlayer"), o.getString("WhiteName"), o.isNull("WhitePfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("WhitePfp"));
+			User blackPlayer = getOrCreateUser(o.getInt("BlackPlayer"), o.getString("BlackName"), o.isNull("BlackPfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("BlackPfp"));
+			matches.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), whitePlayer, blackPlayer, o.getString("Status")));
 		}
 		return matches;
 	}
@@ -179,9 +182,10 @@ public class Client {
 		JSONArray response = received.getJSONArray("response");
 		for(int i = 0; i < response.length(); i++) {
 			JSONObject o = response.getJSONObject(i);
-			result.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), 
-				getOrCreateUser(o.getInt("WhitePlayer"), o.getString("WhiteName"), o.isNull("WhitePfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("WhitePfp")), 
-				getOrCreateUser(o.getInt("BlackPlayer"), o.getString("BlackName"), o.isNull("BlackPfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("BlackPfp")), o.getString("Status")));
+			// Retrieve player users from data
+			User whitePlayer = getOrCreateUser(o.getInt("WhitePlayer"), o.getString("WhiteName"), o.isNull("WhitePfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("WhitePfp"));
+			User blackPlayer = getOrCreateUser(o.getInt("BlackPlayer"), o.getString("BlackName"), o.isNull("BlackPfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("BlackPfp"));
+			result.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), whitePlayer, blackPlayer, o.getString("Status")));
 		}
 		return result;
 	}
@@ -200,9 +204,10 @@ public class Client {
 		JSONArray response = received.getJSONArray("response");
 		for(int i = 0; i < response.length(); i++) {
 			JSONObject o = response.getJSONObject(i);
-			result.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), 
-				getOrCreateUser(o.getInt("WhitePlayer"), o.getString("WhiteName"), o.isNull("WhitePfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("WhitePfp")), 
-				getOrCreateUser(o.getInt("BlackPlayer"), o.getString("BlackName"), o.isNull("BlackPfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("BlackPfp")), o.getString("Status")));
+			// Retrieve player users from data
+			User whitePlayer = getOrCreateUser(o.getInt("WhitePlayer"), o.getString("WhiteName"), o.isNull("WhitePfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("WhitePfp"));
+			User blackPlayer = getOrCreateUser(o.getInt("BlackPlayer"), o.getString("BlackName"), o.isNull("BlackPfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("BlackPfp"));
+			result.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), whitePlayer, blackPlayer, o.getString("Status")));
 		}
 		return result;
 	}
@@ -221,9 +226,9 @@ public class Client {
 		JSONArray response = received.getJSONArray("response");
 		for(int i = 0; i < response.length(); i++) {
 			JSONObject o = response.getJSONObject(i);
-			result.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), 
-				getOrCreateUser(o.getInt("WhitePlayer"), o.getString("WhiteName"), o.isNull("WhitePfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("WhitePfp")), 
-				getOrCreateUser(o.getInt("BlackPlayer"), o.getString("BlackName"), o.isNull("BlackPfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("BlackPfp")), o.getString("Status")));
+			User whitePlayer = getOrCreateUser(o.getInt("WhitePlayer"), o.getString("WhiteName"), o.isNull("WhitePfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("WhitePfp"));
+			User blackPlayer = getOrCreateUser(o.getInt("BlackPlayer"), o.getString("BlackName"), o.isNull("BlackPfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("BlackPfp"));
+			result.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), whitePlayer, blackPlayer, o.getString("Status")));
 		}
 		return result;
 	}
@@ -232,10 +237,9 @@ public class Client {
 	 * Prints error if received error
 	 */
 	public boolean sendMatchRequest(String username, boolean playingAsWhite) {
-		JSONObject send = new JSONObject();
-		send.put("target", username);
-		send.put("request", (playingAsWhite)? Match.Status.WHITE_REQUESTED.toString() : Match.Status.BLACK_REQUESTED.toString());
-		JSONObject received = post("sendMatchRequest", send);
+		// Send request to server
+		JSONObject received = post("sendMatchRequest", Map.of("target", username, "request", playingAsWhite ? Match.Status.WHITE_REQUESTED.toString()
+			: Match.Status.BLACK_REQUESTED.toString()));
 
 		// Return none if error in response
 		if(received.getBoolean("error")) {
@@ -244,28 +248,16 @@ public class Client {
 			return false;
 		}
 
+		// Return response (true if successful)
 		return received.getBoolean("response");
 	}
+	
+	// Send match request based on user
+	public boolean sendMatchRequest(User user, boolean playingAsWhite) { return sendMatchRequest(user.getUsername(), playingAsWhite); }
 
-//	public boolean acceptMatchRequest(Match match) {
-//		JSONObject send = new JSONObject();
-//		send.put("match", match.getID());
-//		JSONObject received = post("acceptMatchRequest", send);
-//
-//		// Return none if error in response
-//		if(received.getBoolean("error")) {
-//			System.err.println("Could not accept match request for #" + match.getID() + " to \"" + profile.getUsername() + "\"");
-//			System.err.println(received.opt("response"));
-//			return false;
-//		}
-//
-//		return received.getBoolean("response");
-//	}
-//
+	// Deny match request from given match
 	public boolean denyMatchRequest(Match match) {
-		JSONObject send = new JSONObject();
-		send.put("match", match.getID());
-		JSONObject received = post("denyMatchRequest", send);
+		JSONObject received = post("denyMatchRequest", Map.of("match", match.getID()));
 
 		// Return none if error in response
 		if(received.getBoolean("error")) {
@@ -277,8 +269,7 @@ public class Client {
 		return received.getBoolean("response");
 	}
 
-	public boolean sendMatchRequest(User user, boolean playingAsWhite) { return sendMatchRequest(user.getUsername(), playingAsWhite); }
-
+	// Retrieve all of user's friends
 	public List<Friend> getFriends() {
 		ArrayList<Friend> friends = new ArrayList<>();
 		JSONObject friendsResponse = post("getFriends", new JSONObject());
@@ -290,6 +281,7 @@ public class Client {
 			return List.of();
 		}
 
+		// Go through received array of friends, retrieve friend for every JSON representation
 		JSONArray friendsReceived = friendsResponse.getJSONArray("response");
 		for(int i = 0; i < friendsReceived.length(); i++) {
 			JSONObject o = friendsReceived.getJSONObject(i);
@@ -305,9 +297,7 @@ public class Client {
 	 * TODO: Print more information regarding false returns
 	 */
 	public boolean sendFriendRequest(String username) {
-		JSONObject send = new JSONObject();
-		send.put("target", username);
-		JSONObject received = post("sendFriendRequest", send);
+		JSONObject received = post("sendFriendRequest", Map.of("target", username));
 
 		// Return none if error in response
 		if(received.getBoolean("error")) {
@@ -327,9 +317,7 @@ public class Client {
 	 * TODO: Print more information regarding false returns
 	 */
 	public boolean acceptFriendRequest(String username) {
-		JSONObject send = new JSONObject();
-		send.put("target", username);
-		JSONObject received = post("acceptFriendRequest", send);
+		JSONObject received = post("acceptFriendRequest", Map.of("target", username));
 
 		// Return none if error in response
 		if(received.getBoolean("error")) {
@@ -349,9 +337,7 @@ public class Client {
 	 * TODO: Print more information regarding false returns
 	 */
 	public boolean denyFriendRequest(String username) {
-		JSONObject send = new JSONObject();
-		send.put("target", username);
-		JSONObject received = post("denyFriendRequest", send);
+		JSONObject received = post("denyFriendRequest", Map.of("target", username));
 
 		// Return none if error in response
 		if(received.getBoolean("error")) {
@@ -365,7 +351,7 @@ public class Client {
 
 	public boolean denyFriendRequest(User user) { return denyFriendRequest(user.getUsername()); }
 
-
+	// Retrieve all friend requests
 	public List<User> getFriendRequests() {
 		ArrayList<User> result = new ArrayList<>();
 		JSONObject received = post("getFriendRequests", new JSONObject());
@@ -377,6 +363,7 @@ public class Client {
 			return List.of();
 		}
 
+		// Loop through received array and create new user for every JSON representation
 		JSONArray response = received.getJSONArray("response");
 		for(int i = 0; i < response.length(); i++) {
 			JSONObject o = response.getJSONObject(i);
@@ -386,6 +373,7 @@ public class Client {
 		return result;
 	}
 
+	/* Update Match Status based on function name */
 	public void acceptMatchRequest(Match match){
             setMatchStatus(match, Match.Status.WHITE_TURN.toString());
         }
@@ -410,25 +398,21 @@ public class Client {
         public void setGameDraw(Match match){
             setMatchStatus(match, Match.Status.DRAW.toString());
         }
+	/* ~~~~ */
         
+	// Set match status on server
         private void setMatchStatus(Match match, String status) {
-		JSONObject sendData = new JSONObject();
-		match.setStatus(status);
-		sendData.put("match", match.getID());
-		sendData.put("status", status);
-		
-		JSONObject response = post("setMatchStatus", sendData);
+		JSONObject response = post("setMatchStatus", Map.of("match", match.getID(), "status", status));
 		if(response.getBoolean("error")) {
 			System.err.println("Could not set match status!");
 			System.err.println(response.opt("response").toString());
 		}
+		match.setStatus(status);
 	}
 
+	// Retrieve new match status from server
 	public String syncMatchStatus(Match match) {
-		JSONObject sendData = new JSONObject();
-		sendData.put("match", match.getID());
-
-		JSONObject response = post("getMatchStatus", sendData);
+		JSONObject response = post("getMatchStatus", Map.of("match", match.getID()));
 		if(response.getBoolean("error")) {
 			System.err.println("Could not get match status!");
 			System.err.println(response.opt("response").toString());
@@ -439,28 +423,10 @@ public class Client {
 		return response.getString("response");
 	}
 
-	/*public String getUserProfilePictureURL(String username) {
-		JSONObject sendData = new JSONObject();
-		sendData.put("target", username);
-
-		JSONObject received = post("getUserProfilePictureID", sendData);
-		if(received.getBoolean("error")) {
-			System.err.println("Could not get user profile picture: " + username);
-			System.err.println(received.opt("response").toString());
-			return ProfileModel.DEFAULT_PROFILE_PICTURE;
-		}
-
-		if(received.isNull("response"))
-			return ProfileModel.DEFAULT_PROFILE_PICTURE;	
-
-		return "https://www.zandgall.com/chessbug/content/" + received.getString("response");
-	}*/
-
-	/*public String getUserProfilePictureURL(User u) { return getUserProfilePictureURL(u.getUsername()); }*/
-
+	// Upload profile picture to server, using a Base64 representation
 	public void uploadProfilePicture(File file) {
-		JSONObject send = new JSONObject();
 		try {
+			JSONObject send = new JSONObject();
 			send.put("image", Base64.getEncoder().encodeToString(Files.readAllBytes(file.toPath())));
 
 			JSONObject received = post("uploadProfilePicture", send);
@@ -476,6 +442,12 @@ public class Client {
 		}
 	}
 
+	// Send a message to the server based on a Map representation of JSON data, (appends login details) and return the result
+	public JSONObject post(String function, Map<?, ?> message) {
+		return post(function, new JSONObject(message));
+	}
+
+	// Send a message to the server based on a JSON Object, appending User login details, and return the result
 	public JSONObject post(String function, JSONObject message) {
 		// Sent JSON Object to server and retrieve response
 		message.put("username", profile.getUsername());
@@ -483,6 +455,7 @@ public class Client {
 		return post(function, message.toString());
 	}
 
+	// Send a string to a given function in the web api, return a JSON result
 	public JSONObject post(String function, String message) {
 		// Send arbitrary string as 
 		byte[] data = message.getBytes(StandardCharsets.UTF_8);
@@ -505,6 +478,7 @@ public class Client {
 			os.write(data);
 		} catch (IOException ioex) {
 			System.err.println("Could not write data to server!");
+			ioex.printStackTrace();
 			JSONObject out = new JSONObject();
 			out.put("response", "Error: Could not write data to server!");
 			out.put("error", true);
@@ -541,6 +515,7 @@ public class Client {
 		}
 	}
 
+	// Create a HTTPS connection based on a web API function, filling out the required headers
 	private static HttpsURLConnection getConnection(String function) {
 		try {
 			HttpsURLConnection con = (HttpsURLConnection)new URI("https://www.zandgall.com/chessbug/" + function + ".php").toURL().openConnection();

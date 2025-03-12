@@ -1,3 +1,4 @@
+// Represents a user, and holds a lazily-loaded profile picture
 package chessBug.network;
 
 import javafx.scene.image.Image;
@@ -21,7 +22,7 @@ public class User {
 	}
 
 	public Image getProfilePicture() {
-		if(profilePic == null)
+		if(profilePic == null) // lazy.... *yawn*  ..loading..
 			profilePic = new Image(profilePicURL);
 		return profilePic;
 	}
