@@ -5,20 +5,14 @@
  */
 package chessBug.game;
 
-import chessBug.ChessBug;
+import chessBug.controllerInterfaces.IGameSelectionController;
+import chessBug.controllerInterfaces.IGameCreationController;
 import chessBug.misc.*;
 import chessGame.*;
 import chessBug.network.*;
 import java.util.*;
 import java.util.stream.Stream;
 
-import javafx.event.ActionEvent;
-import javafx.util.Duration;
-
-import javafx.animation.Timeline;
-import javafx.animation.KeyFrame;
-import javafx.geometry.Pos;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
@@ -30,7 +24,7 @@ public class GameController implements IGameSelectionController, IGameCreationCo
     private Client client;
     private Match match = null;
     private Chat chat;
-    private DatabaseCheckList databaseCheckList;
+    private DatabaseCheckList databaseCheckList; //Add recursive database checks here
     //Page
     private HBox page = new HBox();
     //MVC
@@ -50,6 +44,8 @@ public class GameController implements IGameSelectionController, IGameCreationCo
         Region rightRegion = new Region();
         
         page.getChildren().addAll(leftRegion,promptSelectionPanel,rightRegion);
+        
+        //Style and format
         page.getStyleClass().add("padding");
         HBox.setHgrow(leftRegion, Priority.ALWAYS);
         HBox.setHgrow(rightRegion, Priority.ALWAYS);
@@ -66,7 +62,6 @@ public class GameController implements IGameSelectionController, IGameCreationCo
         internalSelectGame(match);
     }
     
-    //Database check loop
     private void databaseChecks(){
         //System.out.println("Debug: GameController DatabaseCheck" );
         if(!isThisPlayersTurn()){ //While waiting for other player's move check database and update boardstate

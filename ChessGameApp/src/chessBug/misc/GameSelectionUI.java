@@ -1,7 +1,7 @@
 package chessBug.misc;
 
+import chessBug.controllerInterfaces.IGameSelectionController;
 import chessBug.network.Match;
-import chessBug.network.DatabaseCheck;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -20,6 +20,8 @@ public class GameSelectionUI {
     public GameSelectionUI(IGameSelectionController controller){
         this.controller = controller;
         buildGameSelectionPrompt();
+        
+        //Add database checks
         controller.addToDatabaseCheckList(()->databaseChecks());
     }
     
@@ -78,7 +80,7 @@ public class GameSelectionUI {
         //Layout
         HBox hbox = new HBox();
         Button matchButton = new Button(match.toString());
-        Button endButton = new Button((isRequest)? "Deny" : "Forfiet");
+        Button endButton = new Button((isRequest)? "Deny" : "Forfeit");
         
         hbox.getChildren().addAll(matchButton, endButton);
         ((isRequest)? gameRequests : gamesInProgress).getChildren().add(hbox);
@@ -94,11 +96,8 @@ public class GameSelectionUI {
             //If the match is requested, accept the Match
             if(isRequest)
                 controller.acceptMatchRequest(match);
-                            
-            //Create loading screen
-            //TODO
+            
             page.getChildren().clear();
-            page.getChildren().add(new Label("Loading..."));
             //Update controller
             controller.selectGame(match);
         });
@@ -112,13 +111,11 @@ public class GameSelectionUI {
         
         //Style
         hbox.setMaxWidth(Double.MAX_VALUE);
-        
         HBox.setHgrow(matchButton, Priority.ALWAYS);
         HBox.setHgrow(endButton, Priority.ALWAYS);
         matchButton.setMaxWidth(Double.MAX_VALUE);
         endButton.setMaxWidth(Double.MAX_VALUE);
         matchButton.setPrefWidth(200);   
-
         if (!isRequest && !currTurn.equals(controller.getUsername())){
             matchButton.getStyleClass().add("notYourMove");
             endButton.getStyleClass().add("notYourMove");

@@ -1,11 +1,13 @@
 package chessBug.misc;
 
+import chessBug.controllerInterfaces.IGameCreationController;
 import chessBug.network.Friend;
 import java.util.Random;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -45,20 +47,23 @@ public class GameCreationUI {
         //Clear page
         page.getChildren().clear();
         
-        //Title
+        //Title layout
         Label header = new Label("Create New Game");
         VBox headerBox = new VBox(header);
         page.add(headerBox, 0, row++, 4, 1);
-
+        
         //Select Color ---------------------------------------------------------
+        //Hold color info
+        char[] colorSelection = new char[1];
+        colorSelection[0] = '0'; //w for white, b for black, r for random
+        
+        //Layout
         Label label1 = new Label("Select color:");
         VBox labelBox1 = new VBox(label1);
         page.add(labelBox1, 0, row++, 4, 1);
-        char[] colorSelection = new char[1];
-        colorSelection[0] = '0'; //w for white, b for black, r for random
+        
         ToggleGroup colorOptions = new ToggleGroup();
         String[] colorOptionList = {"white", "black", "random"};
-
         for (String option : colorOptionList) {
             RadioButton curr = new RadioButton(option);
             curr.setOnAction(event -> colorSelection[0] = option.charAt(0));
@@ -70,23 +75,29 @@ public class GameCreationUI {
         }
 
         //Challenge friend: list friends in radio buttons ----------------------
+        Friend[] friendSelection = new Friend[1];
+        friendSelection[0] = null;
+        
+        //Layout
         Label label2 = new Label("Challenge friend:");
         VBox labelBox2 = new VBox(label2);
         page.add(labelBox2, 0, row++, 4, 1);
-        Friend[] friendSelection = new Friend[1];
-        friendSelection[0] = null;
+        
         ToggleGroup friendOptions = new ToggleGroup();
+        VBox friendBox = new VBox();
+        ScrollPane scroll = new ScrollPane(friendBox);
         
         for(Friend friend : controller.getFriendList()){
             RadioButton curr = new RadioButton(friend.getUsername());
             curr.setOnAction(event -> friendSelection[0] = friend);
             curr.setToggleGroup(friendOptions);
-            page.add(curr, 1, row++, 2, 1);
+            friendBox.getChildren().add(curr);//add(curr, 1, row++, 2, 1);
             
             //Style
             curr.getStyleClass().add("label");
         }
-
+        page.add(scroll, 1, row++, 2 ,1);
+        
         //Create game button
         Button createGame = new Button("Request Game");
         createGame.setOnMouseClicked(event -> {
@@ -115,10 +126,12 @@ public class GameCreationUI {
         page.add(closeNewGameMenu, 2 , row++ );
         
         //Style
-        header.getStyleClass().add("header");
-        label1.getStyleClass().add("header");
-        label2.getStyleClass().add("header");
+        header.getStyleClass().add("h1");
+        label1.getStyleClass().add("h2");
+        label2.getStyleClass().add("h2");
+        friendBox.getStyleClass().add("scrollBackground");
         
+        //Layout - center questions and headers
         Region leftRegion = new Region();
         Region rightRegion = new Region();
         page.add(leftRegion, 0, 2);

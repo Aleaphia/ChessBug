@@ -1,19 +1,14 @@
 package chessBug.misc;
 
+import chessBug.controllerInterfaces.IFriendRequestController;
 import chessBug.network.*;
 import java.util.List;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
-import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.util.Duration;
-
-
 
 public class ReceiveFriendRequestUI {
     private VBox page = new VBox();
@@ -23,22 +18,23 @@ public class ReceiveFriendRequestUI {
     public ReceiveFriendRequestUI(IFriendRequestController controller){
         this.controller = controller;
         buildRequestField();
-        this.controller.addToDatabaseCheckList(() -> updateRequestField()); //Continued database checks
+        
+        //Add database checks
+        this.controller.addToDatabaseCheckList(() -> updateRequestField());
     }
     
     public VBox getPage(){return page;}
     
     private void buildRequestField(){
+        //Layout
         Label sectionTitle = new Label("Friend Requests");
         ScrollPane scroll = new ScrollPane(friendRequests);        
         page.getChildren().addAll(sectionTitle, scroll);
+        updateRequestField();
         
         //Style
         sectionTitle.getStyleClass().add("h2");
         friendRequests.getStyleClass().add("scrollBackground");
-        
-        
-        updateRequestField();
     }
     
     private void updateRequestField(){
@@ -58,7 +54,6 @@ public class ReceiveFriendRequestUI {
             curr.setAlignment(Pos.CENTER_LEFT);
             curr.setStyle("-fx-padding: 5px; ");
             label.getStyleClass().add("h3");
-
 
             //Function
             accept.setOnAction(event -> {

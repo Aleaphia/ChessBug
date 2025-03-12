@@ -1,6 +1,8 @@
 
 package chessBug.home;
 
+import chessBug.controllerInterfaces.IGameSelectionController;
+import chessBug.controllerInterfaces.IFriendRequestController;
 import chessBug.misc.*;
 import chessBug.network.*;
 import chessBug.game.*;
@@ -29,17 +31,19 @@ public class HomeController implements IGameSelectionController, IFriendRequestC
         
         //Create view
         view = new HomeView(this);
-        
         Region leftRegion = new Region();
         Region rightRegion = new Region();
         
         page.getChildren().addAll(leftRegion,view.getPage(),rightRegion);
+        
+        //Style and format
         page.getStyleClass().add("padding");
         HBox.setHgrow(leftRegion, Priority.ALWAYS);
         HBox.setHgrow(rightRegion, Priority.ALWAYS);
         
     }
     
+    //Getter/Setter methods
     public Pane getPage(){ return page;}
     public String getUserName(){return client.getOwnUser().getUsername();}
     public List<Friend> getFriends(){return client.getFriends();}

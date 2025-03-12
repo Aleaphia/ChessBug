@@ -20,8 +20,6 @@ import java.io.InputStream;
 
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import chessBug.game.GameController;
 import chessBug.home.HomeController;
 import chessBug.login.LoginUI;
@@ -31,7 +29,6 @@ import chessBug.preferences.PreferencesController;
 import chessBug.preferences.PreferencesPage;
 import chessBug.profile.ProfileController;
 import chessBug.network.DatabaseCheckList;
-import chessBug.network.DatabaseCheck;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
@@ -42,7 +39,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
@@ -71,7 +67,7 @@ public class ChessBug extends Application {
         createLoginPage(); //Set up loginPane
         //Scene and Stage
         primaryStage.setTitle("ChessBug"); //Name for application stage
-        mainScene = new Scene(loginPane, 950, 600); //Add loginPane to the mainScene
+        mainScene = new Scene(loginPane, 1600, 800); //Add loginPane to the mainScene
         primaryStage.setScene(mainScene);//Add mainScene to primaryStage
         
         //Style
@@ -191,12 +187,6 @@ public class ChessBug extends Application {
     
         return sidebar;
     }
-    private void changePage(Pane newPage){
-        //Clear and add new page
-        page.getChildren().clear();
-        page.getChildren().add(newPage);
-        PreferencesController.applyStyles(mainScene, "Styles");
-    }
      private void changePage(Pane newPage, String stylePage){
         //Clear and add new page
         page.getChildren().clear();
@@ -232,6 +222,7 @@ public class ChessBug extends Application {
 
         return button;
     }    
+    
     public static void main(String[] args) {
         Application.launch(args);
     }

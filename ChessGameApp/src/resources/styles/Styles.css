@@ -25,12 +25,14 @@
     -fx-fit-to-height: true;
     -fx-hbar-policy: never;
     -fx-vbar-policy: as-needed;
-    -fx-border-radius: 8px;
+    -fx-border-radius: 0px;
     -fx-background-radius: 8px;
+    -fx-min-height: 100px;
 }
 .scrollBackground{
     -fx-background-color: rgb(41, 39, 42);
     -fx-fill: transparent;
+    -fx-padding: 10px;
 }
 
 /* Labels */

@@ -14,6 +14,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -62,6 +63,7 @@ public class HomeView {
     public void setPage(BorderPane page){this.page = page;}
     
     private VBox buildUserStats(){
+        //Layout content
         VBox userStatsSpace = new VBox(20);
         userStatsSpace.setPadding(new Insets(20));
         userStatsSpace.getStyleClass().add("user-stats");
@@ -73,11 +75,13 @@ public class HomeView {
         Label userInfo = new Label("User: " + controller.getUserName());
         userInfo.getStyleClass().addAll("h2", "user-info");
         
-        userStatsSpace.getChildren().addAll(welcomeMessage, userInfo, new Separator());
-        
         VBox statsSection = new VBox(10);
         statsSection.getStyleClass().add("stats-section");
         
+        userStatsSpace.getChildren().addAll(welcomeMessage, userInfo, new Separator(), statsSection);
+        
+        
+        //Statistics sub-section (statsSection) layout
         Label statsTitle = new Label("Recent Game Statistics");
         statsTitle.getStyleClass().addAll("h3","section-title");
         
@@ -85,12 +89,13 @@ public class HomeView {
         currentGames = new Label("Games In Progress: " + controller.getCurrentGamesNumber());
         
         statsSection.getChildren().addAll(statsTitle, gamesPlayed, currentGames);
-        userStatsSpace.getChildren().add(statsSection);
         
+        //Return parent node
         return userStatsSpace;
     }
     
     private VBox buildFriends() {
+        //Layout content
         VBox friendsSpace = new VBox(10);
         friendsSpace.setPadding(new Insets(20));
         friendsSpace.getStyleClass().add("friends-space");
@@ -100,17 +105,24 @@ public class HomeView {
         header.getStyleClass().add("h1");
         
         friendsListContent = new VBox(5);
+        ScrollPane scroll = new ScrollPane(friendsListContent);
         populateFriendsContent();
         
         VBox sendRequestSection = new VBox(10, new SendFriendRequestUI(controller).getPage());
         sendRequestSection.getStyleClass().add("send-request-section");
         
-        friendsSpace.getChildren().addAll(header, new Separator(), friendsListContent, sendRequestSection);
+        friendsSpace.getChildren().addAll(header, new Separator(), scroll, sendRequestSection);
+        
+        //Style
+        friendsListContent.getStyleClass().add("scrollBackground");
+        
         return friendsSpace;
     }
     
     private void populateFriendsContent(){
+        //Clear firends list
         friendsListContent.getChildren().clear();
+        //Add each friend to the list
         controller.getFriends().forEach(friend -> {
             Label curr = new Label(friend.getUsername());
             curr.getStyleClass().add("friend-label");
@@ -119,18 +131,20 @@ public class HomeView {
     }
     
     private void buildCurrentContent() {
+        //Layout content
         currentContent = new VBox(10);
-        currentContent.setAlignment(Pos.TOP_CENTER);
-        currentContent.getStyleClass().add("current-content");
-        VBox.setVgrow(currentContent, Priority.ALWAYS);
-        
         Label sectionTitle = new Label("Game & Requests");
-        sectionTitle.getStyleClass().add("h1");
         
         currentContent.getChildren().addAll(
             sectionTitle, new Separator(),
             new ReceiveFriendRequestUI(controller).getPage(),
             new GameSelectionUI(controller).getPage()
         );
+        
+        //Style
+        currentContent.setAlignment(Pos.TOP_CENTER);
+        currentContent.getStyleClass().add("current-content");
+        VBox.setVgrow(currentContent, Priority.ALWAYS);
+        sectionTitle.getStyleClass().add("h1");
     }
 }
