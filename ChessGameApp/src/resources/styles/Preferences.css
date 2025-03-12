@@ -1,7 +1,6 @@
 /* preferences.css */
 .root {
     -fx-background-color: #fff;
-    -fx-padding: 20px;
 }
 
 .label {
@@ -20,7 +19,7 @@
 .button {
     -fx-background-color: #4CAF50;
     -fx-text-fill: white;
-    -fx-padding: 10px;
+    /*-fx-padding: 10px; /* This style will casue the buttons to width to change on the menu page*/
     -fx-border-radius: 5px;
 }
 

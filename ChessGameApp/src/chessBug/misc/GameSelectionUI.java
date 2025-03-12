@@ -63,7 +63,7 @@ public class GameSelectionUI {
         controller.getOpenMatchList().forEach(match -> displayMatch(match, false));
         
         if(gameRequests.getChildren().isEmpty())
-            gameRequests.getChildren().add(new Label("No pending requests"));
+            gameRequests.getChildren().add(new Label("No pending game requests"));
         if(gamesInProgress.getChildren().isEmpty())
             gamesInProgress.getChildren().add(new Label("No current games"));
         

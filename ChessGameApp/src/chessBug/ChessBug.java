@@ -148,7 +148,7 @@ public class ChessBug extends Application {
 
     private VBox createSidebar() {
         VBox sidebar = new VBox(10); // Vertical layout for sidebar
-        sidebar.setPadding(new Insets(10, 10, 10, 10));
+        sidebar.setPadding(new Insets(10, 10, 10, 10));        
         sidebar.getStylesheets().add(getClass().getResource("/menu.css").toExternalForm());
         sidebar.getStyleClass().add("sideBar");
 
