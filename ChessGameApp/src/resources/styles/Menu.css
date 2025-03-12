@@ -1,0 +1,12 @@
+.sideBar{
+    -fx-background-color: #2f3136;
+    -fx-text-fill: white;
+}
+.button, .file-chooser-button {
+    -fx-background-color: #4faf23;
+    -fx-border-width: 0;
+}
+
+.button:hover, .file-chooser-button:hover {
+    -fx-background-color: #db3030;
+}
