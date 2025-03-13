@@ -69,7 +69,7 @@ public class GameSelectionUI {
         
         //Style
         page.setAlignment(Pos.CENTER);
-        page.setPrefWidth(300);
+        page.setPrefWidth(400);
         gameRequests.getStyleClass().add("scrollBackground");
         gamesInProgress.getStyleClass().add("scrollBackground");
         header1.getStyleClass().add("h2");

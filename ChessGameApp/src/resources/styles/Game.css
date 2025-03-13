@@ -3,11 +3,11 @@
     -fx-hgap: 5;
     -fx-vgap: 1;
 }
-.button{
+/*.button{
     -fx-border-color: #20243f;
     -fx-border-width: 2px;
 
-}
+}*/
 .section{
     -fx-min-width: 00px;
 }
