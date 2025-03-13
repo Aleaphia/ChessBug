@@ -1,0 +1,11 @@
+.background {
+    -fx-background-color: rgb(212, 215, 223);
+    -fx-background-image: url("../../images/BugBackground.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: contain;
+    -fx-background-position: center center;
+}
+
+.label {
+    -fx-text-fill: black;
+}
