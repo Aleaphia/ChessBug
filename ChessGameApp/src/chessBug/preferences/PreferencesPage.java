@@ -9,14 +9,12 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.Slider;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
@@ -40,13 +38,13 @@ public class PreferencesPage {
             profileContainer.setPadding(new Insets(10));
 
             // Profile Picture
-            ImageView profileImageView = new ImageView();
-            profileImageView.setImage(client.getOwnUser().getProfilePicture());
+            //ImageView profileImageView = new ImageView();
+            //profileImageView.setImage(client.getOwnUser().getProfilePicture());
 
-            profileImageView.setFitWidth(90);
-            profileImageView.setFitHeight(90);
-            profileImageView.setClip(new Circle(45, 45, 45)); // Circular profile picture
-            profileImageView.setStyle("-fx-border-radius: 50%; -fx-border-color: white; -fx-border-width: 2px;");
+            //profileImageView.setFitWidth(90);
+            //profileImageView.setFitHeight(90);
+            //profileImageView.setClip(new Circle(45, 45, 45)); // Circular profile picture
+            //profileImageView.setStyle("-fx-border-radius: 50%; -fx-border-color: white; -fx-border-width: 2px;");
 
             // Username Label
             String username = client.getOwnUser().getUsername();
@@ -54,7 +52,7 @@ public class PreferencesPage {
             usernameLabel.setFont(Font.font("Roboto", FontWeight.BOLD, 18));
             usernameLabel.setTextFill(Color.web("#FFFFFF"));
 
-            profileContainer.getChildren().addAll(profileImageView, usernameLabel);
+            profileContainer.getChildren().addAll(usernameLabel);
 
             // Game Settings Section
             VBox gameSettingsContainer = new VBox(20);
