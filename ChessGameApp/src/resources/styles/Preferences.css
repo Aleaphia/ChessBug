@@ -15,14 +15,3 @@ root {
 .check-box, .combo-box {
     -fx-padding: 5px;
 }
-
-.button {
-    -fx-background-color: #4CAF50;
-    -fx-text-fill: white;
-    /*-fx-padding: 10px; /* This style will casue the buttons to width to change on the menu page*/
-    -fx-border-radius: 5px;
-}
-
-.button:hover {
-    -fx-background-color: #45a049;
-}
