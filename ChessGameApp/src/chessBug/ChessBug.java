@@ -149,7 +149,7 @@ public class ChessBug extends Application {
     private VBox createSidebar() {
         VBox sidebar = new VBox(10); // Vertical layout for sidebar
         sidebar.setPadding(new Insets(10, 10, 10, 10));        
-        sidebar.getStylesheets().add(getClass().getResource("/menu.css").toExternalForm());
+        // sidebar.getStylesheets().add(getClass().getResource("/menu.css").toExternalForm());
         sidebar.getStyleClass().add("sideBar");
 
     
@@ -182,7 +182,7 @@ public class ChessBug extends Application {
                 createSideBarButton("Logout.png", event -> {
                     databaseCheckList.clear();
                     mainScene.setRoot(loginPane);
-                    PreferencesController.applyStyles(mainScene, "Styles", "Login");
+                    PreferencesController.applyStyles(mainScene, "Styles", "Menu", "Login");
                 }));
     
         return sidebar;
@@ -191,7 +191,7 @@ public class ChessBug extends Application {
         //Clear and add new page
         page.getChildren().clear();
         page.getChildren().add(newPage);
-        PreferencesController.applyStyles(mainScene, "Styles", stylePage); 
+        PreferencesController.applyStyles(mainScene, "Styles", "Menu", stylePage); 
     }
 
     private Button createSideBarButton(String imageFileName, EventHandler<ActionEvent> eventHandler) {
