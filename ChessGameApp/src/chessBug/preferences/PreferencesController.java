@@ -35,7 +35,7 @@ public class PreferencesController {
         if (scene != null) {
             try {  
                 // Clear existing styles and apply the new ones
-                applyStyles(scene, "Styles", "Preferences");
+                applyStyles(scene, "Styles", "Menu", "Preferences");
                 // Force layout update
                 scene.getRoot().requestLayout();
     
