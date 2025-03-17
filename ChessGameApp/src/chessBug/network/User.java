@@ -27,6 +27,20 @@ public class User {
 		return profilePic;
 	}
 
+	public String getProfilePictureURL() {
+		return profilePicURL;
+	}
+
+	public void setProfilePicture(String newProfilePicture) {
+		if(!this.profilePicURL.equals(PFP_URL_PREFIX + newProfilePicture))
+			profilePic = null; // Forget old image
+		this.profilePicURL = PFP_URL_PREFIX + newProfilePicture;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
 	public int getID() {
 		return id;
 	}
