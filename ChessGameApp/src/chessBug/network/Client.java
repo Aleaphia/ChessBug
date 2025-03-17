@@ -86,6 +86,10 @@ public class Client {
 	private User getOrCreateUser(int id, String username, String pfp) {
 		if(!userMap.containsKey(id))
 			userMap.put(id, new User(id, username, pfp));
+		else {
+			userMap.get(id).setUsername(username);
+			userMap.get(id).setProfilePicture(pfp);
+		}
 		return userMap.get(id);
 	}
 
@@ -436,7 +440,7 @@ public class Client {
 				return;
 			}
 
-			profile.setProfilePicURL("https://www.zandgall.com/chessbug/content/" + received.getString("response"));
+			profile.setProfilePicURL(received.getString("response"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
