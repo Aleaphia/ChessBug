@@ -10,3 +10,7 @@
 .button:hover, .file-chooser-button:hover {
     -fx-background-color: #db3030;
 }
+
+.buttonIcon.home {
+    -fx-padding: -3px 18px 8px 18px;
+}
