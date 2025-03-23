@@ -22,8 +22,14 @@ import java.util.Map;
 import java.util.HashMap;
 
 import java.nio.file.Files;
+import java.nio.charset.StandardCharsets;
 
 import javax.net.ssl.HttpsURLConnection;
+import javax.crypto.SecretKeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.KeySpec;
+import java.security.spec.InvalidKeySpecException;
+import javax.crypto.spec.PBEKeySpec;
 
 import org.json.JSONObject;
 
@@ -33,6 +39,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 public class Client {
+	// "Salt" used to hash passwords
+	private static final byte[] SALT = "chessbug!(%*¡ºªħéñ€óßáñåçœø’ħ‘ºº".getBytes(StandardCharsets.UTF_8);
+	private static SecretKeyFactory keyFactory = null;
 	// Store user information in order to log in
 	private ProfileModel profile;
 
@@ -451,11 +460,31 @@ public class Client {
 		return post(function, new JSONObject(message));
 	}
 
+	public static String hashPassword(String password) {
+		if(keyFactory == null) {
+			try {
+				keyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+			} catch(NoSuchAlgorithmException e) {
+				e.printStackTrace();
+				return password;
+			}
+		}
+		KeySpec spec = new PBEKeySpec(password.toCharArray(), SALT, 65536, 128);
+		try {
+			return Base64.getEncoder().encodeToString(keyFactory.generateSecret(spec).getEncoded());
+		} catch (InvalidKeySpecException e) {
+			e.printStackTrace();
+			return password;
+		}
+	}
+
 	// Send a message to the server based on a JSON Object, appending User login details, and return the result
 	public JSONObject post(String function, JSONObject message) {
 		// Sent JSON Object to server and retrieve response
 		message.put("username", profile.getUsername());
-		message.put("password", profile.getPassword());
+		// Before we append password, we must hash it
+		message.put("password", hashPassword(profile.getPassword()));
+		System.out.println("Hashed password to: " + hashPassword(profile.getPassword()));
 		return post(function, message.toString());
 	}
 
