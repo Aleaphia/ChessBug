@@ -221,27 +221,37 @@ public class ChessBug extends Application {
         Image[] images = loadAnimation("/resources/images/icons/" + iconClass + "/");
         ImageView imageView = new ImageView(images[0]);
         button.graphicProperty().set(imageView);
-        
+
+        // Create an animation that loops through all the animation images for this icon
+        AnimationTimer animateHover = new AnimationTimer() {
+            long prev = 0;
+            int frame = 0;
+            
+            @Override
+            public void start() {
+                prev = 0;
+                frame = 0;
+                super.start();
+            }
+
+            public void handle(long now) {
+                if((now - prev) > 50_000_000l) {
+                    prev = now;
+                    imageView.setImage(images[frame]);
+                    frame++;
+                    if(frame >= images.length)
+                        stop();
+                }
+            }
+        };
+
         //Add style classes and animation handling
         button.getStyleClass().addAll("buttonIcon", iconClass);
         button.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> { 
-            AnimationTimer timer = new AnimationTimer() {
-                long prev = 0;
-                int frame = 0;
-                public void handle(long now) {
-                    if(now / 50_000_000l != prev / 50_000_000l) {
-                        System.out.printf("%d %d %d %d%n", now, prev, now / 100_000_000l, prev / 100_000_000l);
-                        prev = now;
-                        imageView.setImage(images[frame]);
-                        frame++;
-                        if(frame >= images.length)
-                            stop();
-                    }
-                }
-            };
-            timer.start();
+            animateHover.start();
         });
         button.addEventHandler(MouseEvent.MOUSE_EXITED, event -> {
+            animateHover.stop();
             imageView.setImage(images[0]);
         });
 
