@@ -81,16 +81,12 @@ public class ChessBug extends Application {
         PreferencesController.applyStyles(mainScene, "Styles", "Login");
         HBox.setHgrow(page, Priority.ALWAYS); //Makes page take up all avaiable space
         
-        //Check for credentials
-        try(ObjectInputStream fileInput =
-                new ObjectInputStream(new FileInputStream (settingsFile));){
-            //Try to read file
-            loginUI.savedLogin((ProfileModel.ProfileCredentials)fileInput.readObject());
-            System.out.println("File Loaded");
+        if (PreferencesController.isStayLoggedIn()){
+            //Check for credentials
+            try{loginUI.savedLogin();}
+            catch(Exception e){}
         }
-        catch(Exception e){
-            System.out.println("File Not Loaded: go to login page");
-        } //Nothing to load
+        
         
         //Display
         primaryStage.show();
@@ -100,13 +96,13 @@ public class ChessBug extends Application {
     
     @Override
     public void stop(){
-        //Save credientials in .dat file
-        try(ObjectOutputStream fileOutput =
-                new ObjectOutputStream(new FileOutputStream (new File(settingsFile)))){
-            fileOutput.writeObject(client.getProfile().getProfileCredentials());
-            System.out.println("File Saved");
+        //Save credientials
+        if (PreferencesController.isStayLoggedIn()){
+            PreferencesController.setLogginCredentials(client.getProfile().getUsername(), client.getProfile().getPassword());
         }
-        catch (Exception e){System.out.println("File Not Saved");}
+        else{
+            PreferencesController.setLogginCredentials("", "");
+        }
     }
     
     private void continueDatabaseChecks(){

@@ -11,8 +11,7 @@ import javafx.scene.layout.Pane;
 import chessBug.network.Client;
 
 public class PreferencesController {
-
-        
+       
     // Preferences object to store user settings persistently
     private static Preferences preferences = Preferences.userNodeForPackage(PreferencesController.class);
 
@@ -26,6 +25,7 @@ public class PreferencesController {
 
     public Pane getPage() { return page; }
 
+    //Methods for Handling changes
     // Handle the theme change
     protected static void handleThemeChange(String theme, Scene scene) {
         preferences.put("theme", theme);
@@ -65,6 +65,11 @@ public class PreferencesController {
         preferences.putBoolean("confirmMoves", isEnabled);
         System.out.println("Confirm Moves preference changed: " + (isEnabled ? "Enabled" : "Disabled"));
     }
+    
+    protected static void handleStayLoggedIn(boolean isEnabled) {
+        preferences.putBoolean("stayLoggedIn", isEnabled); 
+        System.out.println("Login preference changed: " + (isEnabled ? "Enabled" : "Disabled"));
+    }
 
     // Handle language change
     protected static void handleLanguageChange(String language) {
@@ -87,6 +92,14 @@ public class PreferencesController {
         alert.setContentText("Your preferences have been saved successfully.");
         alert.showAndWait();
     }
+    
+    //Save login credentials
+    public static void setLogginCredentials(String username, String password){
+        preferences.put("username", username);
+        preferences.put("password", password);
+    }
+    
+    //Getter methods
     public static boolean isAutoSaveEnabled() {
         return preferences.getBoolean("autoSaveEnabled", true);
     }
@@ -105,6 +118,18 @@ public class PreferencesController {
 
     public static boolean isConfirmMovesEnabled() {
         return preferences.getBoolean("confirmMoves", false);
+    }
+    
+    public static boolean isStayLoggedIn() {
+        return preferences.getBoolean("stayLoggedIn", false);
+    }
+    
+    public static String getUsername(){
+        return preferences.get("username", "");
+    }
+    
+    public static String getPassword(){
+        return preferences.get("password", "");
     }
 
     public static void applyStyles(Scene scene, String... styles) {

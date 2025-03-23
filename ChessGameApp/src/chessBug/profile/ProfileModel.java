@@ -58,21 +58,4 @@ public class ProfileModel {
     public void setProfilePicURL(String profilePicURL) {
         this.profilePicURL = profilePicURL;
     }
-    
-    public ProfileCredentials getProfileCredentials(){
-        return new ProfileCredentials(this);
-    }
-    
-    public static class ProfileCredentials implements Serializable{
-        private String username;
-        private String password;
-        
-        public ProfileCredentials(ProfileModel model){
-            username = model.getUsername();
-            password = model.getPassword();
-        }
-        public String getUsername() {return username;}
-        public String getPassword() {return password;}
-
-    }
 }

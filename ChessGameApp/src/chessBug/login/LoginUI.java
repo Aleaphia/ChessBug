@@ -1,5 +1,6 @@
 package chessBug.login;
 
+import chessBug.preferences.PreferencesController;
 import chessBug.profile.ProfileModel;
 import org.json.JSONObject;
 
@@ -92,12 +93,15 @@ public class LoginUI {
         return page;
     }
     
-    public void savedLogin(ProfileModel.ProfileCredentials profileCredentials) throws Exception{
-        System.out.println(profileCredentials.getUsername()+ ", " +
-                profileCredentials.getPassword());
+    public void savedLogin() throws Exception{
+        //Check that there is a string returned
+        if (PreferencesController.getUsername().isBlank() ||
+                PreferencesController.getPassword().isBlank())
+            throw new Exception();
+        //Try to login
         JSONObject response = handleLogin.handle(
-                profileCredentials.getUsername(),
-                profileCredentials.getPassword());
+                PreferencesController.getUsername(),
+                PreferencesController.getPassword());
         if (response.getBoolean("error")) {
             throw new Exception();
         }
