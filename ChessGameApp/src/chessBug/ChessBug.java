@@ -22,6 +22,7 @@ import org.json.JSONObject;
 
 import chessBug.game.GameController;
 import chessBug.home.HomeController;
+import chessBug.profile.ProfileModel;
 import chessBug.login.LoginUI;
 import chessBug.network.Client;
 import chessBug.network.ClientAuthException;
@@ -29,6 +30,11 @@ import chessBug.preferences.PreferencesController;
 import chessBug.preferences.PreferencesPage;
 import chessBug.profile.ProfileController;
 import chessBug.network.DatabaseCheckList;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
@@ -60,11 +66,12 @@ public class ChessBug extends Application {
     private GridPane loginPane;
     private Client client;
     private DatabaseCheckList databaseCheckList = new DatabaseCheckList(); 
+    private String settingsFile = "settings.dat";
     
     @Override
     public void start(Stage primaryStage) {
-        //Create stage layout
-        createLoginPage(); //Set up loginPane
+        LoginUI loginUI = createLoginPage(); //Set up loginPane
+        
         //Scene and Stage
         primaryStage.setTitle("ChessBug"); //Name for application stage
         mainScene = new Scene(loginPane, 1600, 800); //Add loginPane to the mainScene
@@ -74,10 +81,32 @@ public class ChessBug extends Application {
         PreferencesController.applyStyles(mainScene, "Styles", "Login");
         HBox.setHgrow(page, Priority.ALWAYS); //Makes page take up all avaiable space
         
+        //Check for credentials
+        try(ObjectInputStream fileInput =
+                new ObjectInputStream(new FileInputStream (settingsFile));){
+            //Try to read file
+            loginUI.savedLogin((ProfileModel.ProfileCredentials)fileInput.readObject());
+            System.out.println("File Loaded");
+        }
+        catch(Exception e){
+            System.out.println("File Not Loaded: go to login page");
+        } //Nothing to load
+        
         //Display
         primaryStage.show();
         
         continueDatabaseChecks();
+    }
+    
+    @Override
+    public void stop(){
+        //Save credientials in .dat file
+        try(ObjectOutputStream fileOutput =
+                new ObjectOutputStream(new FileOutputStream (new File(settingsFile)))){
+            fileOutput.writeObject(client.getProfile().getProfileCredentials());
+            System.out.println("File Saved");
+        }
+        catch (Exception e){System.out.println("File Not Saved");}
     }
     
     private void continueDatabaseChecks(){
@@ -90,7 +119,7 @@ public class ChessBug extends Application {
         timeline.play();
     }
     
-    private void createLoginPage(){
+    private LoginUI createLoginPage(){
         loginPane = new GridPane();
         loginPane.getStyleClass().addAll("background", "login");
 
@@ -134,6 +163,7 @@ public class ChessBug extends Application {
 
         // mainPane.getChildren().add(loginUI.getPage());
         loginPane.add(loginUI.getPage(), 1, 1);
+        return loginUI;
     }
     
     private void successfulLogin(){

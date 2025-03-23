@@ -1,5 +1,6 @@
 package chessBug.login;
 
+import chessBug.profile.ProfileModel;
 import org.json.JSONObject;
 
 import javafx.geometry.Insets;
@@ -16,8 +17,10 @@ import javafx.scene.text.Font;
 
 public class LoginUI {
     private Node page;
+    LoginHandle handleLogin;
 
     public LoginUI(LoginHandle handleLogin, LoginHandle handleAccountCreation) {
+        this.handleLogin = handleLogin;
         page = createLoginPage(handleLogin, handleAccountCreation);
     }
 
@@ -87,6 +90,17 @@ public class LoginUI {
         StackPane page = new StackPane(loginPage);
         page.setStyle("-fx-width: 33.33%; -fx-alignment: center;");
         return page;
+    }
+    
+    public void savedLogin(ProfileModel.ProfileCredentials profileCredentials) throws Exception{
+        System.out.println(profileCredentials.getUsername()+ ", " +
+                profileCredentials.getPassword());
+        JSONObject response = handleLogin.handle(
+                profileCredentials.getUsername(),
+                profileCredentials.getPassword());
+        if (response.getBoolean("error")) {
+            throw new Exception();
+        }
     }
 
     public Node getPage() {
