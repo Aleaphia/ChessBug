@@ -52,7 +52,8 @@ public class Client {
 
 	public Client(String username, String password) throws ClientAuthException {
 		// Call "login" function from the server
-		profile = new ProfileModel(0, username, password, "", User.DEFAULT_PROFILE_PICTURE);
+		System.out.println("Hashed password to: " + hashPassword(password));
+		profile = new ProfileModel(0, username, hashPassword(password), "", User.DEFAULT_PROFILE_PICTURE);
 		JSONObject loginMessage = post("login", new JSONObject());
 
 		// If the server returns an error, throw an exception
@@ -71,7 +72,7 @@ public class Client {
 	public static Client createAccount(String username, String password, String email) throws ClientAuthException {
 		// Create a new blank Client, setting profile data
 		Client c = new Client();
-		c.profile = new ProfileModel(0, username, password, email, "");
+		c.profile = new ProfileModel(0, username, hashPassword(password), email, "");
 
 		// Create a message to send to the server's "createAccount" function, 'c' holds password and username, need to also provide email
 		JSONObject createMessage = c.post("createAccount", Map.of("email", email));
@@ -145,7 +146,7 @@ public class Client {
 
 		profile.setUsername(newUsername);
 		profile.setEmail(newEmail);
-		profile.setPassword(newPassword);
+		profile.setPassword(hashPassword(newPassword));
 	}
 
 	public void updatePassword(String newPassword) throws NetworkException {
@@ -153,7 +154,7 @@ public class Client {
 		if(received.getBoolean("error"))
 			throw new NetworkException(received.opt("response").toString());
 
-		profile.setPassword(newPassword);
+		profile.setPassword(hashPassword(newPassword));
 	}
 
 	// Retrieve a list of all matches the user is a part of
@@ -482,9 +483,7 @@ public class Client {
 	public JSONObject post(String function, JSONObject message) {
 		// Sent JSON Object to server and retrieve response
 		message.put("username", profile.getUsername());
-		// Before we append password, we must hash it
-		message.put("password", hashPassword(profile.getPassword()));
-		System.out.println("Hashed password to: " + hashPassword(profile.getPassword()));
+		message.put("password", profile.getPassword());
 		return post(function, message.toString());
 	}
 
