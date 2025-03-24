@@ -69,6 +69,24 @@ public class Client {
 		}
 	}
 
+	public static Client loginPreHashed(String username, String password) throws ClientAuthException {
+		Client c = new Client();
+		c.profile = new ProfileModel(0, username, password, "", User.DEFAULT_PROFILE_PICTURE);
+		JSONObject loginMessage = c.post("login", new JSONObject());
+		// If the server returns an error, throw an exception
+		if(loginMessage.getBoolean("error")) {
+			throw new ClientAuthException(ClientAuthException.TYPE_LOGIN, loginMessage.opt("response").toString());
+		}
+
+		// Update profile data with email and any other data
+		try {
+			c.syncProfile();
+		} catch(NetworkException e) {
+			throw new ClientAuthException(ClientAuthException.TYPE_LOGIN, e.getMessage());
+		}
+		return c;
+	}
+
 	public static Client createAccount(String username, String password, String email) throws ClientAuthException {
 		// Create a new blank Client, setting profile data
 		Client c = new Client();

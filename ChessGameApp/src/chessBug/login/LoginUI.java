@@ -18,10 +18,10 @@ import javafx.scene.text.Font;
 
 public class LoginUI {
     private Node page;
-    LoginHandle handleLogin;
+    LoginHandle handleSavedLogin;
 
-    public LoginUI(LoginHandle handleLogin, LoginHandle handleAccountCreation) {
-        this.handleLogin = handleLogin;
+    public LoginUI(LoginHandle handleLogin, LoginHandle handleAccountCreation, LoginHandle handleSavedLogin) {
+        this.handleSavedLogin = handleSavedLogin;
         page = createLoginPage(handleLogin, handleAccountCreation);
     }
 
@@ -99,7 +99,7 @@ public class LoginUI {
                 PreferencesController.getPassword().isBlank())
             throw new Exception();
         //Try to login
-        JSONObject response = handleLogin.handle(
+        JSONObject response = handleSavedLogin.handle(
                 PreferencesController.getUsername(),
                 PreferencesController.getPassword());
         if (response.getBoolean("error")) {
