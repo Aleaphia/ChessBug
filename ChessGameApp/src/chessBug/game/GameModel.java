@@ -29,11 +29,13 @@ public class GameModel {
     //Getter/Setter Methods
     public Boolean getGameComplete(){return game.getGameComplete();}
     public Piece getLocalPiece(String square){return game.getLocalPiece(square);}
-    public int getTurnNumber(){return turnNum;}
+    public int getTurnNumber(){return turnNum;} //Returns the number of full moves played (white + black = 1 move)
     public ArrayList<String> getMoveListForLocalPiece(String square){return game.getMoveListForLocalPiece(square);}
     public Boolean getPlayerTurn(){return game.getPlayerTurn();}
     public Boolean getPlayerColor(){return playerColor;}
     public String getEndMessage(){return game.checkEnd();}
+    public String getPosition(){return game.getPosition();}
+    public String getPostion(int index){return game.getPosition(index);}
    
     //Other Methods
     public void printBoard(){game.printBoard();} //Used for debugging
@@ -51,12 +53,14 @@ public class GameModel {
         //Preform gameTurn: gameTurn will return true if it is a valid move
         //If the game move is valid
         if (game.gameTurn(startSquare, endSquare)){
-            if (!game.getPlayerTurn()) //iterate turn after white moves (i.e., currently black's turn)
-                turnNum++;
+            turnNum++;
             return true;
         }
         else 
            return false;
     }
-
+    
+    public String convertToAlgebraic(String notation){
+       return ""; 
+    }
 }

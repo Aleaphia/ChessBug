@@ -89,7 +89,10 @@ public class GameController implements IGameSelectionController, IGameCreationCo
     public Boolean getPlayerTurnBoolean(){return model.getPlayerTurn();}
     public Boolean getPlayerColor(){return model.getPlayerColor();}
     public User getPlayerTurnUser(){return (model.getPlayerTurn())? match.getWhite() : match.getBlack();}
-
+    public String getPosition(){return model.getPosition();}
+    public String getPosition(int index){return model.getPostion(index);}
+    public int getTurnNumber(){return model.getTurnNumber();}
+    //public int getTurnCount(){return model.getTurnCount();}
 
     //Overriden methods ========================================================
     //IDatabaseCheckInterface methods
@@ -102,6 +105,7 @@ public class GameController implements IGameSelectionController, IGameCreationCo
     @Override public void denyMatchRequest(Match match){client.denyMatchRequest(match);}
     @Override public void forfitMatch(Match match){client.forfitMatch(match);}
     @Override public void selectGame(Match newMatch){internalSelectGame(newMatch);}
+    
     
     //IGameCreationController methods
     @Override public List<Friend> getFriendList(){return client.getFriends();}
@@ -162,7 +166,7 @@ public class GameController implements IGameSelectionController, IGameCreationCo
         //Attempt to make player move, will return true on success
         if (model.makePlayerMove(notation)){
             //Add notation to view
-            view.addToNotationBoard(notation, !model.getPlayerTurn(), model.getTurnNumber());
+            view.addToNotationBoard(notation, !model.getPlayerTurn(), (model.getTurnNumber() - 1)/2);
             
             //Display player turn
             String msg = ((getPlayerTurnBoolean())? "White" : "Black") + "'s turn: " +
