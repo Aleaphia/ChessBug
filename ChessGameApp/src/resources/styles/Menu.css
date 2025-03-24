@@ -14,3 +14,7 @@
 .buttonIcon.home {
     -fx-padding: -3px 18px 8px 18px;
 }
+
+.buttonIcon.chess {
+    -fx-padding: -3px 7px -3px 7px;
+}
