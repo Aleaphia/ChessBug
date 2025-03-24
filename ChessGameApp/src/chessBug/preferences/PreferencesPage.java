@@ -46,13 +46,13 @@ public class PreferencesPage {
             //profileImageView.setClip(new Circle(45, 45, 45)); // Circular profile picture
             //profileImageView.setStyle("-fx-border-radius: 50%; -fx-border-color: white; -fx-border-width: 2px;");
 
-            // Username Label
-            String username = client.getOwnUser().getUsername();
-            Label usernameLabel = new Label(username);
-            usernameLabel.setFont(Font.font("Roboto", FontWeight.BOLD, 18));
-            usernameLabel.setTextFill(Color.web("#FFFFFF"));
-
-            profileContainer.getChildren().addAll(usernameLabel);
+//            // Username Label
+//            String username = client.getOwnUser().getUsername();
+//            Label usernameLabel = new Label(username);
+//            usernameLabel.setFont(Font.font("Roboto", FontWeight.BOLD, 18));
+//            usernameLabel.setTextFill(Color.web("#FFFFFF"));
+//
+//            profileContainer.getChildren().addAll(usernameLabel);
 
             // Game Settings Section
             VBox gameSettingsContainer = new VBox(20);
@@ -124,7 +124,18 @@ public class PreferencesPage {
             themeComboBox.setOnAction(event -> PreferencesController.handleThemeChange(themeComboBox.getValue(), themeComboBox.getScene()));
 
             themeContainer.getChildren().addAll(themeLabel, themeComboBox);
-
+            
+            // Loggin Settings Section
+            VBox loginSettingsContainer = new VBox(20);
+            loginSettingsContainer.setPadding(new Insets(10));
+            // Auto-Save Checkbox
+            CheckBox stayLoggedInCheckBox = new CheckBox("Stay logged in");  
+            stayLoggedInCheckBox.setSelected(PreferencesController.isStayLoggedIn());
+            stayLoggedInCheckBox.setOnAction(event -> PreferencesController.handleStayLoggedIn(stayLoggedInCheckBox.isSelected()));
+            stayLoggedInCheckBox.setTextFill(Color.web("#B0B0B0"));
+ 
+            loginSettingsContainer.getChildren().addAll(stayLoggedInCheckBox);
+            
             // Save Preferences Button
             Button savePreferencesButton = new Button("Save Preferences");
             savePreferencesButton.setStyle("-fx-background-color: #7289DA; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 20px; -fx-background-radius: 5px;");
@@ -142,6 +153,8 @@ public class PreferencesPage {
                 new Separator(),
                 languageContainer,
                 themeContainer,
+                new Separator(),
+                loginSettingsContainer,
                 new Separator(),
                 savePreferencesButton
             );
