@@ -154,6 +154,19 @@ public class ChessBug extends Application {
                 }
 
                 return out;
+            },
+            (String username, String password) -> {
+                JSONObject out = new JSONObject();
+                try {
+                    client = Client.loginPreHashed(username, password);
+                    out.put("error", false);
+                    successfulLogin();
+                } catch (ClientAuthException e) {
+                    e.printStackTrace();
+                    out.put("error", true);
+                    out.put("response", e.getServerResponse());
+                }
+                return out;
             }
         );
 

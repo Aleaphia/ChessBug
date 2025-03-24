@@ -22,8 +22,14 @@ import java.util.Map;
 import java.util.HashMap;
 
 import java.nio.file.Files;
+import java.nio.charset.StandardCharsets;
 
 import javax.net.ssl.HttpsURLConnection;
+import javax.crypto.SecretKeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.KeySpec;
+import java.security.spec.InvalidKeySpecException;
+import javax.crypto.spec.PBEKeySpec;
 
 import org.json.JSONObject;
 
@@ -33,6 +39,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 public class Client {
+	// "Salt" used to hash passwords
+	private static final byte[] SALT = "chessbug!(%*¡ºªħéñ€óßáñåçœø’ħ‘ºº".getBytes(StandardCharsets.UTF_8);
+	private static SecretKeyFactory keyFactory = null;
 	// Store user information in order to log in
 	private ProfileModel profile;
 
@@ -43,7 +52,8 @@ public class Client {
 
 	public Client(String username, String password) throws ClientAuthException {
 		// Call "login" function from the server
-		profile = new ProfileModel(0, username, password, "", User.DEFAULT_PROFILE_PICTURE);
+		System.out.println("Hashed password to: " + hashPassword(password));
+		profile = new ProfileModel(0, username, hashPassword(password), "", User.DEFAULT_PROFILE_PICTURE);
 		JSONObject loginMessage = post("login", new JSONObject());
 
 		// If the server returns an error, throw an exception
@@ -59,10 +69,28 @@ public class Client {
 		}
 	}
 
+	public static Client loginPreHashed(String username, String password) throws ClientAuthException {
+		Client c = new Client();
+		c.profile = new ProfileModel(0, username, password, "", User.DEFAULT_PROFILE_PICTURE);
+		JSONObject loginMessage = c.post("login", new JSONObject());
+		// If the server returns an error, throw an exception
+		if(loginMessage.getBoolean("error")) {
+			throw new ClientAuthException(ClientAuthException.TYPE_LOGIN, loginMessage.opt("response").toString());
+		}
+
+		// Update profile data with email and any other data
+		try {
+			c.syncProfile();
+		} catch(NetworkException e) {
+			throw new ClientAuthException(ClientAuthException.TYPE_LOGIN, e.getMessage());
+		}
+		return c;
+	}
+
 	public static Client createAccount(String username, String password, String email) throws ClientAuthException {
 		// Create a new blank Client, setting profile data
 		Client c = new Client();
-		c.profile = new ProfileModel(0, username, password, email, "");
+		c.profile = new ProfileModel(0, username, hashPassword(password), email, "");
 
 		// Create a message to send to the server's "createAccount" function, 'c' holds password and username, need to also provide email
 		JSONObject createMessage = c.post("createAccount", Map.of("email", email));
@@ -136,7 +164,7 @@ public class Client {
 
 		profile.setUsername(newUsername);
 		profile.setEmail(newEmail);
-		profile.setPassword(newPassword);
+		profile.setPassword(hashPassword(newPassword));
 	}
 
 	public void updatePassword(String newPassword) throws NetworkException {
@@ -144,7 +172,7 @@ public class Client {
 		if(received.getBoolean("error"))
 			throw new NetworkException(received.opt("response").toString());
 
-		profile.setPassword(newPassword);
+		profile.setPassword(hashPassword(newPassword));
 	}
 
 	// Retrieve a list of all matches the user is a part of
@@ -449,6 +477,24 @@ public class Client {
 	// Send a message to the server based on a Map representation of JSON data, (appends login details) and return the result
 	public JSONObject post(String function, Map<?, ?> message) {
 		return post(function, new JSONObject(message));
+	}
+
+	public static String hashPassword(String password) {
+		if(keyFactory == null) {
+			try {
+				keyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+			} catch(NoSuchAlgorithmException e) {
+				e.printStackTrace();
+				return password;
+			}
+		}
+		KeySpec spec = new PBEKeySpec(password.toCharArray(), SALT, 65536, 128);
+		try {
+			return Base64.getEncoder().encodeToString(keyFactory.generateSecret(spec).getEncoded());
+		} catch (InvalidKeySpecException e) {
+			e.printStackTrace();
+			return password;
+		}
 	}
 
 	// Send a message to the server based on a JSON Object, appending User login details, and return the result
