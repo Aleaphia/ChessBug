@@ -19,18 +19,15 @@ public class GameSelectionUI {
     private VBox games = new VBox();
     private IGameSelectionController controller;
     private GameStatus status;
-    private StatusType statusType;
+    private GameList gameList;
     
-    public GameSelectionUI(IGameSelectionController controller, GameStatus status){
+    public GameSelectionUI(IGameSelectionController controller, GameStatus status, GameList gameList){
         this.controller = controller;
         
         //Determine status
         this.status = status;
-        switch (status){
-            case (GameStatus.REQUESTED) -> statusType = (() -> controller.receiveMatchRequest());
-            case (GameStatus.IN_PROGRESS) -> statusType = (() -> controller.getOpenMatchList());
-            default -> statusType = (() -> controller.getClosedMatchList());
-        }
+        this.gameList = gameList;
+
         buildGameSelectionPrompt();
         
         //Add database checks
@@ -44,7 +41,7 @@ public class GameSelectionUI {
         //Games in progress
         games.getChildren().clear();
         
-        statusType.getGameList().forEach(match -> displayMatch(match));
+        gameList.getGameList().forEach(match -> displayMatch(match));
         if(games.getChildren().isEmpty())
             games.getChildren().add(new Label("No current games"));
     }
@@ -64,7 +61,7 @@ public class GameSelectionUI {
         page.getChildren().addAll(header, scroll);
         
         //List Games
-        statusType.getGameList().forEach(match -> displayMatch(match));
+        gameList.getGameList().forEach(match -> displayMatch(match));
        
         if(games.getChildren().isEmpty())
             games.getChildren().add(new Label("No current games"));
@@ -133,7 +130,7 @@ public class GameSelectionUI {
         matchButton.setPrefWidth(200);       
     }
     
-    public interface StatusType{
+    public interface GameList{
         public List<Match> getGameList();
     }
 

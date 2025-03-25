@@ -49,6 +49,8 @@ public class HomeController implements IGameSelectionController, IFriendRequestC
     public List<Friend> getFriends(){return client.getFriends();}
     public int getCompleteGamesNumber(){return client.getClosedMatches().size();}
     public int getCurrentGamesNumber(){return client.getOpenMatches().size();}
+    public List<Match> getOpenMatchList(){return client.getOpenMatches();}
+    public List<Match> receiveMatchRequest(){return client.getMatchRequests();}
     
     //Overriden Methods
     //IDatabaseCheckInterface methods
@@ -61,9 +63,6 @@ public class HomeController implements IGameSelectionController, IFriendRequestC
     
     //IGameSelectionController methods
     @Override public String getUsername(){return client.getOwnUser().getUsername();}
-    @Override public List<Match> getOpenMatchList(){return client.getOpenMatches();}
-    @Override public List<Match> getClosedMatchList(){return client.getClosedMatches();}
-    @Override public List<Match> receiveMatchRequest(){return client.getMatchRequests();}
     @Override public void acceptMatchRequest(Match match){client.acceptMatchRequest(match);}
     @Override public void denyMatchRequest(Match match){client.denyMatchRequest(match);}
     @Override public void selectGame(Match match){

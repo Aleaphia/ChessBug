@@ -138,8 +138,12 @@ public class HomeView {
         currentContent.getChildren().addAll(
             sectionTitle, new Separator(),
             new ReceiveFriendRequestUI(controller).getPage(),
-            new GameSelectionUI(controller, GameSelectionUI.GameStatus.REQUESTED).getPage(),
-            new GameSelectionUI(controller, GameSelectionUI.GameStatus.COMPLETE).getPage()
+            new GameSelectionUI(
+                    controller, GameSelectionUI.GameStatus.REQUESTED,
+                    (() -> controller.receiveMatchRequest())).getPage(),
+            new GameSelectionUI(
+                    controller, GameSelectionUI.GameStatus.COMPLETE,
+                    (() -> controller.getOpenMatchList())).getPage()
         );
         
         //Style

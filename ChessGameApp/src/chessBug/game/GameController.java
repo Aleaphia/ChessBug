@@ -12,6 +12,7 @@ import chessGame.*;
 import chessBug.network.*;
 import java.util.*;
 import java.util.stream.Stream;
+import javafx.scene.control.Button;
 
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -40,22 +41,69 @@ public class GameController implements IGameSelectionController, IGameCreationCo
         //Create view
         //Game Prompt Panel
         VBox promptSelectionPanel = new VBox();
-        Region leftRegion = new Region();
-        Region rightRegion = new Region();
+        ArrayList<Region> regionList = new ArrayList<>();
+        regionList.add(new Region());
+        regionList.add(new Region());
         
-        page.getChildren().addAll(leftRegion,promptSelectionPanel,rightRegion);
+        page.getChildren().addAll(regionList.get(regionList.size() - 2),
+                promptSelectionPanel,regionList.get(regionList.size() - 1));
+        
+        //Build promptSelection Pannel
+        HBox menu = new HBox();
+        VBox gameDisplayNode = new VBox();
+        
+        //Menu
+        Button newGame = new Button("New Games");
+        Button currGames = new Button("Current Games");
+        Button oldGames = new Button("Old Games");
+        regionList.add(new Region());
+        regionList.add(new Region());
+        menu.getChildren().addAll(newGame, regionList.get(regionList.size() - 2),
+                currGames, regionList.get(regionList.size() - 1), oldGames); 
+        
+        
+        newGame.setOnAction(event -> {
+            gameDisplayNode.getChildren().clear();
+            gameDisplayNode.getChildren().addAll(
+                    new GameCreationUI(this).getPage(),
+                    new GameSelectionUI(
+                            this, GameSelectionUI.GameStatus.REQUESTED,
+                            (() -> client.getMatchRequests())).getPage()
+            );
+        });
+        
+        currGames.setOnAction(event -> {
+            gameDisplayNode.getChildren().clear();
+            gameDisplayNode.getChildren().add(
+                    new GameSelectionUI(
+                            this, GameSelectionUI.GameStatus.IN_PROGRESS,
+                            (() -> client.getOpenMatches())).getPage()
+            );
+        });
+        
+        oldGames.setOnAction(event -> {
+            gameDisplayNode.getChildren().clear();
+            gameDisplayNode.getChildren().add(
+                    new GameSelectionUI(
+                            this, GameSelectionUI.GameStatus.COMPLETE,
+                            (() -> client.getClosedMatches())).getPage()
+            );
+        });
+        
+        
+        //gameDisplayNode
+        gameDisplayNode.getChildren().add(new GameSelectionUI(
+                        this, GameSelectionUI.GameStatus.IN_PROGRESS,
+                        (() -> client.getOpenMatches())).getPage()
+                );
         
         //Style and format
         page.getStyleClass().add("padding");
-        HBox.setHgrow(leftRegion, Priority.ALWAYS);
-        HBox.setHgrow(rightRegion, Priority.ALWAYS);
+        regionList.forEach(region -> HBox.setHgrow(region, Priority.ALWAYS));
         promptSelectionPanel.getStyleClass().add("section");
 
         //Add selection panel components
-        promptSelectionPanel.getChildren().addAll(new GameCreationUI(this).getPage(),
-                new GameSelectionUI(this, GameSelectionUI.GameStatus.REQUESTED).getPage(),
-                new GameSelectionUI(this, GameSelectionUI.GameStatus.IN_PROGRESS).getPage()
-                );
+        promptSelectionPanel.getChildren().addAll(menu, gameDisplayNode);
     }
     public GameController(Client player, DatabaseCheckList databaseCheckList, Match match){ //selected match
         //Connect to database
@@ -102,9 +150,6 @@ public class GameController implements IGameSelectionController, IGameCreationCo
     @Override public void addToDatabaseCheckList(DatabaseCheck item){databaseCheckList.add(item);}
     //IGameSelectionController methods
     @Override public String getUsername(){return client.getOwnUser().getUsername();}
-    @Override public List<Match> getOpenMatchList(){return client.getOpenMatches();}
-    @Override public List<Match> getClosedMatchList(){return client.getClosedMatches();}
-    @Override public List<Match> receiveMatchRequest(){return client.getMatchRequests();}
     @Override public void acceptMatchRequest(Match match){client.acceptMatchRequest(match);}
     @Override public void denyMatchRequest(Match match){client.denyMatchRequest(match);}
     @Override public void forfitMatch(Match match){client.forfitMatch(match);}
