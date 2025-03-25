@@ -10,3 +10,8 @@
 .button:hover, .file-chooser-button:hover {
     -fx-background-color: #db3030;
 }
+
+/*Test*/
+.notYourMove {
+    -fx-background-color: #864c4c;
+}
