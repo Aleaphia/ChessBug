@@ -16,6 +16,10 @@ public interface IGameSelectionController extends IDatabaseCheckController{
     * @return - a list of all open matches containing the current user
     */
     public List<Match> getOpenMatchList();
+    /** getClosedMatchList - get a list of all closed matches the current user participated in
+    * @return - a list of all closed matches containing the current user
+    */
+    public List<Match> getClosedMatchList();
     /** selectGame - opens the selected game
     * @param - match : the selected game match
     */

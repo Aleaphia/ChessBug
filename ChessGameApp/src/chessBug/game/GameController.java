@@ -52,7 +52,10 @@ public class GameController implements IGameSelectionController, IGameCreationCo
         promptSelectionPanel.getStyleClass().add("section");
 
         //Add selection panel components
-        promptSelectionPanel.getChildren().addAll(new GameCreationUI(this).getPage(), new GameSelectionUI(this).getPage());
+        promptSelectionPanel.getChildren().addAll(new GameCreationUI(this).getPage(),
+                new GameSelectionUI(this, GameSelectionUI.GameStatus.REQUESTED).getPage(),
+                new GameSelectionUI(this, GameSelectionUI.GameStatus.IN_PROGRESS).getPage()
+                );
     }
     public GameController(Client player, DatabaseCheckList databaseCheckList, Match match){ //selected match
         //Connect to database
@@ -100,6 +103,7 @@ public class GameController implements IGameSelectionController, IGameCreationCo
     //IGameSelectionController methods
     @Override public String getUsername(){return client.getOwnUser().getUsername();}
     @Override public List<Match> getOpenMatchList(){return client.getOpenMatches();}
+    @Override public List<Match> getClosedMatchList(){return client.getClosedMatches();}
     @Override public List<Match> receiveMatchRequest(){return client.getMatchRequests();}
     @Override public void acceptMatchRequest(Match match){client.acceptMatchRequest(match);}
     @Override public void denyMatchRequest(Match match){client.denyMatchRequest(match);}
@@ -211,7 +215,7 @@ public class GameController implements IGameSelectionController, IGameCreationCo
         //Update chat/match status
         this.match.poll(client).forEach((move) -> internalPlayerMove(move));
         if (!model.getGameComplete()
-                && this.match.getStatus().charAt(6) == 'W'){ //Acount for forfeit wins that wouldn't otherwise get noticed
+                && this.match.getStatus().charAt(5) == 'W'){ //Acount for forfeit wins that wouldn't otherwise get noticed
                 model.endGame();
                 view.displayBotMessage(this.match.getStatus().substring(0,5) + " won by forfeit");
         }
