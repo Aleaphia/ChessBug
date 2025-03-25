@@ -13,6 +13,8 @@ import chessBug.network.*;
 import java.util.*;
 import java.util.stream.Stream;
 import javafx.scene.control.Button;
+import javafx.scene.control.Separator;
+
 
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -61,14 +63,14 @@ public class GameController implements IGameSelectionController, IGameCreationCo
         menu.getChildren().addAll(newGame, regionList.get(regionList.size() - 2),
                 currGames, regionList.get(regionList.size() - 1), oldGames); 
         
-        
+        //Menu funtionality
         newGame.setOnAction(event -> {
             gameDisplayNode.getChildren().clear();
             gameDisplayNode.getChildren().addAll(
-                    new GameCreationUI(this).getPage(),
                     new GameSelectionUI(
                             this, GameSelectionUI.GameStatus.REQUESTED,
-                            (() -> client.getMatchRequests())).getPage()
+                            (() -> client.getMatchRequests())).getPage(),
+                    new GameCreationUI(this).getPage()
             );
         });
         
@@ -103,7 +105,7 @@ public class GameController implements IGameSelectionController, IGameCreationCo
         promptSelectionPanel.getStyleClass().add("section");
 
         //Add selection panel components
-        promptSelectionPanel.getChildren().addAll(menu, gameDisplayNode);
+        promptSelectionPanel.getChildren().addAll(menu, new Separator(), gameDisplayNode);
     }
     public GameController(Client player, DatabaseCheckList databaseCheckList, Match match){ //selected match
         //Connect to database
