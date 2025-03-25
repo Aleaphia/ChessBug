@@ -36,6 +36,7 @@ public class GameModel {
     public String getEndMessage(){return game.checkEnd();}
     public String getPosition(){return game.getPosition();}
     public String getPostion(int index){return game.getPosition(index);}
+    public void endGame(){game.endGame();}
    
     //Other Methods
     public void printBoard(){game.printBoard();} //Used for debugging

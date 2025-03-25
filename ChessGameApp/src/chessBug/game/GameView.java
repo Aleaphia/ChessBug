@@ -69,6 +69,16 @@ public class GameView {
         
         //Page layout
         page.setCenter(gameBoard);
+        gameBoard.add(msgBoard, 0, 9, 9, 1); //Add msgBoard to center
+        Button forfeit = new Button("Forfeit");
+        forfeit.setOnAction(event -> {
+            controller.forfit();
+            displayBotMessage(controller.getUsername() + " forfeits.");
+                });
+        
+        gameBoard.add(forfeit, 7, 10, 2, 1);
+        
+        
         page.setLeft(createChatSpace());
         page.setRight(createNotationSpace());  
                 
@@ -136,7 +146,6 @@ public class GameView {
             }
         }
         //----------------------------------------------------------------------
-        gameBoard.add(msgBoard, 0, 9, 9, 1); //Add msgBoard
     }
     private VBox createChatSpace() {
         //Create Chat space
@@ -221,8 +230,9 @@ public class GameView {
         newLabel.setMinWidth(20);
         notationLabel.add(newLabel,0,0);
         //Scan moves
-        Button goBack = new Button("<<");
-        Button goForward = new Button(">>");
+        Button goBack = new Button("<");
+        Button goForward = new Button(">");
+        Button jumpForward = new Button (">>");
         goBack.setOnAction(event -> {
             if (currTurnNumber > 0)
                 swapToPastGameDisplay(--currTurnNumber);
@@ -231,7 +241,12 @@ public class GameView {
             if (currTurnNumber < controller.getTurnNumber())
                 swapToPastGameDisplay(++currTurnNumber);
         });
-        moveSliderBox.getChildren().addAll(goBack, goForward);
+        jumpForward.setOnAction(event -> {
+            currTurnNumber = controller.getTurnNumber();
+            swapToPastGameDisplay(currTurnNumber);
+                });
+        
+        moveSliderBox.getChildren().addAll(goBack, goForward, jumpForward);
                
         //Style
         labelW.getStyleClass().addAll("notationLabel", "h2");
@@ -383,17 +398,17 @@ public class GameView {
         controller.getChatMessages().forEach(msg -> {
             long time = System.currentTimeMillis(); //DEBUG
             HBox messageContainer = new HBox();
-            System.out.println(System.currentTimeMillis() - time); //DEBUG
+            //System.out.println(System.currentTimeMillis() - time); //DEBUG
             //Build content
             //profile picture
             ImageView pfpView = new ImageView(msg.getAuthor().getProfilePicture());
-            System.out.println(System.currentTimeMillis() - time); //DEBUG
+            //System.out.println(System.currentTimeMillis() - time); //DEBUG
             StackPane pfpViewContainer = new StackPane(pfpView);
             
             pfpView.setFitWidth(32);
             pfpView.setFitHeight(32);
             pfpViewContainer.getStyleClass().add("chatPfp");
-            System.out.println(System.currentTimeMillis() - time);
+            //System.out.println(System.currentTimeMillis() - time);
             
             //Message
             Label label = new Label(msg.getAuthor().getUsername() + ": " + msg.getContent());
@@ -451,7 +466,6 @@ public class GameView {
     }
     private void swapToPastGameDisplay(int moveNumber){
         String position= controller.getPosition(moveNumber);
-        System.out.println(moveNumber);
         HashMap <String, String> positionMap = new HashMap<>(); // Square to piece map
         int pieceCount = 0;
         for (int i = 1; i < position.length(); i++){ //start at 1 to skip move info

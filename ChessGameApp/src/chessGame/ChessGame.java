@@ -330,6 +330,7 @@ public class ChessGame implements Serializable{
     public void setPromotionMethod(PromotionSelection promotionMethod){
         this.promotionMethod = promotionMethod;
     }
+    public void endGame(){gameComplete = true;}
     
     //Boolean methods that check to Board states
     //  Check that a square exists

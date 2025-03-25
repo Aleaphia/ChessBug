@@ -125,6 +125,9 @@ public class GameController implements IGameSelectionController, IGameCreationCo
      *  @param msg - chat message to send
      */
     public void sendChatMessage(String msg){chat.send(client, msg);}
+    /** forfeit - automatically lose game
+     */
+    public void forfit(){client.forfitMatch(match);}
     
     /** playerMove - makes extra changes needed for user moves (not database moves), e.g., update database, clear selected square from model
      *  Add code here if it should only happen when the move comes from this client/user
@@ -207,8 +210,12 @@ public class GameController implements IGameSelectionController, IGameCreationCo
                 
         //Update chat/match status
         this.match.poll(client).forEach((move) -> internalPlayerMove(move));
+        if (!model.getGameComplete()
+                && this.match.getStatus().charAt(6) == 'W'){ //Acount for forfeit wins that wouldn't otherwise get noticed
+                model.endGame();
+                view.displayBotMessage(this.match.getStatus().substring(0,5) + " won by forfeit");
+        }
         view.refresh(client);
-        
         //Check database
         addToDatabaseCheckList(()->databaseChecks());
     }
