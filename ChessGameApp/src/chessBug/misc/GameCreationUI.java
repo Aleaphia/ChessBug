@@ -38,7 +38,7 @@ public class GameCreationUI {
         
         //Style
         GridPane.setHgrow(buttonBox, Priority.ALWAYS);
-        buttonBox.setAlignment(Pos.TOP_RIGHT);
+        buttonBox.setAlignment(Pos.CENTER);
         page.getStyleClass().add("grid");
     }
     
