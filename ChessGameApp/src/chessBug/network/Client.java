@@ -8,6 +8,7 @@ package chessBug.network;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.File;
@@ -16,6 +17,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Base64;
 import java.util.Map;
@@ -25,9 +27,21 @@ import java.nio.file.Files;
 import java.nio.charset.StandardCharsets;
 
 import javax.net.ssl.HttpsURLConnection;
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
+
+import java.security.InvalidKeyException;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.spec.KeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import javax.crypto.spec.PBEKeySpec;
 
@@ -42,6 +56,12 @@ public class Client {
 	// "Salt" used to hash passwords
 	private static final byte[] SALT = "chessbug!(%*¡ºªħéñ€óßáñåçœø’ħ‘ºº".getBytes(StandardCharsets.UTF_8);
 	private static SecretKeyFactory keyFactory = null;
+
+	private static PublicKey PUBLIC_KEY = null;
+	private static Cipher PUBLIC_ENCRYPT = null;
+
+	private static KeyPair CLIENT_KEY_PAIR;
+
 	// Store user information in order to log in
 	private ProfileModel profile;
 
@@ -291,6 +311,7 @@ public class Client {
 	public boolean denyMatchRequest(Match match) {
 		JSONObject received = post("denyMatchRequest", Map.of("match", match.getID()));
 
+
 		// Return none if error in response
 		if(received.getBoolean("error")) {
 			System.err.println("Could not accept match request for #" + match.getID() + " to \"" + profile.getUsername() + "\"");
@@ -502,13 +523,75 @@ public class Client {
 		// Sent JSON Object to server and retrieve response
 		message.put("username", profile.getUsername());
 		message.put("password", profile.getPassword());
+		if(CLIENT_KEY_PAIR == null) {
+			try {
+				KeyPairGenerator gen = KeyPairGenerator.getInstance("RSA");
+				gen.initialize(2048);
+				CLIENT_KEY_PAIR = gen.generateKeyPair();
+			} catch (NoSuchAlgorithmException e) {e.printStackTrace();}
+		}
+		System.out.println(Base64.getEncoder().encode(CLIENT_KEY_PAIR.getPublic().getEncoded()));
+		message.put("responseKey", Base64.getEncoder().encode(CLIENT_KEY_PAIR.getPublic().getEncoded()));
 		return post(function, message.toString());
+	}
+
+	public static byte[] encrypt(String input) {
+		if(PUBLIC_KEY == null) {
+			HttpsURLConnection con = getConnection("chessbug.main.crt");
+			try {
+				con.connect();
+				String pubKeyCRT = new String(con.getInputStream().readAllBytes())
+					.replace("-----BEGIN PUBLIC KEY-----", "")
+					.replaceAll(System.lineSeparator(), "")
+					.replace("-----END PUBLIC KEY-----", "");
+				byte[] encoded = Base64.getDecoder().decode(pubKeyCRT);
+				KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+				X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encoded);
+				PUBLIC_KEY = keyFactory.generatePublic(keySpec);
+				PUBLIC_ENCRYPT = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+				PUBLIC_ENCRYPT.init(Cipher.ENCRYPT_MODE, PUBLIC_KEY);
+			} catch(IOException e) {
+				System.err.println("Could not read public key data!");
+				e.printStackTrace();
+			} catch(NoSuchAlgorithmException e) {
+				System.err.println("Could not load public key!");
+				e.printStackTrace();
+			} catch(InvalidKeySpecException e) {
+				System.err.println("Could not get public key spec!");
+				e.printStackTrace();
+			} catch(NoSuchPaddingException e) {
+				System.err.println("No such padding?!");
+				e.printStackTrace();
+			} catch(InvalidKeyException e) {
+				System.err.println("And after all of that..");
+				e.printStackTrace();
+			}
+			System.out.println("Initialized key and encryption");
+		}
+		byte[] normalBytes = input.getBytes(StandardCharsets.UTF_8);
+		if(PUBLIC_ENCRYPT == null)
+			return normalBytes;
+		try {
+			for(int i = 0; i < normalBytes.length; i+=245)
+				PUBLIC_ENCRYPT.update(Arrays.copyOfRange(normalBytes, i, Math.min(normalBytes.length, i+245)));
+			return PUBLIC_ENCRYPT.doFinal();
+		} catch (BadPaddingException | IllegalBlockSizeException e) {
+			System.err.println("Can't encrypt :'c");
+			e.printStackTrace();
+			return normalBytes;
+		}
+	}
+
+	public static String decrypt(byte[] data) {
+		return new String(data);
 	}
 
 	// Send a string to a given function in the web api, return a JSON result
 	public JSONObject post(String function, String message) {
-		// Send arbitrary string as 
-		byte[] data = message.getBytes(StandardCharsets.UTF_8);
+		// Send arbitrary string as bytes
+
+		// byte[] data = message.getBytes(StandardCharsets.UTF_8);
+		byte[] data = encrypt(message);
 
 		// Set up a connection to the server
 		HttpsURLConnection con = getConnection(function);
@@ -538,12 +621,15 @@ public class Client {
 		// Read response into `builder`
 		String input = "";
 		try {
-			BufferedReader b = new BufferedReader(new InputStreamReader(con.getInputStream()));
-			StringBuilder builder = new StringBuilder();
-			while( (input = b.readLine()) != null) {
-				builder.append(input);
-			}
-			input = builder.toString();
+			// BufferedReader b = new BufferedReader(new InputStreamReader(con.getInputStream()));
+			// InputStreamReader i = new InputStreamReader(con.getInputStream());
+			// InputStream i = con.getInputStream();
+			input = decrypt(con.getInputStream().readAllBytes());
+			// StringBuilder builder = new StringBuilder();
+			// while( (input = b.readLine()) != null) {
+				// builder.append(input);
+			// }
+			// input = builder.toString();
 		} catch (IOException ioex2) {
 			System.err.println("Could not read server response!");
 			JSONObject out = new JSONObject();
@@ -568,7 +654,7 @@ public class Client {
 	// Create a HTTPS connection based on a web API function, filling out the required headers
 	private static HttpsURLConnection getConnection(String function) {
 		try {
-			HttpsURLConnection con = (HttpsURLConnection)new URI("https://www.zandgall.com/chessbug/" + function + ".php").toURL().openConnection();
+			HttpsURLConnection con = (HttpsURLConnection)new URI("https://www.zandgall.com/chessbug/" + function).toURL().openConnection();
 			con.setRequestMethod("POST");
 			con.setDoOutput(true);
 			con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
