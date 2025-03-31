@@ -60,9 +60,10 @@ import org.json.JSONException;
 public class Client {
 	// "Salt" used to hash passwords
 	private static final byte[] SALT = "chessbug!(%*¡ºªħéñ€óßáñåçœø’ħ‘ºº".getBytes(StandardCharsets.UTF_8);
+	private static final byte[] PUBLIC_KEY = Base64.getDecoder().decode("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqAwpV8rPgnN1yaWTBpPqctTIXCJCu80pbA0jUtug7WVTq0hrKIjZD7VkwSPWBAu/SQaT31Rrcfo2X4wdQiPT4mnncyE5gHgpTZFOLtiTMOEjJmtcF6JW7nzp7c1//NKagP/1gdom3Xrnyr91qsiyMWIij69proLcv1gnQV0pPFifjBNBqMC3czG6bbyhYAWZMgWNODwegYd6DrZ1qqRvVgb5F2qdpdySNVpqERMIXhT0AJnL6IbjA1kB4lq6m6fnB6lU8hSatguH0mRP5HSgg/fhNnu26ajJkxr9BrikJyEk9fOhjp2besWlMhuq8eO4VIRAa2KLwWTTg1NM3i6+3QIDAQAB");
 
 	private static Cipher CLIENT_ENCRYPT = null, CLIENT_DECRYPT = null;	
-	private static String ENCRYPTED_KEY = null;	
+	private static String ENCRYPTED_KEY = null;
 
 	// Store user information in order to log in
 	private ProfileModel profile;
@@ -525,31 +526,30 @@ public class Client {
 	public static byte[] encrypt(String input) {
 		if(CLIENT_ENCRYPT == null) {
 			try {
-				// Pull public key from server  TODO: Change this to a local file
-				HttpsURLConnection con = getConnection("chessbug.main.crt");
-				con.connect();
-				String pubKeyCRT = new String(con.getInputStream().readAllBytes())
-					.replace("-----BEGIN PUBLIC KEY-----", "")
-					.replaceAll(System.lineSeparator(), "")
-					.replace("-----END PUBLIC KEY-----", "");
-				byte[] encoded = Base64.getDecoder().decode(pubKeyCRT);
+				// Create a public key out of stored PUBLIC_KEY data
 				KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-				X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encoded);
+				X509EncodedKeySpec keySpec = new X509EncodedKeySpec(PUBLIC_KEY);
 				PublicKey publicKey = keyFactory.generatePublic(keySpec);
+
+				// Create cipher to encrypt AES key with
 				Cipher rsaCipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 				rsaCipher.init(Cipher.ENCRYPT_MODE, publicKey);
-
-				// Create AES key and cipher to communicate with
+	
+				// Generate AES key, and encrypt it
 				KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
 				keyGenerator.init(128);
 
 				SecretKey aesKey = keyGenerator.generateKey();
 				ENCRYPTED_KEY = Base64.getEncoder().encodeToString(rsaCipher.doFinal(aesKey.getEncoded()));
+
+				// Create encrypt and decrypt cipher, with the given IV and key
 				IvParameterSpec iv = new IvParameterSpec("hellochessbug!<3".getBytes("UTF-8"));
 				CLIENT_ENCRYPT = Cipher.getInstance("AES/CBC/PKCS5PADDING");
 				CLIENT_ENCRYPT.init(Cipher.ENCRYPT_MODE, aesKey, iv);
 				CLIENT_DECRYPT = Cipher.getInstance("AES/CBC/PKCS5PADDING");
 				CLIENT_DECRYPT.init(Cipher.DECRYPT_MODE, aesKey, iv);
+
+				// Encryption set up properly!
 				System.out.println("Initialized key and encryption");
 			} catch(IOException e) {
 				System.err.println("Could not read public key data!");
@@ -561,11 +561,20 @@ public class Client {
 				CLIENT_ENCRYPT = null;
 			}
 		}
-		byte[] normalBytes = input.getBytes();
+
+		// bytes of the data to send
+		byte[] normalBytes = input.getBytes(StandardCharsets.UTF_8);
+
+		// If there is no cipher set up/encryption failed, then resort to unencrypted data. The response will be unencrypted as well
 		if(CLIENT_ENCRYPT == null)
 			return normalBytes;
+
+		// Attempt to encrypt data, if it fails, just provide raw
 		try {
-			return new JSONObject(Map.of("data", Base64.getEncoder().encodeToString(CLIENT_ENCRYPT.doFinal(normalBytes)), "key", ENCRYPTED_KEY)).toString().getBytes(StandardCharsets.UTF_8);
+			return new JSONObject(Map.of(
+				"data", Base64.getEncoder().encodeToString(CLIENT_ENCRYPT.doFinal(normalBytes)), 
+				"key", ENCRYPTED_KEY)
+			).toString().getBytes(StandardCharsets.UTF_8);
 		} catch (BadPaddingException | IllegalBlockSizeException e) {
 			System.err.println("Could not encrypt data!");
 			return normalBytes;
