@@ -48,7 +48,6 @@ public class HomeView {
 
         //Style
         page.getStyleClass().add("section");
-        page.getStylesheets().add(getClass().getResource("/HomeView.css").toExternalForm());
         
         controller.addToDatabaseCheckList(() -> {
             //System.out.println("Debug: GameSelectionUI DatabaseCheck" );

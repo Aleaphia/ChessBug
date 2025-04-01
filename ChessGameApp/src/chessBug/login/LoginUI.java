@@ -28,8 +28,8 @@ public class LoginUI {
     private Node createLoginPage(LoginHandle handleLogin, LoginHandle handleAccountCreation) {
         // Use to report errors to the user
         Label errorTitle = new Label(), errorDescription = new Label();
-        errorTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #FF5555;");
-        errorDescription.setStyle("-fx-text-fill: #FF5555;");
+        errorTitle.getStyleClass().addAll("h2", "error");
+        errorDescription.getStyleClass().addAll("error");
 
         VBox loginPage = new VBox(15);
         loginPage.setAlignment(Pos.CENTER);
@@ -38,21 +38,19 @@ public class LoginUI {
 
         // Title
         Label loginTitle = new Label("Welcome back!");
-        loginTitle.setFont(Font.font("Arial", 24));
-        loginTitle.setTextFill(Color.WHITE);
+        loginTitle.getStyleClass().add("h1");
 
         Label subtitle = new Label("We're so excited to see you again!");
-        subtitle.setTextFill(Color.web("#b9bbbe"));
-        subtitle.setFont(Font.font("Arial", 14));
+        subtitle.getStyleClass().add("h2");
 
         // Username and Password fields
         TextField usernameField = new TextField();
         usernameField.setPromptText("Email or Username");
-        usernameField.setStyle("-fx-background-color: #40444B; -fx-text-fill: white; -fx-border-radius: 5px; -fx-padding: 10px;");
+        usernameField.getStyleClass().add("loginField");
         
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Password");
-        passwordField.setStyle("-fx-background-color: #40444B; -fx-text-fill: white; -fx-border-radius: 5px; -fx-padding: 10px;");
+        passwordField.getStyleClass().add("loginField");
 
         //Jump from username to password filds
         usernameField.setOnAction(event -> passwordField.requestFocus());
@@ -73,9 +71,9 @@ public class LoginUI {
         });
 
         // Create Account Button
-        Button createAccountButton = new Button("Create an account");
-        createAccountButton.setStyle("-fx-background-color: transparent; -fx-text-fill: #4E8AF3;");
-        createAccountButton.setOnAction(event -> {
+        Label createAccountButton = new Label("Create an account");
+        createAccountButton.getStyleClass().add("createAccountButton");
+        createAccountButton.setOnMouseClicked(event -> {
             JSONObject response = handleAccountCreation.handle(usernameField.getText(), passwordField.getText());
             if (response.getBoolean("error")) {
                 errorTitle.setText("Account Creation Failed");

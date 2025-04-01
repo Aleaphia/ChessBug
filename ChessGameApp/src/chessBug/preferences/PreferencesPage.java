@@ -128,7 +128,7 @@ public class PreferencesPage {
             // Loggin Settings Section
             VBox loginSettingsContainer = new VBox(20);
             loginSettingsContainer.setPadding(new Insets(10));
-            // Auto-Save Checkbox
+            // Stay logged in Checkbox
             CheckBox stayLoggedInCheckBox = new CheckBox("Stay logged in");  
             stayLoggedInCheckBox.setSelected(PreferencesController.isStayLoggedIn());
             stayLoggedInCheckBox.setOnAction(event -> PreferencesController.handleStayLoggedIn(stayLoggedInCheckBox.isSelected()));

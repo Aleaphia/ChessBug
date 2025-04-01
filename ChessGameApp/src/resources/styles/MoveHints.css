@@ -1,0 +1,5 @@
+.possibleMove {
+    -fx-border-color: rgb(255, 238, 3);
+    -fx-border-width: 3;
+    -fx-border-insets: 0;
+}

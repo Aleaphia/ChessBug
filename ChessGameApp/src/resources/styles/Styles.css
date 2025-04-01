@@ -2,7 +2,7 @@
 
 /* Background */
 .background {
-    -fx-background-color: rgb(212, 215, 223);
+    -fx-background-color: rgb(72, 85, 98);
     -fx-background-image: url("../images/BugBackground.png");
     -fx-background-repeat: no-repeat;
     -fx-background-size: contain;
@@ -55,6 +55,9 @@
     -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-text-alignment: center;
+}
+.error {
+    -fx-text-fill: #FF5555;
 }
 
 .logoImage {

@@ -139,6 +139,10 @@ public class PreferencesController {
             URL theme = PreferencesController.class.getResource("/resources/styles/" + getTheme() + "/" + style + ".css");
             if(theme != null)
                 scene.getStylesheets().add(theme.toExternalForm());
+            
+            //For game page check if movehints are on
+            if (style.equals("Game") && isShowMoveHintsEnabled())
+                scene.getStylesheets().add(PreferencesController.class.getResource("/resources/styles/MoveHints.css").toExternalForm());
         }
     }
 }

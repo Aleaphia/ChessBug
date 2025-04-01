@@ -4,6 +4,10 @@
     -fx-background-color: rgba(224, 227, 233, 0.8);
     -fx-text-fill: black;
 }
-.label {
+.loginField{
+    -fx-background-color: #ffffff;
     -fx-text-fill: rgb(0, 0, 0);
+}
+.createAccountButton {
+    -fx-text-fill: #162f5c;
 }
