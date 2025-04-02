@@ -17,6 +17,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.beans.binding.Bindings;
 
 public class PreferencesPage {
     private final Client client;
@@ -80,12 +81,18 @@ public class PreferencesPage {
             confirmMovesCheckBox.setTextFill(Color.web("#B0B0B0"));
 
             // Slider for Volume
-            Slider volumeSlider = new Slider(0, 100, 50);
+            Slider volumeSlider = new Slider(0, 100, PreferencesController.getVolume() * 100);
             volumeSlider.setBlockIncrement(10);
             volumeSlider.setStyle("-fx-base: #7289DA; -fx-accent: #4CAF50;");
-            Label volumeLabel = new Label("Volume: " + (int) volumeSlider.getValue());
+            Label volumeLabel = new Label();
+            volumeLabel.textProperty().bind(Bindings.format(
+                    "Volume: %.2f", volumeSlider.valueProperty()));
+            
+//            volumeSlider.setOnDragDropped(event -> 
+//                PreferencesController.handleVolume(volumeSlider.getValue() / 100.0)
+//            );
             volumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> 
-                volumeLabel.setText("Volume: " + newValue.intValue())
+                PreferencesController.handleVolume(volumeSlider.getValue() / 100.0)
             );
 
             gameSettingsContainer.getChildren().addAll(

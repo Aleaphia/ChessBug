@@ -5,5 +5,7 @@ module chessbug {
 	requires org.json;
 	requires java.sql;
 	requires java.prefs;
+	requires javafx.media;
+	
 	exports chessBug;
 }

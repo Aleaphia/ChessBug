@@ -219,6 +219,9 @@ public class GameController implements IGameSelectionController, IGameCreationCo
     private boolean internalPlayerMove(String notation){
         //Attempt to make player move, will return true on success
         if (model.makePlayerMove(notation)){
+            //Sound
+            PreferencesController.playSound();
+            
             //Add notation to view
             view.addToNotationBoard(notation, !model.getPlayerTurn(), (model.getTurnNumber() - 1)/2);
             

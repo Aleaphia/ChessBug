@@ -8,12 +8,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.Pane;
 import javafx.scene.control.ButtonType;
-/*
+
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.Media;
-*/
+
 
 import chessBug.network.Client;
+import javafx.util.Duration;
 
 public class PreferencesController {
        
@@ -21,6 +22,8 @@ public class PreferencesController {
     private static Preferences preferences = Preferences.userNodeForPackage(PreferencesController.class);
 
     private Pane page;
+    private static MediaPlayer sound = new MediaPlayer( new Media(
+            PreferencesController.class.getResource("/resources/sounds/test.wav").toString()));
     PreferencesPage view;
 
     public PreferencesController(Client client) {
@@ -75,6 +78,11 @@ public class PreferencesController {
         preferences.putBoolean("stayLoggedIn", isEnabled); 
         System.out.println("Login preference changed: " + (isEnabled ? "Enabled" : "Disabled"));
     }
+    
+    protected static void handleVolume(Double volume){
+        preferences.putDouble("volume", volume);
+        sound.setVolume(volume);
+    }
 
     // Handle language change
     protected static void handleLanguageChange(String language) {
@@ -107,6 +115,10 @@ public class PreferencesController {
     //Getter methods
     public static boolean isAutoSaveEnabled() {
         return preferences.getBoolean("autoSaveEnabled", true);
+    }
+    
+    public static Double getVolume(){
+        return preferences.getDouble("volume", 1);
     }
 
     public static String getTheme() {
@@ -152,10 +164,9 @@ public class PreferencesController {
     }
     
     public static void playSound(){
-        System.out.println("DEBUG: play sound");
-        //URL url = PreferencesController.class.getResource("/resources/sounds/test.wav");
-        //MediaPlayer player = new MediaPlayer( new Media(url.toString()));
-        //player.play
+        //System.out.println("DEBUG: " + sound.getVolume());
+        sound.seek(Duration.ZERO);
+        sound.play();
     }
     
     public static boolean confirmMove(){
