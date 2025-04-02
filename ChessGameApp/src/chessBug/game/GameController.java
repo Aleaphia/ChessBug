@@ -10,11 +10,11 @@ import chessBug.controllerInterfaces.IGameCreationController;
 import chessBug.misc.*;
 import chessGame.*;
 import chessBug.network.*;
+import chessBug.preferences.PreferencesController;
 import java.util.*;
 import java.util.stream.Stream;
 import javafx.scene.control.Button;
 import javafx.scene.control.Separator;
-
 
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -187,7 +187,7 @@ public class GameController implements IGameSelectionController, IGameCreationCo
      */
     public void playerMove(String notation){
         //Check for legal move, also performs updates independent of move origin
-        if (internalPlayerMove(notation)){
+        if (PreferencesController.confirmMove() && internalPlayerMove(notation)){
             //Update database
             match.makeMove(client, notation); //Add move
             client.setGameTurn(match, model.getPlayerTurn()); //set game status

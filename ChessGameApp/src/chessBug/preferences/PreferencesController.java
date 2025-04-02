@@ -7,6 +7,11 @@ import java.util.prefs.Preferences;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.Pane;
+import javafx.scene.control.ButtonType;
+/*
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.Media;
+*/
 
 import chessBug.network.Client;
 
@@ -144,5 +149,26 @@ public class PreferencesController {
             if (style.equals("Game") && isShowMoveHintsEnabled())
                 scene.getStylesheets().add(PreferencesController.class.getResource("/resources/styles/MoveHints.css").toExternalForm());
         }
+    }
+    
+    public static void playSound(){
+        System.out.println("DEBUG: play sound");
+        //URL url = PreferencesController.class.getResource("/resources/sounds/test.wav");
+        //MediaPlayer player = new MediaPlayer( new Media(url.toString()));
+        //player.play
+    }
+    
+    public static boolean confirmMove(){
+        //Skip confirmation dialog if confirm moves is off
+        if (!isConfirmMovesEnabled())
+            return true;
+        
+        // Show confirmation dialog
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Preferences Saved");
+        alert.setHeaderText(null);
+        alert.setContentText("Confirm your move");
+        //Returns true if the okay button is pressed
+        return alert.showAndWait().isPresent() && alert.getResult().equals(ButtonType.OK);
     }
 }

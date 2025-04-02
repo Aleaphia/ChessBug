@@ -138,12 +138,7 @@ public class PreferencesPage {
             
             // Save Preferences Button
             Button savePreferencesButton = new Button("Save Preferences");
-            savePreferencesButton.setStyle("-fx-background-color: #7289DA; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 20px; -fx-background-radius: 5px;");
             savePreferencesButton.setOnAction(event -> PreferencesController.savePreferences());
-
-            // Hover Effect for Save Button
-            savePreferencesButton.setOnMouseEntered(e -> savePreferencesButton.setStyle("-fx-background-color: #5C6A8B; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 20px; -fx-background-radius: 5px;"));
-            savePreferencesButton.setOnMouseExited(e -> savePreferencesButton.setStyle("-fx-background-color: #7289DA; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 20px; -fx-background-radius: 5px;"));
 
             // Add all components to the main layout
             root.getChildren().addAll(
