@@ -176,7 +176,7 @@ public class ChessBug extends Application {
         mainPane.getStyleClass().addAll("background");
         mainScene.setRoot(mainPane);
         //Open page
-        changePage(new HomeController(client,databaseCheckList).getPage(), "HomeView");
+        changePage(new HomeController(client,databaseCheckList).getPage(), "Styles", "Menu", "HomeView", "Game");
     }
 
     private VBox createSidebar() {
@@ -198,19 +198,19 @@ public class ChessBug extends Application {
                 logoHolder,
                 createSideBarButton("Home.png", event -> {
                     databaseCheckList.clear();
-                    changePage(new HomeController(client, databaseCheckList).getPage(), "HomeView");
+                    changePage(new HomeController(client, databaseCheckList).getPage(), "Styles", "Menu", "HomeView", "Game");
                 }),
                 createSideBarButton("Chess.png", event -> {
                     databaseCheckList.clear();
-                    changePage(new GameController(client, databaseCheckList).getPage(), "Game");
+                    changePage(new GameController(client, databaseCheckList).getPage(), "Styles", "Menu", "Game");
                 }),
                 createSideBarButton("Gear.png", event -> {
                     databaseCheckList.clear();
-                    changePage(new PreferencesPage(client).getPage(), "Preferences");
+                    changePage(new PreferencesPage(client).getPage(), "Styles", "Menu");
                 }),
                 createSideBarButton("User.png", event -> {
                     databaseCheckList.clear();
-                    changePage(new ProfileController(client).getPage(), "Profile");
+                    changePage(new ProfileController(client).getPage(), "Styles", "Menu", "Profile");
                 }),
                 createSideBarButton("Logout.png", event -> {
                     databaseCheckList.clear();
@@ -220,11 +220,11 @@ public class ChessBug extends Application {
     
         return sidebar;
     }
-     private void changePage(Pane newPage, String stylePage){
+     private void changePage(Pane newPage, String... stylePage){
         //Clear and add new page
         page.getChildren().clear();
         page.getChildren().add(newPage);
-        PreferencesController.applyStyles(mainScene, "Styles", "Menu", stylePage); 
+        PreferencesController.applyStyles(mainScene, stylePage); 
     }
 
     private Button createSideBarButton(String imageFileName, EventHandler<ActionEvent> eventHandler) {

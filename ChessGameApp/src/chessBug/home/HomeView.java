@@ -141,7 +141,7 @@ public class HomeView {
                     controller, GameSelectionUI.GameStatus.REQUESTED,
                     (() -> controller.receiveMatchRequest())).getPage(),
             new GameSelectionUI(
-                    controller, GameSelectionUI.GameStatus.COMPLETE,
+                    controller, GameSelectionUI.GameStatus.IN_PROGRESS,
                     (() -> controller.getOpenMatchList())).getPage()
         );
         

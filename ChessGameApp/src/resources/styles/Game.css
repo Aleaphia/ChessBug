@@ -47,7 +47,6 @@
 /* ====================== CHAT BOX STYLES ====================== */
 
 .chatBox {
-    -fx-background-color: rgb(43, 42, 40);
     -fx-font: 12px Tahoma;
     -fx-padding: 5;
 }
