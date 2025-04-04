@@ -154,7 +154,7 @@ public class GameController implements IGameSelectionController, IGameCreationCo
     @Override public String getUsername(){return client.getOwnUser().getUsername();}
     @Override public void acceptMatchRequest(Match match){client.acceptMatchRequest(match);}
     @Override public void denyMatchRequest(Match match){client.denyMatchRequest(match);}
-    @Override public void forfitMatch(Match match){client.forfitMatch(match);}
+    @Override public void forfeitMatch(Match match){client.forfitMatch(match);}
     @Override public void selectGame(Match newMatch){internalSelectGame(newMatch);}
     
     
@@ -178,7 +178,7 @@ public class GameController implements IGameSelectionController, IGameCreationCo
     public void sendChatMessage(String msg){chat.send(client, msg);}
     /** forfeit - automatically lose game
      */
-    public void forfit(){client.forfitMatch(match);}
+    public void forfeitMatch(){forfeitMatch(match);}
     
     /** playerMove - makes extra changes needed for user moves (not database moves), e.g., update database, clear selected square from model
      *  Add code here if it should only happen when the move comes from this client/user

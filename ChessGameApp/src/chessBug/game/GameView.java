@@ -72,7 +72,7 @@ public class GameView {
         gameBoard.add(msgBoard, 0, 9, 9, 1); //Add msgBoard to center
         Button forfeit = new Button("Forfeit");
         forfeit.setOnAction(event -> {
-            controller.forfit();
+            controller.forfeitMatch();
             displayBotMessage(controller.getUsername() + " forfeits.");
                 });
         

@@ -32,6 +32,7 @@ public class HomeView {
     private Label currentGames;
     private Label wins;
     private Label losses;
+    private Label draws;
     
     
     protected HomeView(HomeController controller){
@@ -87,7 +88,7 @@ public class HomeView {
         gamesPlayed = new Label("Games Played: " + controller.getCompleteGamesNumber());
         currentGames = new Label("Games In Progress: " + controller.getCurrentGamesNumber());
         
-        statsSection.getChildren().addAll(statsTitle, gamesPlayed, currentGames);
+        statsSection.getChildren().addAll(statsTitle, currentGames, gamesPlayed);
         
         //Return parent node
         return userStatsSpace;

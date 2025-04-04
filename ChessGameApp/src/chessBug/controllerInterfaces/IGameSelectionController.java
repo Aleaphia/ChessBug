@@ -26,5 +26,5 @@ public interface IGameSelectionController extends IDatabaseCheckController{
     /** forfitMatch - automatically loses a match, sets status such that the other player wins
     * @param - username : the match represented by the requested game
     */
-    public void forfitMatch(Match match);
+    public void forfeitMatch(Match match);
 }

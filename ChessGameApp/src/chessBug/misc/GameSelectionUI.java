@@ -101,7 +101,7 @@ public class GameSelectionUI {
                 if(status == GameStatus.REQUESTED)
                     controller.denyMatchRequest(match);
                 else
-                    controller.forfitMatch(match);
+                    controller.forfeitMatch(match);
             });
             
             //Style
