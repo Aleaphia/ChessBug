@@ -409,11 +409,9 @@ public class Client {
 	public void acceptMatchRequest(Match match){
             setMatchStatus(match, Match.Status.WHITE_TURN.toString());
         }
-        public void forfitMatch(Match match){
-            setMatchStatus(match, getOwnUser().getUsername().equals(match.getWhite().getUsername())?
-                Match.Status.BLACK_WIN.toString() :     //If the user who forfit is white -> black wins
-                Match.Status.WHITE_WIN.toString()       //Otherwise white wins
-            );
+        public void forfeitMatch(Match match){
+            //The other player wins
+            setGameWinner(match, !getOwnUser().getUsername().equals(match.getWhite().getUsername()));
         }
         public void setGameTurn(Match match, Boolean turn){
             setMatchStatus(match,turn ? //set game status
@@ -422,13 +420,15 @@ public class Client {
             );
         }
         public void setGameWinner(Match match, Boolean winner){
-            setMatchStatus(match,winner ? //set game status
+            setMatchStatus(match, winner ? //set game status
                 Match.Status.WHITE_WIN.toString() :
                 Match.Status.BLACK_WIN.toString()
             );
+            match.makeMove(this, "end");
         }
         public void setGameDraw(Match match){
             setMatchStatus(match, Match.Status.DRAW.toString());
+            match.makeMove(this, "end");
         }
 	/* ~~~~ */
         

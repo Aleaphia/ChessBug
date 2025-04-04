@@ -117,13 +117,8 @@ public class GameController implements IGameSelectionController, IGameCreationCo
     
     private void databaseChecks(){
         //System.out.println("Debug: GameController DatabaseCheck" );
-        if(!isThisPlayersTurn()){ //While waiting for other player's move check database and update boardstate
-            match.poll(client).forEach((move) -> internalPlayerMove(move));
-            view.refresh(client);
-        }
-        else{ // during this player's turn just refresh chat
-            view.refreshMessageBoard(client);
-        }
+        match.poll(client).forEach((move) -> internalPlayerMove(move));
+        view.refresh(client);
     }
     
     //Getter Methods ===========================================================
@@ -154,7 +149,7 @@ public class GameController implements IGameSelectionController, IGameCreationCo
     @Override public String getUsername(){return client.getOwnUser().getUsername();}
     @Override public void acceptMatchRequest(Match match){client.acceptMatchRequest(match);}
     @Override public void denyMatchRequest(Match match){client.denyMatchRequest(match);}
-    @Override public void forfeitMatch(Match match){client.forfitMatch(match);}
+    @Override public void forfeitMatch(Match match){client.forfeitMatch(match);}
     @Override public void selectGame(Match newMatch){internalSelectGame(newMatch);}
     
     
@@ -217,8 +212,16 @@ public class GameController implements IGameSelectionController, IGameCreationCo
      *  @return true if the move was successfully made, false otherwise
      */
     private boolean internalPlayerMove(String notation){
+        if (notation.equals("end")){
+            String endMsg = model.getEndMessage();
+            if (endMsg == null){
+                model.endGame();
+                endMsg = this.match.getStatus().substring(0,5) + " won by forfeit";
+            }
+            view.displayBotMessage(endMsg);
+        }
         //Attempt to make player move, will return true on success
-        if (model.makePlayerMove(notation)){
+        else if (model.makePlayerMove(notation)){
             //Sound
             PreferencesController.playSound();
             

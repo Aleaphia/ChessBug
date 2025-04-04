@@ -68,6 +68,6 @@ public class HomeController implements IGameSelectionController, IFriendRequestC
     @Override public void selectGame(Match match){
         page.getChildren().set(1, new GameController(client, databaseCheckList, match).getPage());
     }
-    @Override public void forfeitMatch(Match match){client.forfitMatch(match);}
+    @Override public void forfeitMatch(Match match){client.forfeitMatch(match);}
     
 }
