@@ -1,17 +1,1 @@
 /* preferences.css */
-root {
-    -fx-background-color: #fff;
-}
-
-.label {
-    -fx-font-size: 14px;
-}
-
-.title-label {
-    -fx-font-size: 20px;
-    -fx-font-weight: bold;
-}
-
-.check-box, .combo-box {
-    -fx-padding: 5px;
-}

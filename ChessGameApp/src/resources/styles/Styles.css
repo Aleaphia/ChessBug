@@ -37,6 +37,7 @@
 
 /* Labels */
 .label {
+    -fx-font: 14 Roboto;
     -fx-text-fill: white;
     -fx-background-color: rgba(0, 0, 0, 0);
 }
@@ -108,6 +109,11 @@
     -fx-border-width: 1;
     -fx-background-insets: 0;
     -fx-text-fill: #333;
+}
+
+.slider {
+    -fx-base: #7289DA;
+    -fx-accent: #4CAF50;
 }
 
 /* ====================== GENERAL LAYOUT ====================== */
