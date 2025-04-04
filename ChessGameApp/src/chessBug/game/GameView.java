@@ -502,12 +502,15 @@ public class GameView {
         created from the BoarderPane class, so we can modify all BoarderPane
         children of chessBoard.
          */
+        deselectSquare();
         gameBoard.getChildren().forEach(child -> {
             if (child instanceof BorderPane square) {
                 //System.out.println("Debug: Board id: " + board.getParent().getId() + ", game list size: " + gameList.size());
 
                 //Clear the square's display content
                 square.getChildren().clear();
+                square.getStyleClass().remove("selected");
+                square.getStyleClass().remove("possibleMove");
 
                 //If the key is in the map, add the corresponding piece
                 if (positionMap.containsKey(square.getId())) {
