@@ -167,6 +167,14 @@ public class Client {
 		profile.setPassword(hashPassword(newPassword));
 	}
 
+	// Returns {"Won": (int), "Lost": (int), "Draw": (int), "Current": (int), "Total": (int)}, defaults to all 0s on error
+	public JSONObject getMatchStats() {
+		JSONObject received = post("matchStats", new JSONObject());
+		if(received.getBoolean("error"))
+			return new JSONObject(Map.of("Won", 0, "Lost", 0, "Draw", 0, "Current", 0, "Total", 0));
+		return received.getJSONObject("response");
+	}
+
 	public void updatePassword(String newPassword) throws NetworkException {
 		JSONObject received = post("updatePassword", Map.of("newPassword", newPassword));
 		if(received.getBoolean("error"))

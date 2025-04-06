@@ -4,6 +4,8 @@
  */
 package chessBug.home;
 
+import org.json.JSONObject;
+
 import chessBug.misc.GameSelectionUI;
 import chessBug.misc.ReceiveFriendRequestUI;
 import chessBug.misc.SendFriendRequestUI;
@@ -54,13 +56,21 @@ public class HomeView {
             //System.out.println("Debug: GameSelectionUI DatabaseCheck" );
             //Reload friend list
             populateFriendsContent();
-            gamesPlayed.setText("Games Played: " + controller.getCompleteGamesNumber());
-            currentGames.setText("Games In Progress: " + controller.getCurrentGamesNumber());
+            updateStatsLabels();
         });
     }
     
     public BorderPane getPage(){return page;}
     public void setPage(BorderPane page){this.page = page;}
+
+    private void updateStatsLabels() {
+        JSONObject stats = controller.getGameStats();
+        gamesPlayed.setText("" + (stats.optInt("Total", 0)-stats.optInt("Current")) + " Played");
+        currentGames.setText("" + stats.optInt("Current", 0) + " In Progress");
+        wins.setText("" + stats.optInt("Won", 0) + " Wins");
+        losses.setText("" + stats.optInt("Lost", 0) + " Losses");
+        draws.setText("" + stats.optInt("Draw", 0) + " Draws");
+    }
     
     private VBox buildUserStats(){
         //Layout content
@@ -85,10 +95,14 @@ public class HomeView {
         Label statsTitle = new Label("Recent Game Statistics");
         statsTitle.getStyleClass().addAll("h3","section-title");
         
-        gamesPlayed = new Label("Games Played: " + controller.getCompleteGamesNumber());
-        currentGames = new Label("Games In Progress: " + controller.getCurrentGamesNumber());
+        gamesPlayed = new Label();
+        currentGames = new Label();
+        wins = new Label();
+        losses = new Label();
+        draws = new Label();
+        updateStatsLabels();
         
-        statsSection.getChildren().addAll(statsTitle, currentGames, gamesPlayed);
+        statsSection.getChildren().addAll(statsTitle, currentGames, gamesPlayed, wins, losses, draws);
         
         //Return parent node
         return userStatsSpace;
