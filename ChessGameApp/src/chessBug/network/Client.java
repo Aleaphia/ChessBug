@@ -8,6 +8,7 @@ package chessBug.network;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.File;
@@ -16,6 +17,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Base64;
 import java.util.Map;
@@ -25,11 +27,28 @@ import java.nio.file.Files;
 import java.nio.charset.StandardCharsets;
 
 import javax.net.ssl.HttpsURLConnection;
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
+import javax.crypto.KeyGenerator;
+
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.spec.KeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
+
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
 
 import org.json.JSONObject;
 
@@ -41,7 +60,11 @@ import org.json.JSONException;
 public class Client {
 	// "Salt" used to hash passwords
 	private static final byte[] SALT = "chessbug!(%*¡ºªħéñ€óßáñåçœø’ħ‘ºº".getBytes(StandardCharsets.UTF_8);
-	private static SecretKeyFactory keyFactory = null;
+	private static final byte[] PUBLIC_KEY = Base64.getDecoder().decode("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqAwpV8rPgnN1yaWTBpPqctTIXCJCu80pbA0jUtug7WVTq0hrKIjZD7VkwSPWBAu/SQaT31Rrcfo2X4wdQiPT4mnncyE5gHgpTZFOLtiTMOEjJmtcF6JW7nzp7c1//NKagP/1gdom3Xrnyr91qsiyMWIij69proLcv1gnQV0pPFifjBNBqMC3czG6bbyhYAWZMgWNODwegYd6DrZ1qqRvVgb5F2qdpdySNVpqERMIXhT0AJnL6IbjA1kB4lq6m6fnB6lU8hSatguH0mRP5HSgg/fhNnu26ajJkxr9BrikJyEk9fOhjp2besWlMhuq8eO4VIRAa2KLwWTTg1NM3i6+3QIDAQAB");
+
+	private static Cipher CLIENT_ENCRYPT = null, CLIENT_DECRYPT = null;	
+	private static String ENCRYPTED_KEY = null;
+
 	// Store user information in order to log in
 	private ProfileModel profile;
 
@@ -291,6 +314,7 @@ public class Client {
 	public boolean denyMatchRequest(Match match) {
 		JSONObject received = post("denyMatchRequest", Map.of("match", match.getID()));
 
+
 		// Return none if error in response
 		if(received.getBoolean("error")) {
 			System.err.println("Could not accept match request for #" + match.getID() + " to \"" + profile.getUsername() + "\"");
@@ -480,19 +504,13 @@ public class Client {
 	}
 
 	public static String hashPassword(String password) {
-		if(keyFactory == null) {
-			try {
-				keyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-			} catch(NoSuchAlgorithmException e) {
-				e.printStackTrace();
-				return password;
-			}
-		}
 		KeySpec spec = new PBEKeySpec(password.toCharArray(), SALT, 65536, 128);
 		try {
+			SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
 			return Base64.getEncoder().encodeToString(keyFactory.generateSecret(spec).getEncoded());
-		} catch (InvalidKeySpecException e) {
+		} catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
 			e.printStackTrace();
+			System.err.println("WARN: Could not hash password! Password will be stored as-is");
 			return password;
 		}
 	}
@@ -505,10 +523,79 @@ public class Client {
 		return post(function, message.toString());
 	}
 
+	public static byte[] encrypt(String input) {
+		if(CLIENT_ENCRYPT == null) {
+			try {
+				// Create a public key out of stored PUBLIC_KEY data
+				KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+				X509EncodedKeySpec keySpec = new X509EncodedKeySpec(PUBLIC_KEY);
+				PublicKey publicKey = keyFactory.generatePublic(keySpec);
+
+				// Create cipher to encrypt AES key with
+				Cipher rsaCipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+				rsaCipher.init(Cipher.ENCRYPT_MODE, publicKey);
+	
+				// Generate AES key, and encrypt it
+				KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
+				keyGenerator.init(128);
+
+				SecretKey aesKey = keyGenerator.generateKey();
+				ENCRYPTED_KEY = Base64.getEncoder().encodeToString(rsaCipher.doFinal(aesKey.getEncoded()));
+
+				// Create encrypt and decrypt cipher, with the given IV and key
+				IvParameterSpec iv = new IvParameterSpec("hellochessbug!<3".getBytes("UTF-8"));
+				CLIENT_ENCRYPT = Cipher.getInstance("AES/CBC/PKCS5PADDING");
+				CLIENT_ENCRYPT.init(Cipher.ENCRYPT_MODE, aesKey, iv);
+				CLIENT_DECRYPT = Cipher.getInstance("AES/CBC/PKCS5PADDING");
+				CLIENT_DECRYPT.init(Cipher.DECRYPT_MODE, aesKey, iv);
+
+				// Encryption set up properly!
+				System.out.println("Initialized key and encryption");
+			} catch(IOException e) {
+				System.err.println("Could not read public key data!");
+				e.printStackTrace();
+				System.err.println("WARN: Could not initialize encryption! Messages will be sent and received unencrypted");
+				CLIENT_ENCRYPT = null;
+			} catch(Exception e) {
+				System.err.println("WARN: Could not initialize encryption! Messages will be sent and received unencrypted");
+				CLIENT_ENCRYPT = null;
+			}
+		}
+
+		// bytes of the data to send
+		byte[] normalBytes = input.getBytes(StandardCharsets.UTF_8);
+
+		// If there is no cipher set up/encryption failed, then resort to unencrypted data. The response will be unencrypted as well
+		if(CLIENT_ENCRYPT == null)
+			return normalBytes;
+
+		// Attempt to encrypt data, if it fails, just provide raw
+		try {
+			return new JSONObject(Map.of(
+				"data", Base64.getEncoder().encodeToString(CLIENT_ENCRYPT.doFinal(normalBytes)), 
+				"key", ENCRYPTED_KEY)
+			).toString().getBytes(StandardCharsets.UTF_8);
+		} catch (BadPaddingException | IllegalBlockSizeException e) {
+			System.err.println("Could not encrypt data!");
+			return normalBytes;
+		}
+	}
+
+	public static String decrypt(byte[] data) {
+		try {
+			return new String(CLIENT_DECRYPT.doFinal(Base64.getDecoder().decode(data)));
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new String(data);
+		}	
+	}
+
 	// Send a string to a given function in the web api, return a JSON result
 	public JSONObject post(String function, String message) {
-		// Send arbitrary string as 
-		byte[] data = message.getBytes(StandardCharsets.UTF_8);
+		// Send arbitrary string as bytes
+
+		// byte[] data = message.getBytes(StandardCharsets.UTF_8);
+		byte[] data = encrypt(message);
 
 		// Set up a connection to the server
 		HttpsURLConnection con = getConnection(function);
@@ -538,12 +625,7 @@ public class Client {
 		// Read response into `builder`
 		String input = "";
 		try {
-			BufferedReader b = new BufferedReader(new InputStreamReader(con.getInputStream()));
-			StringBuilder builder = new StringBuilder();
-			while( (input = b.readLine()) != null) {
-				builder.append(input);
-			}
-			input = builder.toString();
+			input = decrypt(con.getInputStream().readAllBytes());
 		} catch (IOException ioex2) {
 			System.err.println("Could not read server response!");
 			JSONObject out = new JSONObject();
@@ -568,7 +650,7 @@ public class Client {
 	// Create a HTTPS connection based on a web API function, filling out the required headers
 	private static HttpsURLConnection getConnection(String function) {
 		try {
-			HttpsURLConnection con = (HttpsURLConnection)new URI("https://www.zandgall.com/chessbug/" + function + ".php").toURL().openConnection();
+			HttpsURLConnection con = (HttpsURLConnection)new URI("https://www.zandgall.com/chessbug/" + function).toURL().openConnection();
 			con.setRequestMethod("POST");
 			con.setDoOutput(true);
 			con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
