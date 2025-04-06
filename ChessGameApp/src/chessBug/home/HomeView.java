@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import chessBug.misc.GameSelectionUI;
 import chessBug.misc.ReceiveFriendRequestUI;
 import chessBug.misc.SendFriendRequestUI;
+import chessBug.network.Friend;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
@@ -21,6 +22,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
+import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 
 
 public class HomeView {
@@ -36,17 +40,22 @@ public class HomeView {
     private Label losses;
     private Label draws;
     
+    boolean newStatsFlag = false;
+    private JSONObject cachedStats = new JSONObject(Map.of("Won", 0, "Lost", 0, "Draw", 0, "Current", 0, "Total", 0));
+
+    boolean newFriendsFlag = false;
+    private List<Friend> cachedFriends = new ArrayList<>();
     
     protected HomeView(HomeController controller){
         this.controller = controller;
         
         //Create view
         VBox userStats = buildUserStats();
-        VBox friends = buildFriends();
+        VBox friendsBox = buildFriends();
         buildCurrentContent();
         
         page.setLeft(userStats);
-        page.setRight(friends);
+        page.setRight(friendsBox);
         page.setCenter(currentContent);
 
         //Style
@@ -58,20 +67,33 @@ public class HomeView {
             populateFriendsContent();
             updateStatsLabels();
         });
+        controller.addToDatabaseCheckList(() -> new Thread(() -> {
+            JSONObject stats = controller.getGameStats();
+            if(!stats.equals(cachedStats)) {
+                newStatsFlag = true;
+                cachedStats = stats;
+            }
+            List<Friend> friends = controller.getFriends();
+            if(!friends.equals(cachedFriends)) {
+                newFriendsFlag = true;
+                cachedFriends = friends;
+            }
+        }).start());
     }
     
     public BorderPane getPage(){return page;}
     public void setPage(BorderPane page){this.page = page;}
 
     private void updateStatsLabels() {
-        JSONObject stats = controller.getGameStats();
-        int current = (stats.optInt("Total", 0)- stats.optInt("Current"));
-        int past = stats.optInt("Current", 0);
+        if(!newStatsFlag) return; 
+        
+        int current = (cachedStats.optInt("Total", 0)- cachedStats.optInt("Current"));
+        int past = cachedStats.optInt("Current", 0);
         currentGames.setText("" + current + ((current != 1)? " games in progress" : " game in progress"));
         gamesPlayed.setText("" + past + ((past != 1)? " games completed" : " game completed"));
-        wins.setText("\tWins: " + stats.optInt("Won", 0));
-        losses.setText("\tLosses: " + stats.optInt("Lost", 0));
-        draws.setText("\tDraws: " + stats.optInt("Draw", 0));
+        wins.setText("\tWins: " + cachedStats.optInt("Won", 0));
+        losses.setText("\tLosses: " + cachedStats.optInt("Lost", 0));
+        draws.setText("\tDraws: " + cachedStats.optInt("Draw", 0));
     }
     
     private VBox buildUserStats(){
@@ -136,10 +158,11 @@ public class HomeView {
     }
     
     private void populateFriendsContent(){
+        if(!newFriendsFlag) return;
         //Clear firends list
         friendsListContent.getChildren().clear();
         //Add each friend to the list
-        controller.getFriends().forEach(friend -> {
+        cachedFriends.forEach(friend -> {
             Label curr = new Label(friend.getUsername());
             curr.getStyleClass().add("friend-label");
             friendsListContent.getChildren().add(curr);

@@ -20,6 +20,8 @@ public class GameSelectionUI {
     private IGameSelectionController controller;
     private GameStatus status;
     private GameList gameList;
+    private boolean remakeListFlag = true;
+    private List<Match> cachedGameList;
     
     public GameSelectionUI(IGameSelectionController controller, GameStatus status, GameList gameList){
         this.controller = controller;
@@ -27,10 +29,19 @@ public class GameSelectionUI {
         //Determine status
         this.status = status;
         this.gameList = gameList;
+        cachedGameList = gameList.getGameList();
 
         buildGameSelectionPrompt();
         
-        //Add database checks
+        //Add database checks, the database portion on another thread
+        //We cannot put javafx stuff on another thread unfortunately, so keep the UI changing functions on this thread
+        controller.addToDatabaseCheckList(()->new Thread(() -> {
+            List<Match> newCachedGameList = gameList.getGameList();
+            if(!cachedGameList.equals(newCachedGameList)) {
+                cachedGameList = newCachedGameList;
+                remakeListFlag = true;
+            }
+        }).start());
         controller.addToDatabaseCheckList(()->databaseChecks());
     }
     
@@ -39,9 +50,11 @@ public class GameSelectionUI {
     public void databaseChecks(){
         //System.out.println("Debug: GameSelectionUI DatabaseCheck" );
         //Games in progress
+        if(!remakeListFlag)
+            return;
         games.getChildren().clear();
         
-        gameList.getGameList().forEach(match -> displayMatch(match));
+        cachedGameList.forEach(match -> displayMatch(match));
         if(games.getChildren().isEmpty())
             games.getChildren().add(new Label("No current games"));
     }
@@ -61,7 +74,7 @@ public class GameSelectionUI {
         page.getChildren().addAll(header, scroll);
         
         //List Games
-        gameList.getGameList().forEach(match -> displayMatch(match));
+        gameList.getGameList().forEach(match -> displayMatch(match)); 
        
         if(games.getChildren().isEmpty())
             games.getChildren().add(new Label("No current games"));
