@@ -17,6 +17,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class Chat {
+	public static final Chat NO_CHAT = new Chat(0);
+
 	private int chatID;
 
 	private int messageNumber = 0;

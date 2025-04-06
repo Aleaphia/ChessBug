@@ -29,6 +29,7 @@ public class GameView {
     private VBox msgBoard = new VBox();
 
     private String selectedSquare = null;
+    private int currTurnNumber; //Used to prevent moves when players are looking at previous position
 
     //Constructors
     public GameView(GameController controller) {
@@ -64,14 +65,24 @@ public class GameView {
 
         //Create spaces
         createGameBoard(controller.getPlayerColor());
+        currTurnNumber = controller.getTurnNumber();
         
         //Page layout
         page.setCenter(gameBoard);
+        gameBoard.add(msgBoard, 0, 9, 9, 1); //Add msgBoard to center
+        Button forfeit = new Button("Forfeit");
+        forfeit.setOnAction(event -> {
+            controller.forfeitMatch();
+            displayBotMessage(controller.getUsername() + " forfeits.");
+                });
+        
+        gameBoard.add(forfeit, 7, 10, 2, 1);
+        
+        
         page.setLeft(createChatSpace());
         page.setRight(createNotationSpace());  
                 
         //Style
-        page.getStylesheets().add(getClass().getResource("/game.css").toExternalForm());
         page.getStyleClass().add("section");
         msgBoard.getStyleClass().add("section");
         
@@ -134,7 +145,6 @@ public class GameView {
             }
         }
         //----------------------------------------------------------------------
-        gameBoard.add(msgBoard, 0, 9, 9, 1); //Add msgBoard
     }
     private VBox createChatSpace() {
         //Create Chat space
@@ -184,6 +194,7 @@ public class GameView {
         VBox notationSpace = new VBox();
         GridPane notationLabel = new GridPane();
         notationContent = new GridPane(); //global variable to allow direct and easy manipulation
+        HBox moveSliderBox = new HBox();
         
         //ScrollPanes contain the chat contents to prevent page overflow
         ScrollPane scroll = new ScrollPane(notationContent);
@@ -206,7 +217,7 @@ public class GameView {
         notationContent.getStyleClass().addAll("notationGrid", "scrollBackground");
         
         //notation space components
-        notationSpace.getChildren().addAll(notationLabel, scroll);
+        notationSpace.getChildren().addAll(notationLabel, scroll, moveSliderBox);
         
         //Create notation space
         Label labelW = new Label("White");
@@ -217,6 +228,24 @@ public class GameView {
         Label newLabel = new Label();
         newLabel.setMinWidth(20);
         notationLabel.add(newLabel,0,0);
+        //Scan moves
+        Button goBack = new Button("<");
+        Button goForward = new Button(">");
+        Button jumpForward = new Button (">>");
+        goBack.setOnAction(event -> {
+            if (currTurnNumber > 0)
+                swapToPastGameDisplay(--currTurnNumber);
+        });
+        goForward.setOnAction(event -> {
+            if (currTurnNumber < controller.getTurnNumber())
+                swapToPastGameDisplay(++currTurnNumber);
+        });
+        jumpForward.setOnAction(event -> {
+            currTurnNumber = controller.getTurnNumber();
+            swapToPastGameDisplay(currTurnNumber);
+                });
+        
+        moveSliderBox.getChildren().addAll(goBack, goForward, jumpForward);
                
         //Style
         labelW.getStyleClass().addAll("notationLabel", "h2");
@@ -233,7 +262,7 @@ public class GameView {
     //Board interactions -------------------------------------------------------
     private void boardInteraction(BorderPane square) {
         if (!controller.isGameComplete() && controller.isThisPlayersTurn()  //correct color turn
-                ){
+                && currTurnNumber == controller.getTurnNumber()){
             /*
             One of two valid actions may occur when a user selects a square:
                 1) The user selects a peice to move
@@ -348,7 +377,9 @@ public class GameView {
      * @param client - database connection needed to update the message board
      */
     public void refresh(Client client) {
-        refreshGameDisplay();
+        if (currTurnNumber == controller.getTurnNumber()){
+            refreshGameDisplay();
+        }
         internalRefreshMessageBoard(client);
     }
 
@@ -366,17 +397,17 @@ public class GameView {
         controller.getChatMessages().forEach(msg -> {
             long time = System.currentTimeMillis(); //DEBUG
             HBox messageContainer = new HBox();
-            System.out.println(System.currentTimeMillis() - time); //DEBUG
+            //System.out.println(System.currentTimeMillis() - time); //DEBUG
             //Build content
             //profile picture
             ImageView pfpView = new ImageView(msg.getAuthor().getProfilePicture());
-            System.out.println(System.currentTimeMillis() - time); //DEBUG
+            //System.out.println(System.currentTimeMillis() - time); //DEBUG
             StackPane pfpViewContainer = new StackPane(pfpView);
             
             pfpView.setFitWidth(32);
             pfpView.setFitHeight(32);
             pfpViewContainer.getStyleClass().add("chatPfp");
-            System.out.println(System.currentTimeMillis() - time);
+            //System.out.println(System.currentTimeMillis() - time);
             
             //Message
             Label label = new Label(msg.getAuthor().getUsername() + ": " + msg.getContent());
@@ -432,7 +463,77 @@ public class GameView {
             }
         });
     }
+    private void swapToPastGameDisplay(int moveNumber){
+        String position= controller.getPosition(moveNumber);
+        HashMap <String, String> positionMap = new HashMap<>(); // Square to piece map
+        int pieceCount = 0;
+        for (int i = 1; i < position.length(); i++){ //start at 1 to skip move info
+            char currChar = position.charAt(i);
+            if (currChar != '_'){
+                /* Figure out the sqaure
+                Notes on how this was acomplished
+                - Subtract 1 from i to account for the playerTurn chartcter
+                - Subtract pieceCount from i to account for the fact that pieces
+                    take up two string indices
+                - add 'a' or 1 to the values to account for starting value differnces
+                */
+                String square = "" + (char) ('a' + ((i - 1 - pieceCount) % 8)) + (((i - 1 - pieceCount) / 8) + 1);
+                //Figure out piece name
+                String pieceName = (currChar == ' ')? "white" : "black";
+                switch(position.charAt(i+ 1)){
+                    case 'p' -> pieceName += "Pawn";
+                    case 'N' -> pieceName += "Knight";
+                    case 'B' -> pieceName += "Bishop";
+                    case 'R' -> pieceName += "Rook";
+                    case 'Q' -> pieceName += "Queen";
+                    case 'K' -> pieceName += "King";
+                }
+                //Add to map
+                positionMap.put(square, pieceName);
+                
+                pieceCount++; //Another piece was found
+                i++; //Skip next string index, it had the piece type
+            }
+        }
 
+        //Update each square in chessBoard to reflect game's condition
+        /*
+        Note: we only need to modify squares (not labels), and all squares are
+        created from the BoarderPane class, so we can modify all BoarderPane
+        children of chessBoard.
+         */
+        deselectSquare();
+        gameBoard.getChildren().forEach(child -> {
+            if (child instanceof BorderPane square) {
+                //System.out.println("Debug: Board id: " + board.getParent().getId() + ", game list size: " + gameList.size());
+
+                //Clear the square's display content
+                square.getChildren().clear();
+                square.getStyleClass().remove("selected");
+                square.getStyleClass().remove("possibleMove");
+
+                //If the key is in the map, add the corresponding piece
+                if (positionMap.containsKey(square.getId())) {
+                    //Determine imageFileName for based on the piece
+                    String imageFileName = positionMap.get(square.getId());
+
+                    //Load corresponding image
+                    try (InputStream imageFile = GameView.class.getResourceAsStream("/resources/images/pieces/" + imageFileName + ".png")) {
+                        //Create image
+                        ImageView icon = new ImageView(new Image(imageFile));
+                        //Style image
+                        icon.setFitHeight(square.getMinHeight() - 6); //Set Height of image. Note x - 6 allows for insets of 3px
+                        icon.setPreserveRatio(true); //Maintain ratio
+                        //Add image
+                        square.setCenter(icon);
+                    } catch (IOException e) {
+                        //If image is not found, use a label to hold the piece's string representation
+                        square.getChildren().add(new Label("" + imageFileName.charAt(0) + imageFileName.charAt(5)));
+                    }
+                }
+            }
+        });
+    }
     //Display/add new content ------------------------------------------------------
     /** displayBotMessage - displays message in chat box with "botMessage" style
      * @param msg - message to display
@@ -449,7 +550,7 @@ public class GameView {
      * @param playerTurn - true means it's white's turn, false means it's black's turn
      * @param gameMove - the move number according to standard chess notation (each play gest a first, second, ...  move)
      */
-    public void addToNotationBoard(String move, Boolean playerTurn, int gameMove) {
+    public void addToNotationBoard(String move, Boolean playerTurn, int notationMove) {
         //Expanded notation string
         String expandedMove = move.substring(0, 2) + "-" + move.substring(2, 4)
                 + ((move.length() == 4) ? "" : ("=" + move.substring(4))); //add promotion info if needed
@@ -458,17 +559,17 @@ public class GameView {
         //Place notation one the notation board
         if (playerTurn) { //White just moved
             //Move number label
-            Label gameMoveLabel = new Label(Integer.toString(gameMove));
+            Label gameMoveLabel = new Label(Integer.toString(notationMove));
             VBox boxMove = new VBox(gameMoveLabel);
             boxMove.setAlignment(Pos.CENTER);
             boxMove.setMinWidth(20);
             
             //Add notation to 
-            notationContent.add(boxMove, 0, gameMove); //Add new turn label
-            notationContent.add(box, 1, gameMove); //Add white move
+            notationContent.add(boxMove, 0, notationMove); //Add new turn label
+            notationContent.add(box, 1, notationMove); //Add white move
         }
         else { //Black just moved
-            notationContent.add(box, 2, gameMove); //Add black move
+            notationContent.add(box, 2, notationMove); //Add black move
 
         }
         
@@ -479,5 +580,9 @@ public class GameView {
         //Style
         newLabel.getStyleClass().add("notationLabel");
         GridPane.setHgrow(box, Priority.ALWAYS);
+        
+        //Update internal state
+        if (currTurnNumber == controller.getTurnNumber() - 1) //iterate only when we are caught up (we would be 1 behind)
+            currTurnNumber++;
     }
 }

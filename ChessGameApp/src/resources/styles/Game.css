@@ -27,13 +27,11 @@
 .white { -fx-background-color: rgb(197, 194, 188); }
 
 /*Bord interactions*/
-.selected, .possibleMove {
+.selected {
+    -fx-border-color: rgb(3, 255, 95); 
     -fx-border-width: 3;
     -fx-border-insets: 0;
 }
-.selected { -fx-border-color: rgb(3, 255, 95); }
-.possibleMove { -fx-border-color: rgb(255, 238, 3); }
-
 /*Notation board --------------------------------------*/
 .notationGrid{
     -fx-hgap: 5;
@@ -49,7 +47,6 @@
 /* ====================== CHAT BOX STYLES ====================== */
 
 .chatBox {
-    -fx-background-color: rgb(43, 42, 40);
     -fx-font: 12px Tahoma;
     -fx-padding: 5;
 }

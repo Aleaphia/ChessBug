@@ -7,16 +7,23 @@ import java.util.prefs.Preferences;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.Pane;
+import javafx.scene.control.ButtonType;
+
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.Media;
+
 
 import chessBug.network.Client;
+import javafx.util.Duration;
 
 public class PreferencesController {
-
-        
+       
     // Preferences object to store user settings persistently
     private static Preferences preferences = Preferences.userNodeForPackage(PreferencesController.class);
 
     private Pane page;
+    private static MediaPlayer sound = new MediaPlayer( new Media(
+            PreferencesController.class.getResource("/resources/sounds/test.wav").toString()));
     PreferencesPage view;
 
     public PreferencesController(Client client) {
@@ -26,6 +33,7 @@ public class PreferencesController {
 
     public Pane getPage() { return page; }
 
+    //Methods for Handling changes
     // Handle the theme change
     protected static void handleThemeChange(String theme, Scene scene) {
         preferences.put("theme", theme);
@@ -65,6 +73,16 @@ public class PreferencesController {
         preferences.putBoolean("confirmMoves", isEnabled);
         System.out.println("Confirm Moves preference changed: " + (isEnabled ? "Enabled" : "Disabled"));
     }
+    
+    protected static void handleStayLoggedIn(boolean isEnabled) {
+        preferences.putBoolean("stayLoggedIn", isEnabled); 
+        System.out.println("Login preference changed: " + (isEnabled ? "Enabled" : "Disabled"));
+    }
+    
+    protected static void handleVolume(Double volume){
+        preferences.putDouble("volume", volume);
+        sound.setVolume(volume);
+    }
 
     // Handle language change
     protected static void handleLanguageChange(String language) {
@@ -87,8 +105,20 @@ public class PreferencesController {
         alert.setContentText("Your preferences have been saved successfully.");
         alert.showAndWait();
     }
+    
+    //Save login credentials
+    public static void setLogginCredentials(String username, String password){
+        preferences.put("username", username);
+        preferences.put("password", password);
+    }
+    
+    //Getter methods
     public static boolean isAutoSaveEnabled() {
         return preferences.getBoolean("autoSaveEnabled", true);
+    }
+    
+    public static Double getVolume(){
+        return preferences.getDouble("volume", 1);
     }
 
     public static String getTheme() {
@@ -106,6 +136,18 @@ public class PreferencesController {
     public static boolean isConfirmMovesEnabled() {
         return preferences.getBoolean("confirmMoves", false);
     }
+    
+    public static boolean isStayLoggedIn() {
+        return preferences.getBoolean("stayLoggedIn", false);
+    }
+    
+    public static String getUsername(){
+        return preferences.get("username", "");
+    }
+    
+    public static String getPassword(){
+        return preferences.get("password", "");
+    }
 
     public static void applyStyles(Scene scene, String... styles) {
         scene.getStylesheets().clear();
@@ -114,6 +156,30 @@ public class PreferencesController {
             URL theme = PreferencesController.class.getResource("/resources/styles/" + getTheme() + "/" + style + ".css");
             if(theme != null)
                 scene.getStylesheets().add(theme.toExternalForm());
+            
+            //For game page check if movehints are on
+            if (style.equals("Game") && isShowMoveHintsEnabled())
+                scene.getStylesheets().add(PreferencesController.class.getResource("/resources/styles/MoveHints.css").toExternalForm());
         }
+    }
+    
+    public static void playSound(){
+        //System.out.println("DEBUG: " + sound.getVolume());
+        sound.seek(Duration.ZERO);
+        sound.play();
+    }
+    
+    public static boolean confirmMove(){
+        //Skip confirmation dialog if confirm moves is off
+        if (!isConfirmMovesEnabled())
+            return true;
+        
+        // Show confirmation dialog
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Preferences Saved");
+        alert.setHeaderText(null);
+        alert.setContentText("Confirm your move");
+        //Returns true if the okay button is pressed
+        return alert.showAndWait().isPresent() && alert.getResult().equals(ButtonType.OK);
     }
 }

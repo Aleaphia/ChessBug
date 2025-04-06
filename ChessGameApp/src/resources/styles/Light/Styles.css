@@ -1,11 +1,18 @@
+/*Only include things that change*/
 .background {
     -fx-background-color: rgb(212, 215, 223);
-    -fx-background-image: url("../../images/BugBackground.png");
-    -fx-background-repeat: no-repeat;
-    -fx-background-size: contain;
-    -fx-background-position: center center;
 }
+.section{
+    -fx-background-color: rgba(255, 255, 255, 0.9);
+    -fx-effect: dropshadow(gaussian, #89898984, 10, 0, 0, 4); /* Added shadow for depth */
 
+}
 .label {
-    -fx-text-fill: rgb(255, 255, 255);
+    -fx-text-fill: rgb(0, 0, 0);
+}
+.error {
+    -fx-text-fill: #902929;
+}
+.scrollBackground{
+    -fx-background-color: rgb(255, 255, 255);
 }

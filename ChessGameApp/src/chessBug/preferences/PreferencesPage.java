@@ -1,151 +1,142 @@
 package chessBug.preferences;
 
+import chessBug.home.HomeView;
 import chessBug.network.Client;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.Slider;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.beans.binding.Bindings;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 
 public class PreferencesPage {
     private final Client client;
-    private VBox root;
+    private HBox root;
 
     public PreferencesPage(Client client) {
         this.client = client;
+        buildPage();
+    }
+    
+    private void buildPage(){
+        //Set up page structure -> use region to push content to the left
+        root = new HBox();
+        
+        VBox page = new VBox(20);
+        Region rightRegion = new Region();
+        
+        root.getChildren().addAll(page,rightRegion);
+        
+        //Style and format
+        page.getStyleClass().addAll("section", "padding");
+        HBox.setHgrow(rightRegion, Priority.ALWAYS);
+        
+        //Fill page
+        Label title = new Label("Settings");
+        title.getStyleClass().add("h1");
+        // Save Preferences Button
+        Button savePreferencesButton = new Button("Save Preferences");
+        savePreferencesButton.setOnAction(event -> PreferencesController.savePreferences());
+        
+        // Add all components to the main layout
+        page.getChildren().addAll(
+            title,
+            new Separator(),
+            buildGameSettings(),
+            new Separator(),
+            buildAppSettings(),
+            new Separator(),
+            savePreferencesButton
+        );
+        
+    }
+    private VBox buildGameSettings(){
+        VBox gameSettingsContainer = new VBox(20);
+        
+        // Game Settings Section
+        Label gameSettingsLabel = new Label("Game Settings:");
+        gameSettingsLabel.getStyleClass().addAll("label", "h2");
+
+        // Show Move Hints Checkbox
+        CheckBox moveHintsCheckBox = new CheckBox("Show Move Hints");
+        moveHintsCheckBox.setSelected(PreferencesController.isShowMoveHintsEnabled());
+        moveHintsCheckBox.setOnAction(event -> PreferencesController.handleShowMoveHints(moveHintsCheckBox.isSelected()));
+        moveHintsCheckBox.getStyleClass().add("label");
+
+        // Confirm Moves Checkbox
+        CheckBox confirmMovesCheckBox = new CheckBox("Confirm Moves Before Playing");
+        confirmMovesCheckBox.setSelected(PreferencesController.isConfirmMovesEnabled());
+        confirmMovesCheckBox.setOnAction(event -> PreferencesController.handleConfirmMoves(confirmMovesCheckBox.isSelected()));
+        confirmMovesCheckBox.getStyleClass().add("label");
+
+        // Slider for Volume
+        Slider volumeSlider = new Slider(0, 100, PreferencesController.getVolume() * 100);
+        volumeSlider.setBlockIncrement(10);
+        Label volumeLabel = new Label();
+        volumeLabel.textProperty().bind(Bindings.format(
+                "Volume: %.2f", volumeSlider.valueProperty()));
+
+        volumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> 
+            PreferencesController.handleVolume(volumeSlider.getValue() / 100.0)
+        );
+
+        gameSettingsContainer.getChildren().addAll(
+            gameSettingsLabel, 
+            moveHintsCheckBox, 
+            confirmMovesCheckBox, 
+            volumeLabel, 
+            volumeSlider
+        );
+        
+        return gameSettingsContainer;
+    }
+    private VBox buildAppSettings(){
+        VBox container = new VBox(20);
+        // App Settings Section
+        Label header = new Label("Application Settings:");
+        header.getStyleClass().addAll("label", "h2");
+        
+        // Theme selection
+        VBox themeContainer = new VBox(15);
+        themeContainer.setPadding(new Insets(10));
+        Label themeLabel = new Label("theme:");
+
+        ComboBox<String> themeComboBox = new ComboBox<>();
+        themeComboBox.getItems().addAll("Light", "Dark");
+        themeComboBox.setValue(PreferencesController.getTheme());
+        themeComboBox.setOnAction(event -> PreferencesController.handleThemeChange(themeComboBox.getValue(), themeComboBox.getScene()));
+
+        themeContainer.getChildren().addAll(themeLabel, themeComboBox);
+        
+        // Stay logged in Checkbox
+        CheckBox stayLoggedInCheckBox = new CheckBox("Stay logged in");  
+        stayLoggedInCheckBox.setSelected(PreferencesController.isStayLoggedIn());
+        stayLoggedInCheckBox.setOnAction(event -> PreferencesController.handleStayLoggedIn(stayLoggedInCheckBox.isSelected()));
+        stayLoggedInCheckBox.getStyleClass().add("label");
+        
+        // Auto-Save Checkbox
+        CheckBox autoSaveCheckBox = new CheckBox("Enable Auto-Save");  
+        autoSaveCheckBox.setSelected(PreferencesController.isAutoSaveEnabled());
+        autoSaveCheckBox.setOnAction(event -> PreferencesController.handleAutoSave(autoSaveCheckBox.isSelected()));
+        autoSaveCheckBox.getStyleClass().add("label");
+
+        // Add all components to the main layout
+        container.getChildren().addAll(
+            header, themeContainer, stayLoggedInCheckBox, autoSaveCheckBox
+        );
+        return container;
     }
 
-    public VBox getPage() {
-        if (root == null) {
-            root = new VBox(20);
-            root.setPadding(new Insets(30));
-            root.setBackground(new Background(new BackgroundFill(Color.web("#2C2F34"), CornerRadii.EMPTY, Insets.EMPTY)));
-
-            // Profile Section
-            HBox profileContainer = new HBox(15);
-            profileContainer.setAlignment(Pos.CENTER_LEFT);
-            profileContainer.setPadding(new Insets(10));
-
-            // Profile Picture
-            //ImageView profileImageView = new ImageView();
-            //profileImageView.setImage(client.getOwnUser().getProfilePicture());
-
-            //profileImageView.setFitWidth(90);
-            //profileImageView.setFitHeight(90);
-            //profileImageView.setClip(new Circle(45, 45, 45)); // Circular profile picture
-            //profileImageView.setStyle("-fx-border-radius: 50%; -fx-border-color: white; -fx-border-width: 2px;");
-
-            // Username Label
-            String username = client.getOwnUser().getUsername();
-            Label usernameLabel = new Label(username);
-            usernameLabel.setFont(Font.font("Roboto", FontWeight.BOLD, 18));
-            usernameLabel.setTextFill(Color.web("#FFFFFF"));
-
-            profileContainer.getChildren().addAll(usernameLabel);
-
-            // Game Settings Section
-            VBox gameSettingsContainer = new VBox(20);
-            gameSettingsContainer.setPadding(new Insets(10));
-            Label gameSettingsLabel = new Label("Game Settings:");
-            gameSettingsLabel.setFont(Font.font("Roboto", FontWeight.BOLD, 16));
-            gameSettingsLabel.setTextFill(Color.web("#FFFFFF"));
-
-            // Auto-Save Checkbox
-            CheckBox autoSaveCheckBox = new CheckBox("Enable Auto-Save");  
-            autoSaveCheckBox.setSelected(PreferencesController.isAutoSaveEnabled());
-            autoSaveCheckBox.setOnAction(event -> PreferencesController.handleAutoSave(autoSaveCheckBox.isSelected()));
-            autoSaveCheckBox.setTextFill(Color.web("#B0B0B0"));
-
-            // Show Move Hints Checkbox
-            CheckBox moveHintsCheckBox = new CheckBox("Show Move Hints");
-            moveHintsCheckBox.setSelected(PreferencesController.isShowMoveHintsEnabled());
-            moveHintsCheckBox.setOnAction(event -> PreferencesController.handleShowMoveHints(moveHintsCheckBox.isSelected()));
-            moveHintsCheckBox.setTextFill(Color.web("#B0B0B0"));
-
-            // Confirm Moves Checkbox
-            CheckBox confirmMovesCheckBox = new CheckBox("Confirm Moves Before Playing");
-            confirmMovesCheckBox.setSelected(PreferencesController.isConfirmMovesEnabled());
-            confirmMovesCheckBox.setOnAction(event -> PreferencesController.handleConfirmMoves(confirmMovesCheckBox.isSelected()));
-            confirmMovesCheckBox.setTextFill(Color.web("#B0B0B0"));
-
-            // Slider for Volume
-            Slider volumeSlider = new Slider(0, 100, 50);
-            volumeSlider.setBlockIncrement(10);
-            volumeSlider.setStyle("-fx-base: #7289DA; -fx-accent: #4CAF50;");
-            Label volumeLabel = new Label("Volume: " + (int) volumeSlider.getValue());
-            volumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> 
-                volumeLabel.setText("Volume: " + newValue.intValue())
-            );
-
-            gameSettingsContainer.getChildren().addAll(
-                gameSettingsLabel, 
-                autoSaveCheckBox, 
-                moveHintsCheckBox, 
-                confirmMovesCheckBox, 
-                volumeLabel, 
-                volumeSlider
-            );
-
-            // Language Section
-            VBox languageContainer = new VBox(15);
-            languageContainer.setPadding(new Insets(10));
-            Label languageLabel = new Label("Language:");
-            languageLabel.setFont(Font.font("Roboto", FontWeight.BOLD, 16));
-            languageLabel.setTextFill(Color.web("#FFFFFF"));
-
-            ComboBox<String> languageComboBox = new ComboBox<>();
-            languageComboBox.getItems().addAll("English", "Spanish", "French", "German");
-            languageComboBox.setValue(PreferencesController.getLanguage());
-            languageComboBox.setOnAction(event -> PreferencesController.handleLanguageChange(languageComboBox.getValue()));
-
-            languageContainer.getChildren().addAll(languageLabel, languageComboBox);
-
-            // Theme selection
-            VBox themeContainer = new VBox(15);
-            themeContainer.setPadding(new Insets(10));
-            Label themeLabel = new Label("theme:");
-            themeLabel.setFont(Font.font("Roboto", FontWeight.BOLD, 16));
-            themeLabel.setTextFill(Color.web("#FFFFFF"));
-
-            ComboBox<String> themeComboBox = new ComboBox<>();
-            themeComboBox.getItems().addAll("Light", "Dark");
-            themeComboBox.setValue(PreferencesController.getTheme());
-            themeComboBox.setOnAction(event -> PreferencesController.handleThemeChange(themeComboBox.getValue(), themeComboBox.getScene()));
-
-            themeContainer.getChildren().addAll(themeLabel, themeComboBox);
-
-            // Save Preferences Button
-            Button savePreferencesButton = new Button("Save Preferences");
-            savePreferencesButton.setStyle("-fx-background-color: #7289DA; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 20px; -fx-background-radius: 5px;");
-            savePreferencesButton.setOnAction(event -> PreferencesController.savePreferences());
-
-            // Hover Effect for Save Button
-            savePreferencesButton.setOnMouseEntered(e -> savePreferencesButton.setStyle("-fx-background-color: #5C6A8B; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 20px; -fx-background-radius: 5px;"));
-            savePreferencesButton.setOnMouseExited(e -> savePreferencesButton.setStyle("-fx-background-color: #7289DA; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 20px; -fx-background-radius: 5px;"));
-
-            // Add all components to the main layout
-            root.getChildren().addAll(
-                profileContainer,
-                new Separator(),
-                gameSettingsContainer,
-                new Separator(),
-                languageContainer,
-                themeContainer,
-                new Separator(),
-                savePreferencesButton
-            );
-        }
+    public HBox getPage() {
         return root;
     }
 }

@@ -1,6 +1,6 @@
 .sideBar{
-    -fx-background-color: #2f3136;
-    -fx-text-fill: white;
+    -fx-background-color: #ffffff;
+    -fx-text-fill: rgb(43, 43, 43);
 }
 .button, .file-chooser-button {
     -fx-background-color: #af2323;
@@ -9,4 +9,9 @@
 
 .button:hover, .file-chooser-button:hover {
     -fx-background-color: #db3030;
+}
+
+/*Test*/
+.notYourMove {
+    -fx-background-color: #864c4c;
 }

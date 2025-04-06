@@ -63,11 +63,12 @@ public class ChessBug extends Application {
     private GridPane loginPane;
     private Client client;
     private DatabaseCheckList databaseCheckList = new DatabaseCheckList(); 
+    private String settingsFile = "settings.dat";
     
     @Override
     public void start(Stage primaryStage) {
-        //Create stage layout
-        createLoginPage(); //Set up loginPane
+        LoginUI loginUI = createLoginPage(); //Set up loginPane
+        
         //Scene and Stage
         primaryStage.setTitle("ChessBug"); //Name for application stage
         mainScene = new Scene(loginPane, 1600, 800); //Add loginPane to the mainScene
@@ -77,10 +78,28 @@ public class ChessBug extends Application {
         PreferencesController.applyStyles(mainScene, "Styles", "Login");
         HBox.setHgrow(page, Priority.ALWAYS); //Makes page take up all avaiable space
         
+        if (PreferencesController.isStayLoggedIn()){
+            //Check for credentials
+            try{loginUI.savedLogin();}
+            catch(Exception e){}
+        }
+        
+        
         //Display
         primaryStage.show();
         
         continueDatabaseChecks();
+    }
+    
+    @Override
+    public void stop(){
+        //Save credientials
+        if (PreferencesController.isStayLoggedIn()){
+            PreferencesController.setLogginCredentials(client.getProfile().getUsername(), client.getProfile().getPassword());
+        }
+        else{
+            PreferencesController.setLogginCredentials("", "");
+        }
     }
     
     private void continueDatabaseChecks(){
@@ -93,7 +112,7 @@ public class ChessBug extends Application {
         timeline.play();
     }
     
-    private void createLoginPage(){
+    private LoginUI createLoginPage(){
         loginPane = new GridPane();
         loginPane.getStyleClass().addAll("background", "login");
 
@@ -132,11 +151,25 @@ public class ChessBug extends Application {
                 }
 
                 return out;
+            },
+            (String username, String password) -> {
+                JSONObject out = new JSONObject();
+                try {
+                    client = Client.loginPreHashed(username, password);
+                    out.put("error", false);
+                    successfulLogin();
+                } catch (ClientAuthException e) {
+                    e.printStackTrace();
+                    out.put("error", true);
+                    out.put("response", e.getServerResponse());
+                }
+                return out;
             }
         );
 
         // mainPane.getChildren().add(loginUI.getPage());
         loginPane.add(loginUI.getPage(), 1, 1);
+        return loginUI;
     }
     
     private void successfulLogin(){
@@ -146,7 +179,7 @@ public class ChessBug extends Application {
         mainPane.getStyleClass().addAll("background");
         mainScene.setRoot(mainPane);
         //Open page
-        changePage(new HomeController(client,databaseCheckList).getPage(), "HomeView");
+        changePage(new HomeController(client,databaseCheckList).getPage(), "Styles", "Menu", "HomeView", "Game");
     }
 
     private VBox createSidebar() {
@@ -168,19 +201,19 @@ public class ChessBug extends Application {
                 logoHolder,
                 createSideBarButton("home", event -> {
                     databaseCheckList.clear();
-                    changePage(new HomeController(client, databaseCheckList).getPage(), "HomeView");
+                    changePage(new HomeController(client, databaseCheckList).getPage(), "Styles", "Menu", "HomeView", "Game");
                 }),
                 createSideBarButton("chess", event -> {
                     databaseCheckList.clear();
-                    changePage(new GameController(client, databaseCheckList).getPage(), "Game");
+                    changePage(new GameController(client, databaseCheckList).getPage(), "Styles", "Menu", "Game");
                 }),
                 createSideBarButton("gear", event -> {
                     databaseCheckList.clear();
-                    changePage(new PreferencesPage(client).getPage(), "Preferences");
+                    changePage(new PreferencesPage(client).getPage(), "Styles", "Menu");
                 }),
                 createSideBarButton("user", event -> {
                     databaseCheckList.clear();
-                    changePage(new ProfileController(client).getPage(), "Profile");
+                    changePage(new ProfileController(client).getPage(), "Styles", "Menu", "Profile");
                 }),
                 createSideBarButton("logout", event -> {
                     databaseCheckList.clear();
@@ -190,11 +223,11 @@ public class ChessBug extends Application {
     
         return sidebar;
     }
-     private void changePage(Pane newPage, String stylePage){
+     private void changePage(Pane newPage, String... stylePage){
         //Clear and add new page
         page.getChildren().clear();
         page.getChildren().add(newPage);
-        PreferencesController.applyStyles(mainScene, "Styles", "Menu", stylePage); 
+        PreferencesController.applyStyles(mainScene, stylePage); 
     }
 
     private Image[] loadAnimation(String animDirectory) {

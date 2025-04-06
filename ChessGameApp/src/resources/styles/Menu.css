@@ -18,3 +18,8 @@
 .buttonIcon.chess {
     -fx-padding: -3px 7px -3px 7px;
 }
+
+/*Test*/
+.notYourMove {
+    -fx-background-color: #864c4c;
+}

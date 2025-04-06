@@ -21,6 +21,7 @@ public class ChessGame implements Serializable{
     // Tracking variables for special rules
     private final int[] ghostPawn = {-1,-1}; //refers to a square jumped over by a pawn; used to determine legality of en passant.
     private int fiftyMoveRuleCounter = 0; // Move counter that ends game if it reaches 100 (50 moves per player)
+    private ArrayList<String> positionList = new ArrayList<>();
     private HashMap<String, Integer> positionCounter = new HashMap<>(); //Counts the number of times a position has occurred
     private boolean gameComplete = false; //Game completion status
     private PromotionSelection promotionMethod; //Determines how promotions should be dealt with
@@ -235,6 +236,18 @@ public class ChessGame implements Serializable{
     private void updatePositionCounter(){
         //Create string that represents board position
         //Include player turn
+        String currPosition = getPosition();
+        
+        //Add or update positionCounter with current position
+        int occurrences = 1;
+        if (positionCounter.containsKey(currPosition)){
+            occurrences = positionCounter.get(currPosition) + 1;
+        }
+        positionCounter.put(currPosition, occurrences);
+        positionList.add(currPosition);
+    }
+    public String getPosition(){
+        //Include player turn
         String currPosition = (playerTurn)? "w" : "b";
         //all board square contents
         for(int row = 0 ; row < BOARD_LENGTH; row++){
@@ -243,12 +256,7 @@ public class ChessGame implements Serializable{
             }
         }
         
-        //Add or update positionCounter with current position
-        int occurrences = 1;
-        if (positionCounter.containsKey(currPosition)){
-            occurrences = positionCounter.get(currPosition) + 1;
-        }
-        positionCounter.put(currPosition, occurrences);
+        return currPosition;
     }
     
     //Converting notation format
@@ -314,11 +322,15 @@ public class ChessGame implements Serializable{
     public boolean getGameComplete(){
         return gameComplete;
     } 
+    public String getPosition(int index){
+        return positionList.get(index);
+    }
 
     //Set methods
     public void setPromotionMethod(PromotionSelection promotionMethod){
         this.promotionMethod = promotionMethod;
     }
+    public void endGame(){gameComplete = true;}
     
     //Boolean methods that check to Board states
     //  Check that a square exists

@@ -3,6 +3,7 @@ package chessBug.misc;
 import chessBug.controllerInterfaces.IFriendRequestController;
 import chessBug.network.*;
 import java.util.List;
+import java.util.ArrayList;
 import javafx.geometry.Pos;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
@@ -14,12 +15,22 @@ public class ReceiveFriendRequestUI {
     private VBox page = new VBox();
     private VBox friendRequests = new VBox();
     IFriendRequestController controller;
+
+    boolean newRequestsFlag = false;
+    List<User> cachedRequests = new ArrayList<>();
     
     public ReceiveFriendRequestUI(IFriendRequestController controller){
         this.controller = controller;
         buildRequestField();
         
         //Add database checks
+        this.controller.addToDatabaseCheckList(() -> new Thread(() -> {
+            List<User> requests = controller.receiveFriendRequest();
+            if(!requests.equals(cachedRequests)) {
+                cachedRequests = requests;
+                newRequestsFlag = true;
+            }
+        }).start());
         this.controller.addToDatabaseCheckList(() -> updateRequestField());
     }
     
@@ -38,11 +49,11 @@ public class ReceiveFriendRequestUI {
     }
     
     private void updateRequestField(){
+        if(!newRequestsFlag) return;
         //System.out.println("Debug: ReceiveFriendRequestUI DatabaseCheck" );
         friendRequests.getChildren().clear();
-        List<User> friendRequestsList = controller.receiveFriendRequest();
         //System.out.println("DEBUG: " + friendRequestsList.isEmpty());
-        friendRequestsList.forEach(user -> {
+        cachedRequests.forEach(user -> {
             HBox curr = new HBox();
             Label label = new Label(user.getUsername());
             Button accept = new Button("Accept");

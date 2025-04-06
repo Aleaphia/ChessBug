@@ -1,5 +1,7 @@
 package chessBug.profile;
 
+import java.io.Serializable;
+
 public class ProfileModel {
     private int userID;
     private String username;

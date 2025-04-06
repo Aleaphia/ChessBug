@@ -10,8 +10,11 @@ import chessBug.controllerInterfaces.IGameCreationController;
 import chessBug.misc.*;
 import chessGame.*;
 import chessBug.network.*;
+import chessBug.preferences.PreferencesController;
 import java.util.*;
 import java.util.stream.Stream;
+import javafx.scene.control.Button;
+import javafx.scene.control.Separator;
 
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -40,19 +43,69 @@ public class GameController implements IGameSelectionController, IGameCreationCo
         //Create view
         //Game Prompt Panel
         VBox promptSelectionPanel = new VBox();
-        Region leftRegion = new Region();
-        Region rightRegion = new Region();
+        ArrayList<Region> regionList = new ArrayList<>();
+        regionList.add(new Region());
+        regionList.add(new Region());
         
-        page.getChildren().addAll(leftRegion,promptSelectionPanel,rightRegion);
+        page.getChildren().addAll(regionList.get(regionList.size() - 2),
+                promptSelectionPanel,regionList.get(regionList.size() - 1));
+        
+        //Build promptSelection Pannel
+        HBox menu = new HBox();
+        VBox gameDisplayNode = new VBox();
+        
+        //Menu
+        Button newGame = new Button("New Games");
+        Button currGames = new Button("Current Games");
+        Button oldGames = new Button("Old Games");
+        regionList.add(new Region());
+        regionList.add(new Region());
+        menu.getChildren().addAll(newGame, regionList.get(regionList.size() - 2),
+                currGames, regionList.get(regionList.size() - 1), oldGames); 
+        
+        //Menu funtionality
+        newGame.setOnAction(event -> {
+            gameDisplayNode.getChildren().clear();
+            gameDisplayNode.getChildren().addAll(
+                    new GameSelectionUI(
+                            this, GameSelectionUI.GameStatus.REQUESTED,
+                            (() -> client.getMatchRequests())).getPage(),
+                    new GameCreationUI(this).getPage()
+            );
+        });
+        
+        currGames.setOnAction(event -> {
+            gameDisplayNode.getChildren().clear();
+            gameDisplayNode.getChildren().add(
+                    new GameSelectionUI(
+                            this, GameSelectionUI.GameStatus.IN_PROGRESS,
+                            (() -> client.getOpenMatches())).getPage()
+            );
+        });
+        
+        oldGames.setOnAction(event -> {
+            gameDisplayNode.getChildren().clear();
+            gameDisplayNode.getChildren().add(
+                    new GameSelectionUI(
+                            this, GameSelectionUI.GameStatus.COMPLETE,
+                            (() -> client.getClosedMatches())).getPage()
+            );
+        });
+        
+        
+        //gameDisplayNode
+        gameDisplayNode.getChildren().add(new GameSelectionUI(
+                        this, GameSelectionUI.GameStatus.IN_PROGRESS,
+                        (() -> client.getOpenMatches())).getPage()
+                );
         
         //Style and format
         page.getStyleClass().add("padding");
-        HBox.setHgrow(leftRegion, Priority.ALWAYS);
-        HBox.setHgrow(rightRegion, Priority.ALWAYS);
+        regionList.forEach(region -> HBox.setHgrow(region, Priority.ALWAYS));
         promptSelectionPanel.getStyleClass().add("section");
 
         //Add selection panel components
-        promptSelectionPanel.getChildren().addAll(new GameCreationUI(this).getPage(), new GameSelectionUI(this).getPage());
+        promptSelectionPanel.getChildren().addAll(menu, new Separator(), gameDisplayNode);
     }
     public GameController(Client player, DatabaseCheckList databaseCheckList, Match match){ //selected match
         //Connect to database
@@ -64,13 +117,8 @@ public class GameController implements IGameSelectionController, IGameCreationCo
     
     private void databaseChecks(){
         //System.out.println("Debug: GameController DatabaseCheck" );
-        if(!isThisPlayersTurn()){ //While waiting for other player's move check database and update boardstate
-            match.poll(client).forEach((move) -> internalPlayerMove(move));
-            view.refresh(client);
-        }
-        else{ // during this player's turn just refresh chat
-            view.refreshMessageBoard(client);
-        }
+        match.poll(client).forEach((move) -> internalPlayerMove(move));
+        view.refresh(client);
     }
     
     //Getter Methods ===========================================================
@@ -89,19 +137,21 @@ public class GameController implements IGameSelectionController, IGameCreationCo
     public Boolean getPlayerTurnBoolean(){return model.getPlayerTurn();}
     public Boolean getPlayerColor(){return model.getPlayerColor();}
     public User getPlayerTurnUser(){return (model.getPlayerTurn())? match.getWhite() : match.getBlack();}
-
+    public String getPosition(){return model.getPosition();}
+    public String getPosition(int index){return model.getPostion(index);}
+    public int getTurnNumber(){return model.getTurnNumber();}
+    //public int getTurnCount(){return model.getTurnCount();}
 
     //Overriden methods ========================================================
     //IDatabaseCheckInterface methods
     @Override public void addToDatabaseCheckList(DatabaseCheck item){databaseCheckList.add(item);}
     //IGameSelectionController methods
     @Override public String getUsername(){return client.getOwnUser().getUsername();}
-    @Override public List<Match> getOpenMatchList(){return client.getOpenMatches();}
-    @Override public List<Match> receiveMatchRequest(){return client.getMatchRequests();}
     @Override public void acceptMatchRequest(Match match){client.acceptMatchRequest(match);}
     @Override public void denyMatchRequest(Match match){client.denyMatchRequest(match);}
-    @Override public void forfitMatch(Match match){client.forfitMatch(match);}
+    @Override public void forfeitMatch(Match match){client.forfeitMatch(match);}
     @Override public void selectGame(Match newMatch){internalSelectGame(newMatch);}
+    
     
     //IGameCreationController methods
     @Override public List<Friend> getFriendList(){return client.getFriends();}
@@ -121,6 +171,9 @@ public class GameController implements IGameSelectionController, IGameCreationCo
      *  @param msg - chat message to send
      */
     public void sendChatMessage(String msg){chat.send(client, msg);}
+    /** forfeit - automatically lose game
+     */
+    public void forfeitMatch(){forfeitMatch(match);}
     
     /** playerMove - makes extra changes needed for user moves (not database moves), e.g., update database, clear selected square from model
      *  Add code here if it should only happen when the move comes from this client/user
@@ -129,7 +182,7 @@ public class GameController implements IGameSelectionController, IGameCreationCo
      */
     public void playerMove(String notation){
         //Check for legal move, also performs updates independent of move origin
-        if (internalPlayerMove(notation)){
+        if (PreferencesController.confirmMove() && internalPlayerMove(notation)){
             //Update database
             match.makeMove(client, notation); //Add move
             client.setGameTurn(match, model.getPlayerTurn()); //set game status
@@ -159,10 +212,21 @@ public class GameController implements IGameSelectionController, IGameCreationCo
      *  @return true if the move was successfully made, false otherwise
      */
     private boolean internalPlayerMove(String notation){
+        if (notation.equals("end")){
+            String endMsg = model.getEndMessage();
+            if (endMsg == null){
+                model.endGame();
+                endMsg = this.match.getStatus().substring(0,5) + " won by forfeit";
+            }
+            view.displayBotMessage(endMsg);
+        }
         //Attempt to make player move, will return true on success
-        if (model.makePlayerMove(notation)){
+        else if (model.makePlayerMove(notation)){
+            //Sound
+            PreferencesController.playSound();
+            
             //Add notation to view
-            view.addToNotationBoard(notation, !model.getPlayerTurn(), model.getTurnNumber());
+            view.addToNotationBoard(notation, !model.getPlayerTurn(), (model.getTurnNumber() - 1)/2);
             
             //Display player turn
             String msg = ((getPlayerTurnBoolean())? "White" : "Black") + "'s turn: " +
@@ -203,8 +267,12 @@ public class GameController implements IGameSelectionController, IGameCreationCo
                 
         //Update chat/match status
         this.match.poll(client).forEach((move) -> internalPlayerMove(move));
+        if (!model.getGameComplete()
+                && this.match.getStatus().charAt(5) == 'W'){ //Acount for forfeit wins that wouldn't otherwise get noticed
+                model.endGame();
+                view.displayBotMessage(this.match.getStatus().substring(0,5) + " won by forfeit");
+        }
         view.refresh(client);
-        
         //Check database
         addToDatabaseCheckList(()->databaseChecks());
     }

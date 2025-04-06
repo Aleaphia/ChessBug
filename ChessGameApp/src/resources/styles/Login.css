@@ -1,5 +1,4 @@
 /* ====================== LOGIN PAGE ====================== */
-
 .login-error { 
     -fx-border-color: #ff0000;
 }
@@ -9,9 +8,20 @@
     -fx-text-fill: white;
 }
 
+.loginField{
+    -fx-background-color: #40444B;
+    -fx-text-fill: white;
+    -fx-border-radius: 5px;
+    -fx-padding: 10px;
+}
+
 .background.login {
     -fx-background-image: url("../images/BugBackground.png");
     -fx-background-repeat: no-repeat;
     -fx-background-size: contain;
     -fx-background-position: center center;
+}
+.createAccountButton {
+    -fx-background-color: transparent;
+    -fx-text-fill: #4E8AF3;
 }

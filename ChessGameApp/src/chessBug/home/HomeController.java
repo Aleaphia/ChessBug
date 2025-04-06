@@ -7,6 +7,9 @@ import chessBug.misc.*;
 import chessBug.network.*;
 import chessBug.game.*;
 import java.util.List;
+
+import org.json.JSONObject;
+
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -47,8 +50,9 @@ public class HomeController implements IGameSelectionController, IFriendRequestC
     public Pane getPage(){ return page;}
     public String getUserName(){return client.getOwnUser().getUsername();}
     public List<Friend> getFriends(){return client.getFriends();}
-    public int getCompleteGamesNumber(){return client.getClosedMatches().size();}
-    public int getCurrentGamesNumber(){return client.getOpenMatches().size();}
+    public List<Match> getOpenMatchList(){return client.getOpenMatches();}
+    public List<Match> receiveMatchRequest(){return client.getMatchRequests();}
+    public JSONObject getGameStats() { return client.getMatchStats(); }
     
     //Overriden Methods
     //IDatabaseCheckInterface methods
@@ -61,13 +65,11 @@ public class HomeController implements IGameSelectionController, IFriendRequestC
     
     //IGameSelectionController methods
     @Override public String getUsername(){return client.getOwnUser().getUsername();}
-    @Override public List<Match> getOpenMatchList(){return client.getOpenMatches();}
-    @Override public List<Match> receiveMatchRequest(){return client.getMatchRequests();}
     @Override public void acceptMatchRequest(Match match){client.acceptMatchRequest(match);}
     @Override public void denyMatchRequest(Match match){client.denyMatchRequest(match);}
     @Override public void selectGame(Match match){
         page.getChildren().set(1, new GameController(client, databaseCheckList, match).getPage());
     }
-    @Override public void forfitMatch(Match match){client.forfitMatch(match);}
+    @Override public void forfeitMatch(Match match){client.forfeitMatch(match);}
     
 }

@@ -6,7 +6,7 @@ plugins {
 
 javafx {
     version = '23'
-    modules = [ 'javafx.controls', 'javafx.fxml' ]
+    modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.media' ]
 }
 
 jlink {
@@ -23,6 +23,16 @@ repositories {
 dependencies {
     // This dependency is used by the application.
     implementation 'org.json:json:20250107'
+
+    //Google Authenticator for TOTP authentication
+    implementation 'com.warrenstrange:googleauth:1.5.0'
+    
+    // ZXing library for QR code generation 
+    implementation 'com.google.zxing:core:3.5.1'
+    implementation 'com.google.zxing:javase:3.5.1'
+
+    //Javafx-Media for sounds
+    implementation 'org.openjfx:javafx-media:17'
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
