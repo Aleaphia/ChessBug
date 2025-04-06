@@ -68,8 +68,12 @@ public class Client {
 	// Store user information in order to log in
 	private ProfileModel profile;
 
-	// Used to cache all users  TODO: partially clear cache every once in a while
+	private static boolean LOCK = false;
+
+	// Used to cache users, matches, and chats
 	private Map<Integer, User> userMap = new HashMap<>();
+	private Map<Integer, Match> matchMap = new HashMap<>();
+	private Map<Integer, Chat> chatMap = new HashMap<>();
 
 	private Client() {}
 
@@ -129,11 +133,10 @@ public class Client {
 	public User getUserByID(int id) {
 		if(userMap.containsKey(id))
 			return userMap.get(id);
-		else return new User(0, "unknown", User.DEFAULT_PROFILE_PICTURE);
+		else return User.NO_USER;
 	}
 
 	// Retrieve a user from cache if exists, if not, creates one and puts it in cache
-	// TODO: Cache checking can be handled here, checking if the cached user has the right username and profile picture
 	private User getOrCreateUser(int id, String username, String pfp) {
 		if(!userMap.containsKey(id))
 			userMap.put(id, new User(id, username, pfp));
@@ -145,16 +148,49 @@ public class Client {
 	}
 
 	// Retrieve a friend from cache if exists and is a friend, if not, creates one and puts it in cache
-	// TODO: Create Friend(User, chat) constructor, also do cache handling
 	private Friend getOrCreateFriend(int id, String username, String pfp, int chat) {
 		if(!userMap.containsKey(id) || !(userMap.get(id) instanceof Friend))
 			userMap.put(id, new Friend(id, username, pfp, chat));
+		else {
+			userMap.get(id).setUsername(username);
+			userMap.get(id).setProfilePicture(pfp);
+		}
 		return (Friend)userMap.get(id);
 	}
 
 	// Retrieve user object for current user
 	public User getOwnUser() {
 		return getOrCreateUser(profile.getUserID(), profile.getUsername(), profile.getProfilePicURL());
+	}
+
+	public Match getMatchByID(int id) {
+		if(matchMap.containsKey(id))
+			return matchMap.get(id);
+		return Match.NO_MATCH;
+	}
+
+	private Match getOrCreateMatch(int id, int chatID, User white, User black, String status) {
+		Match m;
+		if(!matchMap.containsKey(id)) {
+			m = new Match(id, getOrCreateChat(chatID), white, black, status);
+			matchMap.put(id, m);
+		} else {
+			m = matchMap.get(id);
+			m.setStatus(status);
+		}
+		return m;
+	}
+
+	public Chat getChatByID(int id) {
+		if(chatMap.containsKey(id))
+			return chatMap.get(id);
+		return Chat.NO_CHAT;
+	}
+
+	public Chat getOrCreateChat(int id) {
+		if(!chatMap.containsKey(id))
+			chatMap.put(id, new Chat(id));
+		return chatMap.get(id);
 	}
 	
 	// Update profile with server data
@@ -226,7 +262,7 @@ public class Client {
 			// Retrieve player users from data
 			User whitePlayer = getOrCreateUser(o.getInt("WhitePlayer"), o.getString("WhiteName"), o.isNull("WhitePfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("WhitePfp"));
 			User blackPlayer = getOrCreateUser(o.getInt("BlackPlayer"), o.getString("BlackName"), o.isNull("BlackPfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("BlackPfp"));
-			matches.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), whitePlayer, blackPlayer, o.getString("Status")));
+			matches.add(getOrCreateMatch(o.getInt("MatchID"), o.getInt("Chat"), whitePlayer, blackPlayer, o.getString("Status")));
 		}
 		return matches;
 	}
@@ -248,12 +284,12 @@ public class Client {
 			// Retrieve player users from data
 			User whitePlayer = getOrCreateUser(o.getInt("WhitePlayer"), o.getString("WhiteName"), o.isNull("WhitePfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("WhitePfp"));
 			User blackPlayer = getOrCreateUser(o.getInt("BlackPlayer"), o.getString("BlackName"), o.isNull("BlackPfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("BlackPfp"));
-			result.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), whitePlayer, blackPlayer, o.getString("Status")));
+			result.add(getOrCreateMatch(o.getInt("MatchID"), o.getInt("Chat"), whitePlayer, blackPlayer, o.getString("Status")));
 		}
 		return result;
 	}
         
-        public List<Match> getClosedMatches() {
+	public List<Match> getClosedMatches() {
 		ArrayList<Match> result = new ArrayList<>();
 		JSONObject received = post("getClosedMatches", new JSONObject());
 
@@ -270,7 +306,7 @@ public class Client {
 			// Retrieve player users from data
 			User whitePlayer = getOrCreateUser(o.getInt("WhitePlayer"), o.getString("WhiteName"), o.isNull("WhitePfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("WhitePfp"));
 			User blackPlayer = getOrCreateUser(o.getInt("BlackPlayer"), o.getString("BlackName"), o.isNull("BlackPfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("BlackPfp"));
-			result.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), whitePlayer, blackPlayer, o.getString("Status")));
+			result.add(getOrCreateMatch(o.getInt("MatchID"), o.getInt("Chat"), whitePlayer, blackPlayer, o.getString("Status")));
 		}
 		return result;
 	}
@@ -291,7 +327,7 @@ public class Client {
 			JSONObject o = response.getJSONObject(i);
 			User whitePlayer = getOrCreateUser(o.getInt("WhitePlayer"), o.getString("WhiteName"), o.isNull("WhitePfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("WhitePfp"));
 			User blackPlayer = getOrCreateUser(o.getInt("BlackPlayer"), o.getString("BlackName"), o.isNull("BlackPfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("BlackPfp"));
-			result.add(new Match(o.getInt("MatchID"), o.getInt("Chat"), whitePlayer, blackPlayer, o.getString("Status")));
+			result.add(getOrCreateMatch(o.getInt("MatchID"), o.getInt("Chat"), whitePlayer, blackPlayer, o.getString("Status")));
 		}
 		return result;
 	}
@@ -589,17 +625,16 @@ public class Client {
 		}
 	}
 
-	public static String decrypt(byte[] data) {
-		try {
-			return new String(CLIENT_DECRYPT.doFinal(Base64.getDecoder().decode(data)));
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new String(data);
-		}	
+	public static String decrypt(byte[] data) throws Exception {
+		return new String(CLIENT_DECRYPT.doFinal(Base64.getDecoder().decode(data)));
 	}
 
 	// Send a string to a given function in the web api, return a JSON result
 	public JSONObject post(String function, String message) {
+		long lockBypass = System.nanoTime();
+		while(LOCK) {if (System.nanoTime() - lockBypass > 200000000) break;}
+		LOCK = true;
+
 		// Send arbitrary string as bytes
 
 		// byte[] data = message.getBytes(StandardCharsets.UTF_8);
@@ -612,6 +647,7 @@ public class Client {
 			JSONObject out = new JSONObject();
 			out.put("response", "Error: Could not connect to server!");
 			out.put("error", true);
+			LOCK = false;
 			return out;
 		}
 
@@ -627,6 +663,7 @@ public class Client {
 			JSONObject out = new JSONObject();
 			out.put("response", "Error: Could not write data to server!");
 			out.put("error", true);
+			LOCK = false;
 			return out;
 		}
 
@@ -634,23 +671,26 @@ public class Client {
 		String input = "";
 		try {
 			input = decrypt(con.getInputStream().readAllBytes());
-		} catch (IOException ioex2) {
+		} catch (Exception ex) {
 			System.err.println("Could not read server response!");
 			JSONObject out = new JSONObject();
 			out.put("response", "Unable to reach or communicate with the server!");
 			out.put("error", true);	
-			ioex2.printStackTrace();
+			ex.printStackTrace();
+			LOCK = false;
 			return out;
 		}
 
 		// Try to parse as straight JSON Object,
 		try {
+			LOCK = false;
 			return new JSONObject(input);
 		} catch (JSONException e) {
 			// If it's not a JSON Object, it probably contains error data
 			JSONObject jo = new JSONObject();
 			jo.put("error", true);
 			jo.put("response", input);
+			LOCK = false;
 			return jo;
 		}
 	}

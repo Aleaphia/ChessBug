@@ -13,6 +13,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class Match {
+	public static final Match NO_MATCH = new Match(0, Chat.NO_CHAT, User.NO_USER, User.NO_USER, Status.DRAW.toString());
+
 	// Represent the status of the match
 	public enum Status {
 		WHITE_WIN("WhiteWin"), BLACK_WIN("BlackWin"), DRAW("Draw"),
@@ -36,10 +38,10 @@ public class Match {
 	private int movesNumber = 0;
 	private ArrayList<String> moves;
 
-	public Match(int matchID, int chatID, User white, User black, String status) {
+	public Match(int matchID, Chat chat, User white, User black, String status) {
 		this.matchID = matchID;
 		moves = new ArrayList<>();
-		this.chat = new Chat(chatID);
+		this.chat = chat;
 		this.white = white;
 		this.black = black;
 		this.status = status;
