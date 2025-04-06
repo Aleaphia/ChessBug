@@ -65,11 +65,13 @@ public class HomeView {
 
     private void updateStatsLabels() {
         JSONObject stats = controller.getGameStats();
-        gamesPlayed.setText("" + (stats.optInt("Total", 0)-stats.optInt("Current")) + " Played");
-        currentGames.setText("" + stats.optInt("Current", 0) + " In Progress");
-        wins.setText("" + stats.optInt("Won", 0) + " Wins");
-        losses.setText("" + stats.optInt("Lost", 0) + " Losses");
-        draws.setText("" + stats.optInt("Draw", 0) + " Draws");
+        int current = (stats.optInt("Total", 0)- stats.optInt("Current"));
+        int past = stats.optInt("Current", 0);
+        currentGames.setText("" + current + ((current != 1)? " games in progress" : " game in progress"));
+        gamesPlayed.setText("" + past + ((past != 1)? " games completed" : " game completed"));
+        wins.setText("\tWins: " + stats.optInt("Won", 0));
+        losses.setText("\tLosses: " + stats.optInt("Lost", 0));
+        draws.setText("\tDraws: " + stats.optInt("Draw", 0));
     }
     
     private VBox buildUserStats(){
