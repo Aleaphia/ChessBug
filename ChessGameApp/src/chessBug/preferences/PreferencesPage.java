@@ -123,15 +123,9 @@ public class PreferencesPage {
         stayLoggedInCheckBox.setOnAction(event -> PreferencesController.handleStayLoggedIn(stayLoggedInCheckBox.isSelected()));
         stayLoggedInCheckBox.getStyleClass().add("label");
         
-        // Auto-Save Checkbox
-        CheckBox autoSaveCheckBox = new CheckBox("Enable Auto-Save");  
-        autoSaveCheckBox.setSelected(PreferencesController.isAutoSaveEnabled());
-        autoSaveCheckBox.setOnAction(event -> PreferencesController.handleAutoSave(autoSaveCheckBox.isSelected()));
-        autoSaveCheckBox.getStyleClass().add("label");
-
         // Add all components to the main layout
         container.getChildren().addAll(
-            header, themeContainer, stayLoggedInCheckBox, autoSaveCheckBox
+            header, themeContainer, stayLoggedInCheckBox
         );
         return container;
     }
