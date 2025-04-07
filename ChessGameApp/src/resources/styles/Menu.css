@@ -11,12 +11,20 @@
     -fx-background-color: #db3030;
 }
 
+.buttonIcon {
+    -fx-padding: 8px 18px 8px 18px;
+}
+
 .buttonIcon.home {
     -fx-padding: -3px 18px 8px 18px;
 }
 
 .buttonIcon.chess {
     -fx-padding: -3px 7px -3px 7px;
+}
+
+.buttonIcon.logout {
+    -fx-padding: -3px 7px 8px 18px;
 }
 
 /*Test*/
