@@ -17,6 +17,7 @@ Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (ActionEvent 
 */
 
 import java.io.InputStream;
+import java.util.ArrayList;
 
 import org.json.JSONObject;
 
@@ -29,6 +30,7 @@ import chessBug.preferences.PreferencesController;
 import chessBug.preferences.PreferencesPage;
 import chessBug.profile.ProfileController;
 import chessBug.network.DatabaseCheckList;
+import javafx.animation.AnimationTimer;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
@@ -41,6 +43,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -196,23 +199,23 @@ public class ChessBug extends Application {
         // Add items to the sidebar
         sidebar.getChildren().addAll(
                 logoHolder,
-                createSideBarButton("Home.png", event -> {
+                createSideBarButton("home", event -> {
                     databaseCheckList.clear();
                     changePage(new HomeController(client, databaseCheckList).getPage(), "Styles", "Menu", "HomeView", "Game");
                 }),
-                createSideBarButton("Chess.png", event -> {
+                createSideBarButton("chess", event -> {
                     databaseCheckList.clear();
                     changePage(new GameController(client, databaseCheckList).getPage(), "Styles", "Menu", "Game");
                 }),
-                createSideBarButton("Gear.png", event -> {
+                createSideBarButton("gear", event -> {
                     databaseCheckList.clear();
                     changePage(new PreferencesPage(client).getPage(), "Styles", "Menu");
                 }),
-                createSideBarButton("User.png", event -> {
+                createSideBarButton("user", event -> {
                     databaseCheckList.clear();
                     changePage(new ProfileController(client).getPage(), "Styles", "Menu", "Profile");
                 }),
-                createSideBarButton("Logout.png", event -> {
+                createSideBarButton("logout", event -> {
                     databaseCheckList.clear();
                     mainScene.setRoot(loginPane);
                     PreferencesController.applyStyles(mainScene, "Styles", "Menu", "Login");
@@ -227,30 +230,64 @@ public class ChessBug extends Application {
         PreferencesController.applyStyles(mainScene, stylePage); 
     }
 
-    private Button createSideBarButton(String imageFileName, EventHandler<ActionEvent> eventHandler) {
+    private Image[] loadAnimation(String animDirectory) {
+        ArrayList<Image> list = new ArrayList<>();
+
+        for(int i = 0; true; i++) {
+            InputStream s = getClass().getResourceAsStream(animDirectory + i + ".png");
+            if(s == null)
+                break;
+            list.add(new Image(s));
+        }
+
+        Image[] out = new Image[list.size()];
+        if(list.size() == 0)
+            return new Image[]{new Image(getClass().getResourceAsStream("/resources/images/GoldCrown.png"))};
+        return list.toArray(out);
+    }
+
+    private Button createSideBarButton(String iconClass, EventHandler<ActionEvent> eventHandler) {
         //Create button
         Button button = new Button();
 
-        //Load the image based on the provided image file name 
-        InputStream i = ChessBug.class.getResourceAsStream("/resources/images/"+imageFileName);
-        Image image = null;
-        if(i != null)
-            image = new Image(i);
+        // Load all necessary images, and give the button an imageview
+        Image[] images = loadAnimation("/resources/images/icons/" + iconClass + "/");
+        ImageView imageView = new ImageView(images[0]);
+        button.graphicProperty().set(imageView);
 
-        if (image == null || image.isError()) {
-            System.out.println("Error loading image:" + imageFileName);
-        }
+        // Create an animation that loops through all the animation images for this icon
+        AnimationTimer animateHover = new AnimationTimer() {
+            long prev = 0;
+            int frame = 0;
+            
+            @Override
+            public void start() {
+                prev = 0;
+                frame = 0;
+                super.start();
+            }
 
-        // Create ImageView for graphic
-        ImageView imageView = new ImageView(image);
+            public void handle(long now) {
+                if((now - prev) > 50_000_000l) {
+                    prev = now;
+                    imageView.setImage(images[frame]);
+                    frame++;
+                    if(frame >= images.length)
+                        stop();
+                }
+            }
+        };
 
-        imageView.setFitWidth(50);
-        imageView.setFitHeight(50);
-        imageView.setPreserveRatio(true);
+        //Add style classes and animation handling
+        button.getStyleClass().addAll("buttonIcon", iconClass);
+        button.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> { 
+            animateHover.start();
+        });
+        button.addEventHandler(MouseEvent.MOUSE_EXITED, event -> {
+            animateHover.stop();
+            imageView.setImage(images[0]);
+        });
 
-        button.setGraphic(imageView);
-        
-        //Create function
         button.setOnAction(eventHandler);
 
         return button;
