@@ -207,6 +207,8 @@ public class Client {
 			profile.setProfilePicURL(profileData.getJSONObject("response").getString("pfp"));
 		profile.setUserID(profileData.getJSONObject("response").getInt("UserID"));
 
+		profile.setBio(profileData.getJSONObject("response").optString("bio", ""));
+
 		return profile;
 	}
 
@@ -368,6 +370,27 @@ public class Client {
 
 		return received.getBoolean("response");
 	}
+
+	public void updateBio(String newBio) throws NetworkException {
+		JSONObject response = post("updateBio", Map.of("bio", newBio));
+		if (response.getBoolean("error")) {
+			throw new NetworkException(response.opt("response").toString());
+		}
+		profile.setBio(newBio);
+	}
+
+	public void changePassword(String oldPassword, String newPassword) throws NetworkException {
+		JSONObject response = post("changePassword", Map.of(
+			"oldPassword", oldPassword,
+			"newPassword", newPassword
+		));
+		
+		if (response.getBoolean("error"))
+			throw new NetworkException(response.opt("response").toString());
+	
+		profile.setPassword(hashPassword(newPassword));
+	}
+	
 
 	// Retrieve all of user's friends
 	public List<Friend> getFriends() {

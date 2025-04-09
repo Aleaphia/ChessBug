@@ -44,4 +44,24 @@ public class ProfileController {
             view.updateProfileView(client.getProfile());
         }
     }
+
+    public void updateBio(String newBio) {
+        try {
+            client.updateBio(newBio);
+            getModel().setBio(newBio);
+        } catch (NetworkException e) {
+            System.err.println("Unable to update bio.");
+            e.printStackTrace();
+        }
+    }
+
+    public void resetPassword(String oldPassword, String newPassword) {
+        try {
+            client.changePassword(oldPassword, newPassword);
+            getModel().setPassword(newPassword);
+        } catch (NetworkException e) {
+            System.err.println("Password reset failed.");
+            e.printStackTrace();
+        }
+    }
 }

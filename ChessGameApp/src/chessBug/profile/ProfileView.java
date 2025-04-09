@@ -28,6 +28,9 @@ public class ProfileView extends VBox {
     private ProfileController controller;
     private TextField usernameField, emailField;
     private Button changeProfilePicButton;
+    private TextField bioField;
+    private TextField oldPasswordField;
+    private TextField newPasswordField;
 
     public ProfileView(ProfileController controller, Client client) {
         this.controller = controller;
@@ -73,6 +76,20 @@ public class ProfileView extends VBox {
         emailField.setMaxWidth(300);
         emailField.setPromptText("Enter your email address");
 
+        //Bio Field
+        bioField = new TextField(controller.getModel().getBio());
+        bioField.setMaxWidth(300);
+        bioField.setPromptText("Enter your bio");
+
+        //Password Fields
+        oldPasswordField = new TextField();
+        oldPasswordField.setPromptText("Old Password");
+        oldPasswordField.setMaxWidth(300);
+
+        newPasswordField = new TextField();
+        newPasswordField.setPromptText("New Password");
+        newPasswordField.setMaxWidth(300);
+
         // Buttons with Updated Styles
         Button updateProfileButton = new Button("Update Profile");
         updateProfileButton.setStyle("-fx-background-color: #4e8af3; -fx-text-fill: white;");
@@ -82,13 +99,42 @@ public class ProfileView extends VBox {
         changeProfilePicButton.setStyle("-fx-background-color: #4e8af3; -fx-text-fill: white;");
         changeProfilePicButton.setOnAction(e -> openFileChooserForProfilePic(client));
 
+        Button updateBioButton = new Button("Update Bio");
+        updateBioButton.setOnAction(e -> controller.updateBio(bioField.getText()));
+        updateBioButton.setStyle("-fx-background-color: #4e8af3; -fx-text-fill: white;");
+
+        Button resetPasswordButton = new Button("Reset Password");
+        resetPasswordButton.setOnAction(e -> {
+            String oldPass = oldPasswordField.getText();
+            String newPass = newPasswordField.getText();
+            if (oldPass.isEmpty() || newPass.isEmpty()) {
+                showError("Both password fields must be filled");
+            } else {
+                controller.resetPassword(oldPass, newPass);
+                showConfirmation();
+            }           
+        });
+        
+
         // Layout - Using VBox to stack profile image, text, fields, and buttons
         StackPane profileStack = new StackPane(banner, profileImageView);
         profileStack.setAlignment(Pos.CENTER);
         profileImageView.setTranslateY(25);
 
         // User Info Section
-        VBox userInfoSection = new VBox(10, profileStack, usernameText, emailText, profileDescriptionText, usernameField, emailField, updateProfileButton, changeProfilePicButton);
+        VBox userInfoSection = new VBox(10, profileStack, 
+        usernameText, 
+        emailText, 
+        profileDescriptionText, 
+        usernameField, 
+        emailField, 
+        updateProfileButton, 
+        changeProfilePicButton,
+        updateBioButton,
+        oldPasswordField,
+        newPasswordField,
+        resetPasswordButton
+        );
         userInfoSection.setAlignment(Pos.CENTER);
         userInfoSection.setSpacing(15);
 

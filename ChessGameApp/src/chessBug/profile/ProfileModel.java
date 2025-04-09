@@ -1,7 +1,5 @@
 package chessBug.profile;
 
-import java.io.Serializable;
-
 public class ProfileModel {
     private int userID;
     private String username;
@@ -57,5 +55,15 @@ public class ProfileModel {
 
     public void setProfilePicURL(String profilePicURL) {
         this.profilePicURL = profilePicURL;
+    }
+
+    private String bio;
+
+    public String getBio() {
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
     }
 }
