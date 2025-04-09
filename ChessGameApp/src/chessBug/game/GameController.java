@@ -117,16 +117,18 @@ public class GameController implements IGameSelectionController, IGameCreationCo
     
     private void databaseChecks(){
         //System.out.println("Debug: GameController DatabaseCheck" );
-        match.poll(client).forEach((move) -> internalPlayerMove(move));
-        view.refresh(client);
+        try {
+            match.poll(client).forEach((move) -> internalPlayerMove(move));
+            view.refresh(client);
+        } catch (NetworkException ignored) {} // We'll try again in a moment
     }
     
     //Getter Methods ===========================================================
     public Pane getPage(){return page;}
     
     //Database information
-    public Stream<Message> getChatMessages(){return chat.poll(client);}
-    public Stream<String> getMatchMoves(){return match.poll(client);}
+    public Stream<Message> getChatMessages() throws NetworkException {return chat.poll(client);}
+    public Stream<String> getMatchMoves() throws NetworkException {return match.poll(client);}
     
     //Model information
     public Piece getLocalPiece(String square){return model.getLocalPiece(square);}
@@ -147,14 +149,14 @@ public class GameController implements IGameSelectionController, IGameCreationCo
     @Override public void addToDatabaseCheckList(DatabaseCheck item){databaseCheckList.add(item);}
     //IGameSelectionController methods
     @Override public String getUsername(){return client.getOwnUser().getUsername();}
-    @Override public void acceptMatchRequest(Match match){client.acceptMatchRequest(match);}
-    @Override public void denyMatchRequest(Match match){client.denyMatchRequest(match);}
-    @Override public void forfeitMatch(Match match){client.forfeitMatch(match);}
-    @Override public void selectGame(Match newMatch){internalSelectGame(newMatch);}
+    @Override public void acceptMatchRequest(Match match) throws NetworkException {client.acceptMatchRequest(match);}
+    @Override public void denyMatchRequest(Match match) throws NetworkException {client.denyMatchRequest(match);}
+    @Override public void forfeitMatch(Match match) throws NetworkException {client.forfeitMatch(match);}
+    @Override public void selectGame(Match newMatch) {internalSelectGame(newMatch);}
     
     
     //IGameCreationController methods
-    @Override public List<Friend> getFriendList(){return client.getFriends();}
+    @Override public List<Friend> getFriendList() throws NetworkException {return client.getFriends();}
     @Override public void sendGameRequest(Boolean playerColor, User opponent){
         // Send new match request in database for opponent
         try{
@@ -170,17 +172,17 @@ public class GameController implements IGameSelectionController, IGameCreationCo
     /** sendChatMessage - sends chat message to database
      *  @param msg - chat message to send
      */
-    public void sendChatMessage(String msg){chat.send(client, msg);}
+    public void sendChatMessage(String msg) throws NetworkException {chat.send(client, msg);}
     /** forfeit - automatically lose game
      */
-    public void forfeitMatch(){forfeitMatch(match);}
+    public void forfeitMatch() throws NetworkException {forfeitMatch(match);}
     
     /** playerMove - makes extra changes needed for user moves (not database moves), e.g., update database, clear selected square from model
      *  Add code here if it should only happen when the move comes from this client/user
      * 
      * @param notation - chess move in coordinate notation (e.g., e2e4 or e7e8Q)
      */
-    public void playerMove(String notation){
+    public void playerMove(String notation) throws NetworkException {
         //Check for legal move, also performs updates independent of move origin
         if (PreferencesController.confirmMove() && internalPlayerMove(notation)){
             //Update database
@@ -249,7 +251,7 @@ public class GameController implements IGameSelectionController, IGameCreationCo
         //Cache match and chat
         this.match = match;
         chat = this.match.getChat();
-                        
+
         //Build model
         boolean playerColor = this.match.getWhite().equals(client.getOwnUser()); //Assumes player is valid player in match
         model = new GameModel(playerColor);
@@ -266,7 +268,9 @@ public class GameController implements IGameSelectionController, IGameCreationCo
         HBox.setHgrow(rightRegion, Priority.ALWAYS);
                 
         //Update chat/match status
-        this.match.poll(client).forEach((move) -> internalPlayerMove(move));
+        try {
+            this.match.poll(client).forEach((move) -> internalPlayerMove(move));
+        } catch(NetworkException ignored) {} // We'll try again soon
         if (!model.getGameComplete()
                 && this.match.getStatus().charAt(5) == 'W'){ //Acount for forfeit wins that wouldn't otherwise get noticed
                 model.endGame();
