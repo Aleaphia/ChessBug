@@ -60,6 +60,7 @@ public class ProfileView extends VBox {
 
         // Profile Description Text
         profileDescriptionText = new Text("Add a brief description about yourself...");
+        profileDescriptionText.setText(controller.getModel().getBio());
         profileDescriptionText.setStyle("-fx-font-size: 14px; -fx-fill: gray; -fx-font-style: italic;");
 
         // Username and Email Text
@@ -102,8 +103,16 @@ public class ProfileView extends VBox {
         changeProfilePicButton.setOnAction(e -> openFileChooserForProfilePic(client));
 
         Button updateBioButton = new Button("Update Bio");
-        updateBioButton.setOnAction(e -> controller.updateBio(bioField.getText()));
-        updateBioButton.setStyle("-fx-background-color: #4e8af3; -fx-text-fill: white;");
+updateBioButton.setStyle("-fx-background-color: #4e8af3; -fx-text-fill: white;");
+updateBioButton.setOnAction(e -> {
+    String newBio = bioField.getText();
+    if (newBio == null || newBio.isBlank()) {
+        showError("Bio cannot be empty.");
+    } else {
+        controller.updateBio(newBio); // this calls into the ProfileController
+        showConfirmation();
+    }
+});
 
         Button resetPasswordButton = new Button("Reset Password");
         resetPasswordButton.setOnAction(e -> {
@@ -129,7 +138,8 @@ public class ProfileView extends VBox {
         emailText, 
         profileDescriptionText, 
         usernameField, 
-        emailField, 
+        emailField,
+        bioField, 
         updateProfileButton, 
         changeProfilePicButton,
         updateBioButton,
@@ -167,17 +177,34 @@ public class ProfileView extends VBox {
 
     //Update profile view
     public void updateProfileView(ProfileModel updatedProfile) {
+        // Update username if it's changed
         if (!usernameText.getText().equals(updatedProfile.getUsername())) {
             usernameText.setText(updatedProfile.getUsername());
         }
+    
+        // Update email if it's changed
         if (!emailText.getText().equals(updatedProfile.getEmail())) {
             emailText.setText(updatedProfile.getEmail());
         }
-        
+    
+        // Update profile picture if it's changed
         if (!profileImageView.getImage().getUrl().endsWith(updatedProfile.getProfilePicURL())) {
             profileImageView.setImage(new Image(updatedProfile.getProfilePicURL()));
         }
+    
+        // ✅ Update bio if it's changed
+        String newBio = updatedProfile.getBio();
+        String currentBio = profileDescriptionText.getText();
+    
+        if (newBio != null && !newBio.equals(currentBio)) {
+            if (newBio.isBlank()) {
+                profileDescriptionText.setText("Add a brief description about yourself...");
+            } else {
+                profileDescriptionText.setText(newBio);
+            }
+        }
     }
+    
 
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);

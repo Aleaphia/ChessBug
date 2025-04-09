@@ -49,6 +49,7 @@ public class ProfileController {
         try {
             client.updateBio(newBio);
             getModel().setBio(newBio);
+            view.updateProfileView(getModel());
         } catch (NetworkException e) {
             System.err.println("Unable to update bio.");
             e.printStackTrace();
