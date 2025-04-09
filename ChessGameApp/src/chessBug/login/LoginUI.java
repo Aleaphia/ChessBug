@@ -1,8 +1,9 @@
 package chessBug.login;
 
-import org.json.JSONObject;
-
 import chessBug.preferences.PreferencesController;
+import chessBug.profile.ProfileModel;
+import org.json.JSONObject;
+import com.warrenstrange.googleauth.GoogleAuthenticator;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -10,8 +11,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 
 public class LoginUI {
     private Node page;
@@ -51,19 +53,85 @@ public class LoginUI {
 
         //Jump from username to password filds
         usernameField.setOnAction(event -> passwordField.requestFocus());
-        
+
+        // 2FA field (initially hidden)
+        TextField otpField = new TextField();
+        otpField.setPromptText("Enter 2FA Code (if enabled)");
+        otpField.getStyleClass().add("loginField");
+        otpField.setVisible(false); // Hide OTP field initially
+
         // Login Button
         Button loginButton = new Button("Login");
         loginButton.setStyle("-fx-background-color: #5865F2; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5px;");
         loginButton.setDefaultButton(true);
         loginButton.setOnAction(event -> {
+            // First, try to log in with the username and password
             JSONObject response = handleLogin.handle(usernameField.getText(), passwordField.getText());
+
+            // If login is unsuccessful, show error
             if (response.getBoolean("error")) {
                 errorTitle.setText("Login Failed");
                 errorDescription.setText(response.getString("response"));
                 if (!loginPage.getChildren().contains(errorTitle)) {
                     loginPage.getChildren().addAll(errorTitle, errorDescription);
                 }
+            } else {
+                // Check if 2FA is enabled
+                boolean is2FAEnabled = response.has("2fa") && response.getBoolean("2fa");
+
+                if (is2FAEnabled) {
+                    // Show the OTP field if 2FA is enabled
+                    otpField.setVisible(true);
+                    
+                    // Check for 2FA secret key
+                    if (!response.has("secretKey")) {
+                        errorTitle.setText("2FA Setup Error");
+                        errorDescription.setText("No secret key found for 2FA validation.");
+                        if (!loginPage.getChildren().contains(errorTitle)) {
+                            loginPage.getChildren().addAll(errorTitle, errorDescription);
+                        }
+                        return;
+                    }
+                    
+                    String secretKey = response.getString("secretKey");
+                    String otpText = otpField.getText().trim();
+
+                    // Validate 2FA code
+                    if (otpText.isEmpty()) {
+                        errorTitle.setText("2FA Required");
+                        errorDescription.setText("Please enter your 2FA code.");
+                        if (!loginPage.getChildren().contains(errorTitle)) {
+                            loginPage.getChildren().addAll(errorTitle, errorDescription);
+                        }
+                        return;
+                    }
+
+                    try {
+                        int otp = Integer.parseInt(otpText);
+                        GoogleAuthenticator gAuth = new GoogleAuthenticator();
+                        boolean isValid = gAuth.authorize(secretKey, otp);
+
+                        if (!isValid) {
+                            errorTitle.setText("Invalid 2FA Code");
+                            errorDescription.setText("Please enter the correct 2FA code.");
+                            if (!loginPage.getChildren().contains(errorTitle)) {
+                                loginPage.getChildren().addAll(errorTitle, errorDescription);
+                            }
+                            return;
+                        }
+                    } catch (NumberFormatException e) {
+                        errorTitle.setText("Invalid Code");
+                        errorDescription.setText("2FA code must be a number.");
+                        if (!loginPage.getChildren().contains(errorTitle)) {
+                            loginPage.getChildren().addAll(errorTitle, errorDescription);
+                        }
+                        return;
+                    }
+                }
+
+                // If login is successful or 2FA is validated
+                System.out.println("Login successful!");
+                // Proceed with app flow after successful login
             }
         });
 
@@ -82,18 +150,18 @@ public class LoginUI {
         });
 
         // Add components to the login page
-        loginPage.getChildren().addAll(loginTitle, subtitle, usernameField, passwordField, loginButton, createAccountButton);
+        loginPage.getChildren().addAll(loginTitle, subtitle, usernameField, passwordField, otpField, loginButton, createAccountButton);
         StackPane page = new StackPane(loginPage);
         page.setStyle("-fx-width: 33.33%; -fx-alignment: center;");
         return page;
     }
     
-    public void savedLogin() throws Exception{
-        //Check that there is a string returned
+    public void savedLogin() throws Exception {
+        // Check that there is a string returned
         if (PreferencesController.getUsername().isBlank() ||
                 PreferencesController.getPassword().isBlank())
             throw new Exception();
-        //Try to login
+        // Try to login
         JSONObject response = handleSavedLogin.handle(
                 PreferencesController.getUsername(),
                 PreferencesController.getPassword());

@@ -39,6 +39,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
@@ -112,24 +113,33 @@ public class ChessBug extends Application {
         timeline.play();
     }
     
-    private LoginUI createLoginPage(){
+    private LoginUI createLoginPage() {
         loginPane = new GridPane();
         loginPane.getStyleClass().addAll("background", "login");
-
+    
         // Set up sizing constraints, middle is always 300x480, and everything else grows and shrinks around it
         RowConstraints row = new RowConstraints(0, 0, Double.MAX_VALUE, Priority.ALWAYS, VPos.CENTER, true),
-                   rowMain = new RowConstraints(480, 480, 480);
+                       rowMain = new RowConstraints(480, 480, 480);
         loginPane.getRowConstraints().addAll(row, rowMain, row);
         ColumnConstraints column = new ColumnConstraints(0, 0, Double.MAX_VALUE, Priority.ALWAYS, HPos.CENTER, true),
-                      columnMain = new ColumnConstraints(300, 300, 300);
+                          columnMain = new ColumnConstraints(300, 300, 300);
         loginPane.getColumnConstraints().addAll(column, columnMain, column);
-
-         LoginUI loginUI = new LoginUI(
+    
+        LoginUI loginUI = new LoginUI(
             (String username, String password) -> { // Handle login
                 JSONObject out = new JSONObject();
                 try {
                     client = new Client(username, password);
-                    out.put("error", false);
+                    boolean is2FAEnabled = client.is2FAEnabled();  // Check if 2FA is enabled for the user
+                    if (is2FAEnabled) {
+                        String secretKey = client.get2FASecretKey();  // Get 2FA secret key
+                        out.put("error", false);
+                        out.put("2fa", true);        // 2FA enabled
+                        out.put("secretKey", secretKey);  // Include secret key in the response
+                    } else {
+                        out.put("error", false);
+                        out.put("2fa", false);       // 2FA not enabled
+                    }
                     successfulLogin();
                 } catch (ClientAuthException e) {
                     e.printStackTrace();
@@ -149,10 +159,10 @@ public class ChessBug extends Application {
                     out.put("error", true);
                     out.put("response", e.getServerResponse());
                 }
-
+    
                 return out;
             },
-            (String username, String password) -> {
+            (String username, String password) -> { // Handle saved login (pre-hashed)
                 JSONObject out = new JSONObject();
                 try {
                     client = Client.loginPreHashed(username, password);
@@ -166,11 +176,11 @@ public class ChessBug extends Application {
                 return out;
             }
         );
-
-        // mainPane.getChildren().add(loginUI.getPage());
-        loginPane.add(loginUI.getPage(), 1, 1);
+    
+        loginPane.add((Node) loginUI.getPage(), 1, 1);
         return loginUI;
     }
+    
     
     private void successfulLogin(){
         //Create Menu
