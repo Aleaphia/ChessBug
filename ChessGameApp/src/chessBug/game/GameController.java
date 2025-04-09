@@ -276,6 +276,7 @@ public class GameController implements IGameSelectionController, IGameCreationCo
                 model.endGame();
                 view.displayBotMessage(this.match.getStatus().substring(0,5) + " won by forfeit");
         }
+        view.addMessages(chat.getAllMessages().stream());
         view.refresh(client);
         //Check database
         addToDatabaseCheckList(()->databaseChecks());
