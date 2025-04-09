@@ -1,7 +1,7 @@
 plugins {
 	id 'application'
 	id 'org.openjfx.javafxplugin' version '0.1.0'
-        id 'org.beryx.jlink' version '3.0.1'
+    id 'org.beryx.jlink' version '3.0.1'
 }
 
 javafx {
@@ -32,7 +32,7 @@ dependencies {
     implementation 'com.google.zxing:javase:3.5.1'
 
     //Javafx-Media for sounds
-    implementation 'org.openjfx:javafx-media:17'
+    implementation 'org.openjfx:javafx-media:23'
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -66,3 +66,12 @@ task clientExample(dependsOn: classes, type: JavaExec) {
 run {
     standardInput = System.in
 }
+
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += ['--add-reads', 'chessbug=ALL-UNNAMED']
+}
+
+tasks.withType(JavaExec).configureEach {
+    jvmArgs += ['--add-reads', 'chessbug=ALL-UNNAMED']
+}
+

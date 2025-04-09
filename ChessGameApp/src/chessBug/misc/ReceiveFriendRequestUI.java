@@ -25,11 +25,13 @@ public class ReceiveFriendRequestUI {
         
         //Add database checks
         this.controller.addToDatabaseCheckList(() -> new Thread(() -> {
-            List<User> requests = controller.receiveFriendRequest();
-            if(!requests.equals(cachedRequests)) {
-                cachedRequests = requests;
-                newRequestsFlag = true;
-            }
+            try {
+                List<User> requests = controller.receiveFriendRequest();
+                if(!requests.equals(cachedRequests)) {
+                    cachedRequests = requests;
+                    newRequestsFlag = true;
+                }
+            } catch (NetworkException ignored) {} // We'll try again soon
         }).start());
         this.controller.addToDatabaseCheckList(() -> updateRequestField());
     }
@@ -68,12 +70,22 @@ public class ReceiveFriendRequestUI {
 
             //Function
             accept.setOnAction(event -> {
-                controller.acceptFriendRequest(user.getUsername());
-                curr.getChildren().clear();
+                try {
+                    controller.acceptFriendRequest(user.getUsername());
+                    curr.getChildren().clear();
+                } catch(NetworkException e) {
+                    System.err.println("Unable to accept friend request!");
+                    e.printStackTrace();
+                }
             });
             deny.setOnAction(event -> {
-                controller.denyFriendRequest(user.getUsername());
-                curr.getChildren().clear();
+                try {
+                    controller.denyFriendRequest(user.getUsername());
+                    curr.getChildren().clear();
+                } catch(NetworkException e) {
+                    System.err.println("Unable to accept friend request!");
+                    e.printStackTrace();
+                }
             });
         });
         

@@ -2,6 +2,8 @@ package chessBug.misc;
 
 import chessBug.controllerInterfaces.IGameCreationController;
 import chessBug.network.Friend;
+import chessBug.network.NetworkException;
+
 import java.util.Random;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -87,15 +89,17 @@ public class GameCreationUI {
         VBox friendBox = new VBox();
         ScrollPane scroll = new ScrollPane(friendBox);
         
-        for(Friend friend : controller.getFriendList()){
-            RadioButton curr = new RadioButton(friend.getUsername());
-            curr.setOnAction(event -> friendSelection[0] = friend);
-            curr.setToggleGroup(friendOptions);
-            friendBox.getChildren().add(curr);//add(curr, 1, row++, 2, 1);
-            
-            //Style
-            curr.getStyleClass().add("label");
-        }
+        try {
+            for(Friend friend : controller.getFriendList()){
+                RadioButton curr = new RadioButton(friend.getUsername());
+                curr.setOnAction(event -> friendSelection[0] = friend);
+                curr.setToggleGroup(friendOptions);
+                friendBox.getChildren().add(curr);//add(curr, 1, row++, 2, 1);
+                
+                //Style
+                curr.getStyleClass().add("label");
+            }
+        } catch (NetworkException ignored) {} // We'll try again soon
         page.add(scroll, 1, row++, 2 ,1);
         
         //Create game button
@@ -111,10 +115,15 @@ public class GameCreationUI {
                 }
 
                 //Create new game
-                controller.sendGameRequest(playerColor, friendSelection[0]);
-                
-                //Reset pannel
-                addNewGameButton();
+                try {
+                    controller.sendGameRequest(playerColor, friendSelection[0]);
+                    
+                    //Reset pannel
+                    addNewGameButton();
+                } catch (NetworkException e) {
+                    System.err.println("Couldn't send game request!");
+                    e.printStackTrace();
+                }
             }
             
         });

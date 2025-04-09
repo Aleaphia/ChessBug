@@ -72,9 +72,14 @@ public class GameView {
         gameBoard.add(msgBoard, 0, 9, 9, 1); //Add msgBoard to center
         Button forfeit = new Button("Forfeit");
         forfeit.setOnAction(event -> {
-            controller.forfeitMatch();
-            displayBotMessage(controller.getUsername() + " forfeits.");
-                });
+            try {
+                controller.forfeitMatch();
+                displayBotMessage(controller.getUsername() + " forfeits.");
+            } catch(NetworkException e) {
+                System.err.println("Failed to forfeit!");
+                e.printStackTrace();
+            }
+        });
         
         gameBoard.add(forfeit, 7, 10, 2, 1);
         
@@ -181,10 +186,15 @@ public class GameView {
             String msg = msgInput.getText();
 
             //Send msg to database
-            controller.sendChatMessage(msg);
+            try {
+                controller.sendChatMessage(msg);
+                //Clear input
+                msgInput.setText("");
+            } catch (NetworkException e) {
+                System.err.println("Failed to send message!");
+                e.printStackTrace();
+            }
 
-            //Clear input
-            msgInput.setText("");
         });
         
         return chatSpace;
@@ -332,7 +342,12 @@ public class GameView {
                     selection of a piece.*/
                     promote(square, potentialMove);
                 } else {
-                    controller.playerMove(potentialMove);
+                    try {
+                        controller.playerMove(potentialMove);
+                    } catch (NetworkException e) {
+                        System.err.println("Could not make move!");
+                        e.printStackTrace();
+                    }
                 }
             }
             //==================================================================
@@ -358,8 +373,13 @@ public class GameView {
                 icon.setPreserveRatio(true); //Maintain ratio
                 //Add function
                 icon.setOnMouseClicked(event -> {
-                    char promotionChoice = (piece.charAt(0) == 'K') ? 'N' : piece.charAt(0); //user the first letter of each peice (but knights use N instead of K)
-                    controller.playerMove(potentialMove + promotionChoice);
+                    try {
+                        char promotionChoice = (piece.charAt(0) == 'K') ? 'N' : piece.charAt(0); //user the first letter of each peice (but knights use N instead of K)
+                        controller.playerMove(potentialMove + promotionChoice);
+                    } catch (NetworkException e) {
+                        System.err.println("Failed to promote piece!");
+                        e.printStackTrace();
+                    }
                 });
 
                 //Add to pane
@@ -394,35 +414,40 @@ public class GameView {
     private void internalRefreshMessageBoard(Client client) {
         
         //Get any new messages, add each message to the chat
-        controller.getChatMessages().forEach(msg -> {
-            long time = System.currentTimeMillis(); //DEBUG
-            HBox messageContainer = new HBox();
-            //System.out.println(System.currentTimeMillis() - time); //DEBUG
-            //Build content
-            //profile picture
-            ImageView pfpView = new ImageView(msg.getAuthor().getProfilePicture());
-            //System.out.println(System.currentTimeMillis() - time); //DEBUG
-            StackPane pfpViewContainer = new StackPane(pfpView);
-            
-            pfpView.setFitWidth(32);
-            pfpView.setFitHeight(32);
-            pfpViewContainer.getStyleClass().add("chatPfp");
-            //System.out.println(System.currentTimeMillis() - time);
-            
-            //Message
-            Label label = new Label(msg.getAuthor().getUsername() + ": " + msg.getContent());
-            
-            label.getStyleClass().addAll("chatMessage",
-                    //Test if the client player sent this message and add appropriate style class
-                    (msg.getAuthor().equals(controller.getUsername()))? 
-                            "thisPlayerMessage": "otherPlayerMessage");
-            System.out.println(System.currentTimeMillis() - time);
-            
-            //Add contents to chat container
-            messageContainer.getChildren().addAll(pfpViewContainer, label);
-            chatContent.getChildren().add(messageContainer);
-            System.out.println(System.currentTimeMillis() - time);
-        });
+        try {
+            controller.getChatMessages().forEach(msg -> {
+                long time = System.currentTimeMillis(); //DEBUG
+                HBox messageContainer = new HBox();
+                //System.out.println(System.currentTimeMillis() - time); //DEBUG
+                //Build content
+                //profile picture
+                ImageView pfpView = new ImageView(msg.getAuthor().getProfilePicture());
+                //System.out.println(System.currentTimeMillis() - time); //DEBUG
+                StackPane pfpViewContainer = new StackPane(pfpView);
+                
+                pfpView.setFitWidth(32);
+                pfpView.setFitHeight(32);
+                pfpViewContainer.getStyleClass().add("chatPfp");
+                //System.out.println(System.currentTimeMillis() - time);
+                
+                //Message
+                Label label = new Label(msg.getAuthor().getUsername() + ": " + msg.getContent());
+                
+                label.getStyleClass().addAll("chatMessage",
+                        //Test if the client player sent this message and add appropriate style class
+                        (msg.getAuthor().equals(controller.getUsername()))? 
+                                "thisPlayerMessage": "otherPlayerMessage");
+                System.out.println(System.currentTimeMillis() - time);
+                
+                //Add contents to chat container
+                messageContainer.getChildren().addAll(pfpViewContainer, label);
+                chatContent.getChildren().add(messageContainer);
+                System.out.println(System.currentTimeMillis() - time);
+            });
+        } catch (NetworkException e) {
+            System.err.println("Failed to get chat messages!");
+            e.printStackTrace();
+        }
     }
     private void refreshGameDisplay() {
         //Update each square in chessBoard to reflect game's condition

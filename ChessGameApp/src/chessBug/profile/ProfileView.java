@@ -1,8 +1,10 @@
 package chessBug.profile;
 
 import java.io.File;
+import java.io.IOException;
 
 import chessBug.network.Client;
+import chessBug.network.NetworkException;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
@@ -28,6 +30,9 @@ public class ProfileView extends VBox {
     private ProfileController controller;
     private TextField usernameField, emailField;
     private Button changeProfilePicButton;
+    private TextField bioField;
+    private TextField oldPasswordField;
+    private TextField newPasswordField;
 
     public ProfileView(ProfileController controller, Client client) {
         this.controller = controller;
@@ -55,6 +60,7 @@ public class ProfileView extends VBox {
 
         // Profile Description Text
         profileDescriptionText = new Text("Add a brief description about yourself...");
+        profileDescriptionText.setText(controller.getModel().getBio());
         profileDescriptionText.setStyle("-fx-font-size: 14px; -fx-fill: gray; -fx-font-style: italic;");
 
         // Username and Email Text
@@ -73,6 +79,20 @@ public class ProfileView extends VBox {
         emailField.setMaxWidth(300);
         emailField.setPromptText("Enter your email address");
 
+        //Bio Field
+        bioField = new TextField(controller.getModel().getBio());
+        bioField.setMaxWidth(300);
+        bioField.setPromptText("Enter your bio");
+
+        //Password Fields
+        oldPasswordField = new TextField();
+        oldPasswordField.setPromptText("Old Password");
+        oldPasswordField.setMaxWidth(300);
+
+        newPasswordField = new TextField();
+        newPasswordField.setPromptText("New Password");
+        newPasswordField.setMaxWidth(300);
+
         // Buttons with Updated Styles
         Button updateProfileButton = new Button("Update Profile");
         updateProfileButton.setStyle("-fx-background-color: #4e8af3; -fx-text-fill: white;");
@@ -82,13 +102,51 @@ public class ProfileView extends VBox {
         changeProfilePicButton.setStyle("-fx-background-color: #4e8af3; -fx-text-fill: white;");
         changeProfilePicButton.setOnAction(e -> openFileChooserForProfilePic(client));
 
+        Button updateBioButton = new Button("Update Bio");
+updateBioButton.setStyle("-fx-background-color: #4e8af3; -fx-text-fill: white;");
+updateBioButton.setOnAction(e -> {
+    String newBio = bioField.getText();
+    if (newBio == null || newBio.isBlank()) {
+        showError("Bio cannot be empty.");
+    } else {
+        controller.updateBio(newBio); // this calls into the ProfileController
+        showConfirmation();
+    }
+});
+
+        Button resetPasswordButton = new Button("Reset Password");
+        resetPasswordButton.setOnAction(e -> {
+            String oldPass = oldPasswordField.getText();
+            String newPass = newPasswordField.getText();
+            if (oldPass.isEmpty() || newPass.isEmpty()) {
+                showError("Both password fields must be filled");
+            } else {
+                controller.resetPassword(oldPass, newPass);
+                showConfirmation();
+            }           
+        });
+        
+
         // Layout - Using VBox to stack profile image, text, fields, and buttons
         StackPane profileStack = new StackPane(banner, profileImageView);
         profileStack.setAlignment(Pos.CENTER);
         profileImageView.setTranslateY(25);
 
         // User Info Section
-        VBox userInfoSection = new VBox(10, profileStack, usernameText, emailText, profileDescriptionText, usernameField, emailField, updateProfileButton, changeProfilePicButton);
+        VBox userInfoSection = new VBox(10, profileStack, 
+        usernameText, 
+        emailText, 
+        profileDescriptionText, 
+        usernameField, 
+        emailField,
+        bioField, 
+        updateProfileButton, 
+        changeProfilePicButton,
+        updateBioButton,
+        oldPasswordField,
+        newPasswordField,
+        resetPasswordButton
+        );
         userInfoSection.setAlignment(Pos.CENTER);
         userInfoSection.setSpacing(15);
 
@@ -119,17 +177,34 @@ public class ProfileView extends VBox {
 
     //Update profile view
     public void updateProfileView(ProfileModel updatedProfile) {
+        // Update username if it's changed
         if (!usernameText.getText().equals(updatedProfile.getUsername())) {
             usernameText.setText(updatedProfile.getUsername());
         }
+    
+        // Update email if it's changed
         if (!emailText.getText().equals(updatedProfile.getEmail())) {
             emailText.setText(updatedProfile.getEmail());
         }
-        
+    
+        // Update profile picture if it's changed
         if (!profileImageView.getImage().getUrl().endsWith(updatedProfile.getProfilePicURL())) {
             profileImageView.setImage(new Image(updatedProfile.getProfilePicURL()));
         }
+    
+        // ✅ Update bio if it's changed
+        String newBio = updatedProfile.getBio();
+        String currentBio = profileDescriptionText.getText();
+    
+        if (newBio != null && !newBio.equals(currentBio)) {
+            if (newBio.isBlank()) {
+                profileDescriptionText.setText("Add a brief description about yourself...");
+            } else {
+                profileDescriptionText.setText(newBio);
+            }
+        }
     }
+    
 
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -155,8 +230,14 @@ public class ProfileView extends VBox {
         File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
             Image selectedImage = new Image("file:" + file.getAbsolutePath());
-            profileImageView.setImage(selectedImage);
-            client.uploadProfilePicture(file); // Ensure client method handles the file upload
+            try {
+                client.uploadProfilePicture(file); // Ensure client method handles the file upload
+                profileImageView.setImage(selectedImage);
+            } catch (NetworkException | IOException e) {
+                System.err.println("Unable to upload profile picture!");
+                showError("Unable to upload profile picture!");
+                e.printStackTrace();
+            }
         }
     }
 }

@@ -2,6 +2,8 @@ package chessBug.misc;
 
 import chessBug.controllerInterfaces.IGameSelectionController;
 import chessBug.network.Match;
+import chessBug.network.NetworkException;
+
 import java.util.List;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -20,7 +22,7 @@ public class GameSelectionUI {
     private IGameSelectionController controller;
     private GameStatus status;
     private GameList gameList;
-    private boolean remakeListFlag = true;
+    private boolean remakeListFlag = false;
     private List<Match> cachedGameList;
     
     public GameSelectionUI(IGameSelectionController controller, GameStatus status, GameList gameList){
@@ -29,18 +31,19 @@ public class GameSelectionUI {
         //Determine status
         this.status = status;
         this.gameList = gameList;
-        cachedGameList = gameList.getGameList();
 
         buildGameSelectionPrompt();
         
         //Add database checks, the database portion on another thread
         //We cannot put javafx stuff on another thread unfortunately, so keep the UI changing functions on this thread
         controller.addToDatabaseCheckList(()->new Thread(() -> {
-            List<Match> newCachedGameList = gameList.getGameList();
-            if(!cachedGameList.equals(newCachedGameList)) {
-                cachedGameList = newCachedGameList;
-                remakeListFlag = true;
-            }
+            try {
+                List<Match> newCachedGameList = gameList.getGameList();
+                if(!newCachedGameList.equals(cachedGameList)) {
+                    cachedGameList = newCachedGameList;
+                    remakeListFlag = true;
+                }
+            } catch (NetworkException ignored) {} // We'll try again soon
         }).start());
         controller.addToDatabaseCheckList(()->databaseChecks());
     }
@@ -74,7 +77,9 @@ public class GameSelectionUI {
         page.getChildren().addAll(header, scroll);
         
         //List Games
-        gameList.getGameList().forEach(match -> displayMatch(match)); 
+        try {
+            gameList.getGameList().forEach(match -> displayMatch(match)); 
+        } catch (NetworkException ignored) {} // we'll try again soon
        
         if(games.getChildren().isEmpty())
             games.getChildren().add(new Label("No current games"));
@@ -94,12 +99,17 @@ public class GameSelectionUI {
         
          matchButton.setOnAction(event -> {
             //If the match is requested, accept the Match
-            if(status == GameStatus.REQUESTED)
-                controller.acceptMatchRequest(match);
-            
-            page.getChildren().clear();
-            //Update controller
-            controller.selectGame(match);
+            try {
+                if(status == GameStatus.REQUESTED)
+                    controller.acceptMatchRequest(match);
+                
+                page.getChildren().clear();
+                //Update controller
+                controller.selectGame(match);
+            } catch(NetworkException e) {
+                System.err.println("Failed to accept match request");
+                e.printStackTrace();
+            }
         });
         
         
@@ -111,10 +121,15 @@ public class GameSelectionUI {
             
             //Function
             endButton.setOnAction(event -> {
-                if(status == GameStatus.REQUESTED)
-                    controller.denyMatchRequest(match);
-                else
-                    controller.forfeitMatch(match);
+                try {
+                    if(status == GameStatus.REQUESTED)
+                        controller.denyMatchRequest(match);
+                    else
+                        controller.forfeitMatch(match);
+                } catch (NetworkException e) {
+                    System.err.println("Could not deny/forfeit match!");
+                    e.printStackTrace();
+                }
             });
             
             //Style
@@ -144,7 +159,7 @@ public class GameSelectionUI {
     }
     
     public interface GameList{
-        public List<Match> getGameList();
+        public List<Match> getGameList() throws NetworkException;
     }
 
 }
