@@ -627,9 +627,17 @@
 		 }
 	 }
  
-	 public static String decrypt(byte[] data) throws Exception {
-		 return new String(CLIENT_DECRYPT.doFinal(Base64.getDecoder().decode(data)));
-	 }
+	public static String decrypt(byte[] data) throws Exception {
+		byte[] base64Decoded;
+		try {
+			base64Decoded = Base64.getDecoder().decode(data);
+		} catch (IllegalArgumentException e) {
+			System.out.println("Could not decode with base64: " + new String(data));
+			e.printStackTrace();
+		}
+		return new String(CLIENT_DECRYPT.doFinal(base64Decoded));
+	}
+
  
 	 // Send a string to a given function in the web api, return a JSON result
 	 public JSONObject post(String function, String message) {
