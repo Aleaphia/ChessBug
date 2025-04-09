@@ -8,7 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
 public class SendFriendRequestUI {
-    private VBox page = new VBox();
+    private final VBox page = new VBox();
     IFriendRequestController controller;
     
     public SendFriendRequestUI(IFriendRequestController controller){

@@ -1,8 +1,3 @@
-/*
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package chessBug.game;
 
 import chessBug.controllerInterfaces.IGameSelectionController;
@@ -214,9 +209,10 @@ public class GameController implements IGameSelectionController, IGameCreationCo
      *  @return true if the move was successfully made, false otherwise
      */
     private boolean internalPlayerMove(String notation){
+        //Handle end of game
         if (notation.equals("end")){
             String endMsg = model.getEndMessage();
-            if (endMsg == null){
+            if (endMsg == null){ //Game state is not at end -> someone forfeit
                 model.endGame();
                 endMsg = this.match.getStatus().substring(0,5) + " won by forfeit";
             }

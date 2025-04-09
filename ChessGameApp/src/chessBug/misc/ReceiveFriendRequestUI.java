@@ -12,8 +12,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 
 public class ReceiveFriendRequestUI {
-    private VBox page = new VBox();
-    private VBox friendRequests = new VBox();
+    private final VBox page = new VBox();
+    private final VBox friendRequests = new VBox();
     IFriendRequestController controller;
 
     boolean newRequestsFlag = false;

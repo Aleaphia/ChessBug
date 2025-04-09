@@ -57,12 +57,6 @@ public class PreferencesController {
         }
     }
 
-    // Handle auto-save preference change
-    protected static void handleAutoSave(boolean isEnabled) {
-        preferences.putBoolean("autoSaveEnabled", isEnabled); 
-        System.out.println("Auto-Save preference changed: " + (isEnabled ? "Enabled" : "Disabled"));
-    }
-
     protected static void handleShowMoveHints(boolean isEnabled) {
         preferences.putBoolean("showMoveHints", isEnabled); 
         System.out.println("Move Hints preference changed: " + (isEnabled ? "Enabled" : "Disabled")); 
@@ -110,11 +104,6 @@ public class PreferencesController {
     public static void setLogginCredentials(String username, String password){
         preferences.put("username", username);
         preferences.put("password", password);
-    }
-    
-    //Getter methods
-    public static boolean isAutoSaveEnabled() {
-        return preferences.getBoolean("autoSaveEnabled", true);
     }
     
     public static Double getVolume(){
