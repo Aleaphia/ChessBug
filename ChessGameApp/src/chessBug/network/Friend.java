@@ -4,7 +4,7 @@ package chessBug.network;
 public class Friend extends User {
 	private Chat chat;
 	public Friend(int id, String username, String pfp, int chatID) {
-		super(id, username, pfp);
+		super(id, username, pfp, null, false);
 		chat = new Chat(chatID);
 	}
 
