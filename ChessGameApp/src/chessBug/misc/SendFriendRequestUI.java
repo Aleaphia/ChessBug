@@ -1,6 +1,7 @@
 package chessBug.misc;
 
 import chessBug.controllerInterfaces.IFriendRequestController;
+import chessBug.network.NetworkException;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Button;
@@ -42,9 +43,12 @@ public class SendFriendRequestUI {
             page.getChildren().clear();
         
             //Try to send friend request and display sucess status
-            boolean isRequestSent = controller.sendFriendRequest(friendUsername);
-            String msg = (isRequestSent)? "Request sent" : "Error: Request not sent";
-            page.getChildren().add(new Label(msg));
+            try {
+                controller.sendFriendRequest(friendUsername);
+                page.getChildren().add(new Label("Request sent"));
+            } catch (NetworkException e) {
+                page.getChildren().add(new Label("Error: Request not sent"));
+            }
             
             //Close request field
             buildClosedRequestField();

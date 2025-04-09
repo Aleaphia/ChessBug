@@ -10,9 +10,7 @@ import chessBug.misc.GameSelectionUI;
 import chessBug.misc.ReceiveFriendRequestUI;
 import chessBug.misc.SendFriendRequestUI;
 import chessBug.network.Friend;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
-import javafx.event.ActionEvent;
+import chessBug.network.NetworkException;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -21,7 +19,6 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.util.Duration;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
@@ -68,16 +65,18 @@ public class HomeView {
             updateStatsLabels();
         });
         controller.addToDatabaseCheckList(() -> new Thread(() -> {
-            JSONObject stats = controller.getGameStats();
-            if(!stats.equals(cachedStats)) {
-                newStatsFlag = true;
-                cachedStats = stats;
-            }
-            List<Friend> friends = controller.getFriends();
-            if(!friends.equals(cachedFriends)) {
-                newFriendsFlag = true;
-                cachedFriends = friends;
-            }
+            try {
+                JSONObject stats = controller.getGameStats();
+                if(!stats.equals(cachedStats)) {
+                    newStatsFlag = true;
+                    cachedStats = stats;
+                }
+                List<Friend> friends = controller.getFriends();
+                if(!friends.equals(cachedFriends)) {
+                    newFriendsFlag = true;
+                    cachedFriends = friends;
+                }
+            } catch (NetworkException ignored) {} // If there's an error while trying to get stats or friends, just ignore it, it'll try again soon
         }).start());
     }
     

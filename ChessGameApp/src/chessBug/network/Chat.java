@@ -8,7 +8,6 @@
 package chessBug.network;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -30,15 +29,9 @@ public class Chat {
 		messages = new ArrayList<>();
 	}
 
-	public Stream<Message> poll(Client client) {
+	public Stream<Message> poll(Client client) throws NetworkException {
 		// Ask the server how many messages exist in the current chat
 		JSONObject numMessagesResponse = client.post("getMessageCount", Map.of("chat", chatID));
-
-		if(numMessagesResponse.getBoolean("error")) {
-			System.err.println("Could not retrieve message count! Chat: " + chatID);
-			System.err.println(numMessagesResponse.opt("response"));
-			return Stream.empty();
-		}
 
 		// If the number of messages if more than the amount we've already counted, grab al new messages
 		int currentNumber;
@@ -50,12 +43,6 @@ public class Chat {
 
 		// Ask for all new messages (the current number of messages in chat, minus the ones we've already collected)
 		JSONObject getMessagesResponse = client.post("getNMessages", Map.of("chat", chatID, "num", currentNumber - messageNumber));
-
-		if(getMessagesResponse.getBoolean("error")) {
-			System.err.println("Could not retrieve " + (currentNumber - messageNumber) + " messages from chat: " + chatID);
-			System.err.println(getMessagesResponse.opt("response"));
-			return Stream.empty();
-		}
 
 		// Poll through list of new messages
 		JSONArray retrievedMessages = getMessagesResponse.getJSONArray("response");
@@ -79,7 +66,7 @@ public class Chat {
 		return chatID;
 	}
 
-	public void send(Client from, String content) {
+	public void send(Client from, String content) throws NetworkException {
 		from.post("sendMessage", Map.of("chat", chatID, "content", content));
 	}
 }

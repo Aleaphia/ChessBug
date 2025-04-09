@@ -48,14 +48,9 @@ public class Match {
 	}
 
 	//Load new moves from the server
-	public Stream<String> poll(Client client) {
+	public Stream<String> poll(Client client) throws NetworkException {
 		// Ask the server how many moves exist in the current match
 		JSONObject numMovesResponse = client.post("getMatchMoveCount", Map.of("match", matchID));
-		if(numMovesResponse.getBoolean("error")) {
-			System.err.println("Could not retrieve match move count! Match: " + matchID);
-			System.err.println(numMovesResponse.opt("response"));
-			return Stream.empty();
-		}
 
 		// If the number of moves if more than the amount we've already counted, grab all new moves
 		int currentNumber;
@@ -67,12 +62,6 @@ public class Match {
 
 		// Ask for all new moves (current number of match moves minus number already retrieved)
 		JSONObject getMovesResponse = client.post("getNMatchMoves", Map.of("match", matchID, "num", currentNumber - movesNumber));
-
-		if(getMovesResponse.getBoolean("error")) {
-			System.err.println("Could not retrieve " + (currentNumber - movesNumber) + " moves from chess match: " + matchID);
-			System.err.println(getMovesResponse.opt("response"));
-			return Stream.empty();
-		}
 
 		// Poll through new moves
 		JSONArray retrievedMoves = getMovesResponse.getJSONArray("response");
@@ -123,13 +112,13 @@ public class Match {
         }
 
 	// Make a move, update client side moves and moveNumber while also updating the server
-	public void makeMove(Client from, String move) {
-                movesNumber++; //Iterate move count
-                moves.add(move); //Add new move to the list
+	public void makeMove(Client from, String move) throws NetworkException {
 		JSONObject message = new JSONObject();
 		message.put("match", matchID);
 		message.put("move", move);
 		from.post("makeMove", message);
+                movesNumber++; //Iterate move count
+                moves.add(move); //Add new move to the list
 	}
         
         @Override

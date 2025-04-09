@@ -7,7 +7,7 @@ import java.util.Scanner;
 import java.util.stream.Stream;
 
 public class Example {
-	public static void main(String[] args) {
+	public static void main(String[] args) throws NetworkException {
 		// User enters login information to log in to the application
 		// ~~~~~~~~~~~~~~
 		Client client;

@@ -81,35 +81,26 @@ public class Client {
 		// Call "login" function from the server
 		System.out.println("Hashed password to: " + hashPassword(password));
 		profile = new ProfileModel(0, username, hashPassword(password), "", User.DEFAULT_PROFILE_PICTURE);
-		JSONObject loginMessage = post("login", new JSONObject());
-
-		// If the server returns an error, throw an exception
-		if(loginMessage.getBoolean("error")) {
-			throw new ClientAuthException(ClientAuthException.TYPE_LOGIN, loginMessage.opt("response").toString());
-		}
 
 		// Update profile data with email and any other data
 		try {
+			post("login", new JSONObject());
 			syncProfile();
 		} catch(NetworkException e) {
-			throw new ClientAuthException(ClientAuthException.TYPE_LOGIN, e.getMessage());
+			throw new ClientAuthException(ClientAuthException.TYPE_LOGIN, e);
 		}
 	}
 
 	public static Client loginPreHashed(String username, String password) throws ClientAuthException {
 		Client c = new Client();
 		c.profile = new ProfileModel(0, username, password, "", User.DEFAULT_PROFILE_PICTURE);
-		JSONObject loginMessage = c.post("login", new JSONObject());
-		// If the server returns an error, throw an exception
-		if(loginMessage.getBoolean("error")) {
-			throw new ClientAuthException(ClientAuthException.TYPE_LOGIN, loginMessage.opt("response").toString());
-		}
 
 		// Update profile data with email and any other data
 		try {
+			c.post("login", new JSONObject());
 			c.syncProfile();
 		} catch(NetworkException e) {
-			throw new ClientAuthException(ClientAuthException.TYPE_LOGIN, e.getMessage());
+			throw new ClientAuthException(ClientAuthException.TYPE_LOGIN, e);
 		}
 		return c;
 	}
@@ -120,11 +111,11 @@ public class Client {
 		c.profile = new ProfileModel(0, username, hashPassword(password), email, "");
 
 		// Create a message to send to the server's "createAccount" function, 'c' holds password and username, need to also provide email
-		JSONObject createMessage = c.post("createAccount", Map.of("email", email));
-
-		// If the server returns an error, throw an exception
-		if(createMessage.getBoolean("error"))
-			throw new ClientAuthException(ClientAuthException.TYPE_CREATE_ACCOUNT, createMessage.opt("response").toString());
+		try {
+			c.post("createAccount", Map.of("email", email));
+		} catch(NetworkException e) {
+			throw new ClientAuthException(ClientAuthException.TYPE_CREATE_ACCOUNT, e);
+		}
 
 		return c;
 	}
@@ -147,6 +138,10 @@ public class Client {
 		return userMap.get(id);
 	}
 
+	private User getOrCreateUser(JSONObject o) {
+		return getOrCreateUser(o.optInt("UserID", 0), o.optString("Name", "unknown"), o.optString("pfp", User.DEFAULT_PROFILE_PICTURE));
+	}
+
 	// Retrieve a friend from cache if exists and is a friend, if not, creates one and puts it in cache
 	private Friend getOrCreateFriend(int id, String username, String pfp, int chat) {
 		if(!userMap.containsKey(id) || !(userMap.get(id) instanceof Friend))
@@ -156,6 +151,10 @@ public class Client {
 			userMap.get(id).setProfilePicture(pfp);
 		}
 		return (Friend)userMap.get(id);
+	}
+
+	private Friend getOrCreateFriend(JSONObject o) {
+		return getOrCreateFriend(o.optInt("UserID", 0), o.optString("Name", "unknown"), o.optString("pfp", User.DEFAULT_PROFILE_PICTURE), o.optInt("Chat", 0));
 	}
 
 	// Retrieve user object for current user
@@ -181,6 +180,12 @@ public class Client {
 		return m;
 	}
 
+	private Match getOrCreateMatch(JSONObject o) {
+		User whitePlayer = getOrCreateUser(o.getInt("WhitePlayer"), o.getString("WhiteName"), o.isNull("WhitePfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("WhitePfp"));
+		User blackPlayer = getOrCreateUser(o.getInt("BlackPlayer"), o.getString("BlackName"), o.isNull("BlackPfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("BlackPfp"));
+		return getOrCreateMatch(o.getInt("MatchID"), o.getInt("Chat"), whitePlayer, blackPlayer, o.getString("Status"));
+	}
+
 	public Chat getChatByID(int id) {
 		if(chatMap.containsKey(id))
 			return chatMap.get(id);
@@ -197,10 +202,6 @@ public class Client {
 	public ProfileModel syncProfile() throws NetworkException {
 		JSONObject profileData = post("getProfileData", new JSONObject());
 		
-		// If couldn't retrieve profile data...
-		if(profileData.getBoolean("error"))
-			throw new NetworkException(profileData.opt("response").toString());
-
 		// We need to send correct username and password to retrieve information so no need to update those variables
 		profile.setEmail(profileData.getJSONObject("response").getString("EmailAddress"));
 		if(!profileData.getJSONObject("response").isNull("pfp"))
@@ -219,156 +220,82 @@ public class Client {
 	// Update profile with new data
 	public void updateProfile(String newUsername, String newEmail, String newPassword) throws NetworkException {
 		// Send to server to update profile data
-		JSONObject response = post("updateProfile", Map.of("newUsername", newUsername, "newPassword", newPassword, "newEmail", newEmail));
-		if(response.getBoolean("error"))
-			throw new NetworkException(response.opt("response").toString());
-
+		post("updateProfile", Map.of("newUsername", newUsername, "newPassword", newPassword, "newEmail", newEmail));
 		profile.setUsername(newUsername);
 		profile.setEmail(newEmail);
 		profile.setPassword(hashPassword(newPassword));
 	}
 
-	// Returns {"Won": (int), "Lost": (int), "Draw": (int), "Current": (int), "Total": (int)}, defaults to all 0s on error
-	public JSONObject getMatchStats() {
+	// Returns {"Won": (int), "Lost": (int), "Draw": (int), "Current": (int), "Total": (int)}
+	public JSONObject getMatchStats() throws NetworkException {
 		JSONObject received = post("matchStats", new JSONObject());
-		if(received.getBoolean("error"))
-			return new JSONObject(Map.of("Won", 0, "Lost", 0, "Draw", 0, "Current", 0, "Total", 0));
 		return received.getJSONObject("response");
 	}
 
 	public void updatePassword(String newPassword) throws NetworkException {
-		JSONObject received = post("updatePassword", Map.of("newPassword", newPassword));
-		if(received.getBoolean("error"))
-			throw new NetworkException(received.opt("response").toString());
-
+		post("updatePassword", Map.of("newPassword", newPassword));
 		profile.setPassword(hashPassword(newPassword));
 	}
 
 	// Retrieve a list of all matches the user is a part of
-	public List<Match> getMatches() {
-		// Call the server function
-		ArrayList<Match> matches = new ArrayList<>();
-		JSONObject matchesResponse = post("getMatches", new JSONObject());
-
-		// Return none if error in response
-		if(matchesResponse.getBoolean("error")) {
-			System.err.println("Could not retrieve matches for \"" + profile.getUsername() + "\"");
-			System.err.println(matchesResponse.opt("response"));
-			return List.of();
-		}
+	public List<Match> getMatches() throws NetworkException {
+		// Call server and throw exception if error in response
+		JSONObject received = post("getMatches", new JSONObject());
+		if(received.getBoolean("error"))
+			throw new NetworkException("Could not retrieve matches for \"" + profile.getUsername() + "\" " + received.optString("response", ""));
 
 		// Loop through all entries of received matches array, and make new Matches out of JSON representations
-		JSONArray matchesReceived = matchesResponse.getJSONArray("response");
-		for(int i = 0; i < matchesReceived.length(); i++) {
-			JSONObject o = matchesReceived.getJSONObject(i);
-			// Retrieve player users from data
-			User whitePlayer = getOrCreateUser(o.getInt("WhitePlayer"), o.getString("WhiteName"), o.isNull("WhitePfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("WhitePfp"));
-			User blackPlayer = getOrCreateUser(o.getInt("BlackPlayer"), o.getString("BlackName"), o.isNull("BlackPfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("BlackPfp"));
-			matches.add(getOrCreateMatch(o.getInt("MatchID"), o.getInt("Chat"), whitePlayer, blackPlayer, o.getString("Status")));
-		}
+		ArrayList<Match> matches = new ArrayList<>();
+		received.getJSONArray("response").iterator().forEachRemaining(o -> matches.add(getOrCreateMatch((JSONObject)o)));
 		return matches;
 	}
 
-	public List<Match> getOpenMatches() {
-		ArrayList<Match> result = new ArrayList<>();
+	public List<Match> getOpenMatches() throws NetworkException {
+		// Call server and throw exception if error in response
 		JSONObject received = post("getOpenMatches", new JSONObject());
-
-		// Return none if error in response
-		if(received.getBoolean("error")) {
-			System.err.println("Could not retrieve open matches for \"" + profile.getUsername() + "\"");
-			System.err.println(received.opt("response"));
-			return List.of();
-		}
+		if(received.getBoolean("error"))
+			throw new NetworkException("Could not retrieve open matches for \"" + profile.getUsername() + "\" " + received.optString("response", ""));
                 
-		JSONArray response = received.getJSONArray("response");
-		for(int i = 0; i < response.length(); i++) {
-			JSONObject o = response.getJSONObject(i);
-			// Retrieve player users from data
-			User whitePlayer = getOrCreateUser(o.getInt("WhitePlayer"), o.getString("WhiteName"), o.isNull("WhitePfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("WhitePfp"));
-			User blackPlayer = getOrCreateUser(o.getInt("BlackPlayer"), o.getString("BlackName"), o.isNull("BlackPfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("BlackPfp"));
-			result.add(getOrCreateMatch(o.getInt("MatchID"), o.getInt("Chat"), whitePlayer, blackPlayer, o.getString("Status")));
-		}
-		return result;
+		ArrayList<Match> matches = new ArrayList<>();
+		received.getJSONArray("response").iterator().forEachRemaining(o -> matches.add(getOrCreateMatch((JSONObject)o)));
+		return matches;
 	}
         
-	public List<Match> getClosedMatches() {
-		ArrayList<Match> result = new ArrayList<>();
+	public List<Match> getClosedMatches() throws NetworkException {
+		// Call server and throw exception if error in response
 		JSONObject received = post("getClosedMatches", new JSONObject());
+		if(received.getBoolean("error"))
+			throw new NetworkException("Could not retrieve closed matches for \"" + profile.getUsername() + "\" " + received.optString("response", ""));
 
-		// Return none if error in response
-		if(received.getBoolean("error")) {
-			System.err.println("Could not retrieve closed matches for \"" + profile.getUsername() + "\"");
-			System.err.println(received.opt("response"));
-			return List.of();
-		}
-
-		JSONArray response = received.getJSONArray("response");
-		for(int i = 0; i < response.length(); i++) {
-			JSONObject o = response.getJSONObject(i);
-			// Retrieve player users from data
-			User whitePlayer = getOrCreateUser(o.getInt("WhitePlayer"), o.getString("WhiteName"), o.isNull("WhitePfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("WhitePfp"));
-			User blackPlayer = getOrCreateUser(o.getInt("BlackPlayer"), o.getString("BlackName"), o.isNull("BlackPfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("BlackPfp"));
-			result.add(getOrCreateMatch(o.getInt("MatchID"), o.getInt("Chat"), whitePlayer, blackPlayer, o.getString("Status")));
-		}
-		return result;
+		ArrayList<Match> matches = new ArrayList<>();
+		received.getJSONArray("response").iterator().forEachRemaining(o -> matches.add(getOrCreateMatch((JSONObject)o)));
+		return matches;
 	}
 
-	public List<Match> getMatchRequests() {
-		ArrayList<Match> result = new ArrayList<>();
+	public List<Match> getMatchRequests() throws NetworkException {
 		JSONObject received = post("getMatchRequests", new JSONObject());
 
-		// Return none if error in response
-		if(received.getBoolean("error")) {
-			System.err.println("Could not retrieve match requests for \"" + profile.getUsername() + "\"");
-			System.err.println(received.opt("response"));
-			return List.of();
-		}
-
-		JSONArray response = received.getJSONArray("response");
-		for(int i = 0; i < response.length(); i++) {
-			JSONObject o = response.getJSONObject(i);
-			User whitePlayer = getOrCreateUser(o.getInt("WhitePlayer"), o.getString("WhiteName"), o.isNull("WhitePfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("WhitePfp"));
-			User blackPlayer = getOrCreateUser(o.getInt("BlackPlayer"), o.getString("BlackName"), o.isNull("BlackPfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("BlackPfp"));
-			result.add(getOrCreateMatch(o.getInt("MatchID"), o.getInt("Chat"), whitePlayer, blackPlayer, o.getString("Status")));
-		}
-		return result;
+		ArrayList<Match> matches = new ArrayList<>();
+		received.getJSONArray("response").iterator().forEachRemaining(o -> matches.add(getOrCreateMatch((JSONObject)o)));
+		return matches;
 	}
 
-	/* Returns true if successfully sent a match request 
-	 * Prints error if received error
-	 */
-	public boolean sendMatchRequest(String username, boolean playingAsWhite) {
-		// Send request to server
+	public void sendMatchRequest(String username, boolean playingAsWhite) throws NetworkException {
+		// Call server and throw exception if error in response
 		JSONObject received = post("sendMatchRequest", Map.of("target", username, "request", playingAsWhite ? Match.Status.WHITE_REQUESTED.toString()
 			: Match.Status.BLACK_REQUESTED.toString()));
-
-		// Return none if error in response
-		if(received.getBoolean("error")) {
-			System.err.println("Could not send match request from \"" + profile.getUsername() + "\" to \"" + username + "\"");
-			System.err.println(received.opt("response"));
-			return false;
-		}
-
-		// Return response (true if successful)
-		return received.getBoolean("response");
+		// TODO: See if any cases where 'received.getBoolean("response")' is false, and throw a special exception
+		// received.getBoolean("received"); // is true when match request successful
 	}
 	
 	// Send match request based on user
-	public boolean sendMatchRequest(User user, boolean playingAsWhite) { return sendMatchRequest(user.getUsername(), playingAsWhite); }
+	public void sendMatchRequest(User user, boolean playingAsWhite) throws NetworkException { sendMatchRequest(user.getUsername(), playingAsWhite); }
 
 	// Deny match request from given match
-	public boolean denyMatchRequest(Match match) {
+	public void denyMatchRequest(Match match) throws NetworkException {
 		JSONObject received = post("denyMatchRequest", Map.of("match", match.getID()));
-
-
-		// Return none if error in response
-		if(received.getBoolean("error")) {
-			System.err.println("Could not accept match request for #" + match.getID() + " to \"" + profile.getUsername() + "\"");
-			System.err.println(received.opt("response"));
-			return false;
-		}
-
-		return received.getBoolean("response");
+		// TODO: See if any cases where 'received.getBoolean("response")' is false, and throw a special exception
+		// received.getBoolean("received"); // is true when match request successful
 	}
 
 	public void updateBio(String newBio) throws NetworkException {
@@ -393,24 +320,12 @@ public class Client {
 	
 
 	// Retrieve all of user's friends
-	public List<Friend> getFriends() {
-		ArrayList<Friend> friends = new ArrayList<>();
+	public List<Friend> getFriends() throws NetworkException {
 		JSONObject friendsResponse = post("getFriends", new JSONObject());
 
-		// Return none if error in response
-		if(friendsResponse.getBoolean("error")) {
-			System.err.println("Could not retrieve friends for \"" + profile.getUsername() + "\"");
-			System.err.println(friendsResponse.opt("response"));
-			return List.of();
-		}
-
-		// Go through received array of friends, retrieve friend for every JSON representation
-		JSONArray friendsReceived = friendsResponse.getJSONArray("response");
-		for(int i = 0; i < friendsReceived.length(); i++) {
-			JSONObject o = friendsReceived.getJSONObject(i);
-			friends.add(getOrCreateFriend(o.getInt("UserID"), o.getString("Name"), o.isNull("pfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("pfp"), o.getInt("Chat")));
-		}
-
+		// Create new friend for every JSON representation received
+		ArrayList<Friend> friends = new ArrayList<>();
+		friendsResponse.getJSONArray("response").iterator().forEachRemaining(o -> friends.add(getOrCreateFriend((JSONObject) o)));
 		return friends;
 	}
 
@@ -419,154 +334,103 @@ public class Client {
 	 * Prints nothing and returns false on no friend request for "normal" reasons (i.e. already friended or sent/received friend request)
 	 * TODO: Print more information regarding false returns
 	 */
-	public boolean sendFriendRequest(String username) {
+	public void sendFriendRequest(String username) throws NetworkException {	
 		JSONObject received = post("sendFriendRequest", Map.of("target", username));
-
-		// Return none if error in response
-		if(received.getBoolean("error")) {
-			System.err.println("Could not send friend request from \"" + profile.getUsername() + "\" to \"" + username + "\"");
-			System.err.println(received.opt("response"));
-			return false;
-		}
-
-		return received.getBoolean("response");
+		// TODO: See if any cases where 'received.getBoolean("response")' is false, and throw a special exception
+		// received.getBoolean("received"); // is true when match request successful	
 	}
 
-	public boolean sendFriendRequest(User user) { return sendFriendRequest(user.getUsername()); }
+	public void sendFriendRequest(User user) throws NetworkException { sendFriendRequest(user.getUsername()); }
 
 	/* Returns true if successfully accepted a friend request 
 	 * Prints error if received error
 	 * Prints nothing and returns false on no friend request accepted for "normal" reasons (i.e. friend request doesn't exist or already friends with target)
 	 * TODO: Print more information regarding false returns
 	 */
-	public boolean acceptFriendRequest(String username) {
+	public void acceptFriendRequest(String username) throws NetworkException {
 		JSONObject received = post("acceptFriendRequest", Map.of("target", username));
-
-		// Return none if error in response
-		if(received.getBoolean("error")) {
-			System.err.println("Could not accept friend request from \"" + username + "\" to \"" + profile.getUsername() + "\"");
-			System.err.println(received.opt("response"));
-			return false;
-		}
-
-		return received.getBoolean("response");
+		// TODO: See if any cases where 'received.getBoolean("response")' is false, and throw a special exception
+		// received.getBoolean("received"); // is true when match request successful	
 	}
 
-	public boolean acceptFriendRequest(User user) { return acceptFriendRequest(user.getUsername()); }
+	public void acceptFriendRequest(User user) throws NetworkException { acceptFriendRequest(user.getUsername()); }
 
 	/* Returns true if successfully denied a friend request 
 	 * Prints error if received error
 	 * Prints nothing and returns false on no friend request denied for "normal" reasons (i.e. friend request doesn't exist or is friends with target)
 	 * TODO: Print more information regarding false returns
 	 */
-	public boolean denyFriendRequest(String username) {
+	public void denyFriendRequest(String username) throws NetworkException {
 		JSONObject received = post("denyFriendRequest", Map.of("target", username));
-
-		// Return none if error in response
-		if(received.getBoolean("error")) {
-			System.err.println("Could not deny friend request from \"" + username + "\" to \"" + profile.getUsername() + "\"");
-			System.err.println(received.opt("response"));
-			return false;
-		}
-
-		return received.getBoolean("response");
+		// TODO: See if any cases where 'received.getBoolean("response")' is false, and throw a special exception
+		// received.getBoolean("received"); // is true when match request successful	
 	}
 
-	public boolean denyFriendRequest(User user) { return denyFriendRequest(user.getUsername()); }
+	public void denyFriendRequest(User user) throws NetworkException { denyFriendRequest(user.getUsername()); }
 
 	// Retrieve all friend requests
-	public List<User> getFriendRequests() {
-		ArrayList<User> result = new ArrayList<>();
+	public List<User> getFriendRequests() throws NetworkException {
 		JSONObject received = post("getFriendRequests", new JSONObject());
-
-		// Return none if error in response
-		if(received.getBoolean("error")) {
-			System.err.println("Could not retrieve friend requests for \"" + profile.getUsername() + "\"");
-			System.err.println(received.opt("response"));
-			return List.of();
-		}
-
-		// Loop through received array and create new user for every JSON representation
-		JSONArray response = received.getJSONArray("response");
-		for(int i = 0; i < response.length(); i++) {
-			JSONObject o = response.getJSONObject(i);
-			result.add(getOrCreateUser(o.getInt("UserID"), o.getString("Name"), o.isNull("pfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("pfp")));
-		}
-
+		
+		// Create new user for every JSON representation received
+		ArrayList<User> result = new ArrayList<>();
+		received.getJSONArray("response").iterator().forEachRemaining(o -> { result.add(getOrCreateUser((JSONObject)o)); });
 		return result;
 	}
 
 	/* Update Match Status based on function name */
-	public void acceptMatchRequest(Match match){
-            setMatchStatus(match, Match.Status.WHITE_TURN.toString());
-        }
-        public void forfeitMatch(Match match){
-            //The other player wins
-            setGameWinner(match, !getOwnUser().getUsername().equals(match.getWhite().getUsername()));
-        }
-        public void setGameTurn(Match match, Boolean turn){
-            setMatchStatus(match,turn ? //set game status
-                Match.Status.WHITE_TURN.toString() :
-                Match.Status.BLACK_TURN.toString()
-            );
-        }
-        public void setGameWinner(Match match, Boolean winner){
-            setMatchStatus(match, winner ? //set game status
-                Match.Status.WHITE_WIN.toString() :
-                Match.Status.BLACK_WIN.toString()
-            );
-            match.makeMove(this, "end");
-        }
-        public void setGameDraw(Match match){
-            setMatchStatus(match, Match.Status.DRAW.toString());
-            match.makeMove(this, "end");
-        }
+	public void acceptMatchRequest(Match match) throws NetworkException {
+		setMatchStatus(match, Match.Status.WHITE_TURN.toString());
+	}
+
+	//The other player wins
+	public void forfeitMatch(Match match) throws NetworkException {
+		setGameWinner(match, !getOwnUser().getUsername().equals(match.getWhite().getUsername()));
+    }
+
+	public void setGameTurn(Match match, Boolean turn) throws NetworkException {
+		setMatchStatus(match,turn ? //set game status
+			Match.Status.WHITE_TURN.toString() :
+			Match.Status.BLACK_TURN.toString()
+		);
+	}
+	public void setGameWinner(Match match, Boolean winner) throws NetworkException {
+		setMatchStatus(match, winner ? //set game 
+			Match.Status.WHITE_WIN.toString() :
+			Match.Status.BLACK_WIN.toString()
+		);
+		match.makeMove(this, "end");
+	}
+    
+	public void setGameDraw(Match match) throws NetworkException {
+		setMatchStatus(match, Match.Status.DRAW.toString());
+		match.makeMove(this, "end");
+	}
 	/* ~~~~ */
-        
+
 	// Set match status on server
-        private void setMatchStatus(Match match, String status) {
-		JSONObject response = post("setMatchStatus", Map.of("match", match.getID(), "status", status));
-		if(response.getBoolean("error")) {
-			System.err.println("Could not set match status!");
-			System.err.println(response.opt("response").toString());
-		}
+	private void setMatchStatus(Match match, String status) throws NetworkException {
+		post("setMatchStatus", Map.of("match", match.getID(), "status", status));
 		match.setStatus(status);
 	}
 
 	// Retrieve new match status from server
-	public String syncMatchStatus(Match match) {
+	public String syncMatchStatus(Match match) throws NetworkException {
 		JSONObject response = post("getMatchStatus", Map.of("match", match.getID()));
-		if(response.getBoolean("error")) {
-			System.err.println("Could not get match status!");
-			System.err.println(response.opt("response").toString());
-			return null;
-		}
-
 		match.setStatus(response.getString("response"));
 		return response.getString("response");
 	}
 
 	// Upload profile picture to server, using a Base64 representation
-	public void uploadProfilePicture(File file) {
-		try {
-			JSONObject send = new JSONObject();
-			send.put("image", Base64.getEncoder().encodeToString(Files.readAllBytes(file.toPath())));
-
-			JSONObject received = post("uploadProfilePicture", send);
-			if(received.getBoolean("error")) {
-				System.err.println("Could not upload profile picture! " + file.toPath());
-				System.err.println(received.opt("response").toString());
-				return;
-			}
-
-			profile.setProfilePicURL(received.getString("response"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public void uploadProfilePicture(File file) throws NetworkException, IOException {
+		JSONObject send = new JSONObject();
+		send.put("image", Base64.getEncoder().encodeToString(Files.readAllBytes(file.toPath())));
+		JSONObject received = post("uploadProfilePicture", send);
+		profile.setProfilePicURL(received.getString("response"));
 	}
 
 	// Send a message to the server based on a Map representation of JSON data, (appends login details) and return the result
-	public JSONObject post(String function, Map<?, ?> message) {
+	public JSONObject post(String function, Map<?, ?> message) throws NetworkException {
 		return post(function, new JSONObject(message));
 	}
 
@@ -583,12 +447,19 @@ public class Client {
 	}
 
 	// Send a message to the server based on a JSON Object, appending User login details, and return the result
-	public JSONObject post(String function, JSONObject message) {
+	public JSONObject post(String function, JSONObject message) throws NetworkException {
 		// Sent JSON Object to server and retrieve response
 		message.put("username", profile.getUsername());
 		message.put("password", profile.getPassword());
 		return post(function, message.toString());
 	}
+
+	public JSONObject post(String function) throws NetworkException {
+		// Sent JSON Object to server and retrieve response
+		JSONObject message = new JSONObject(Map.of("username", profile.getUsername(), "password", profile.getPassword()));
+		return post(function, message.toString());
+	}
+
 
 	public static byte[] encrypt(String input) {
 		if(CLIENT_ENCRYPT == null) {
@@ -653,7 +524,7 @@ public class Client {
 	}
 
 	// Send a string to a given function in the web api, return a JSON result
-	public JSONObject post(String function, String message) {
+	public JSONObject post(String function, String message) throws NetworkException {
 		long lockBypass = System.nanoTime();
 		while(LOCK) {if (System.nanoTime() - lockBypass > 200000000) break;}
 		LOCK = true;
@@ -664,14 +535,18 @@ public class Client {
 		byte[] data = encrypt(message);
 
 		// Set up a connection to the server
-		HttpsURLConnection con = getConnection(function);
-		if(con == null) {
-			System.err.println("Could not connect to server!");
-			JSONObject out = new JSONObject();
-			out.put("response", "Error: Could not connect to server!");
-			out.put("error", true);
+		HttpsURLConnection con;
+		try {
+			con = getConnection(function);
+		} catch (URISyntaxException e1) {
 			LOCK = false;
-			return out;
+			throw new NetworkException(function + " - Error: Could not connect to server, Invalid URI Syntax!", e1);
+		} catch (MalformedURLException e2) {
+			LOCK = false;
+			throw new NetworkException(function + " - Error: Could not connect to server, Malformed URL!", e2);
+		} catch (IOException e3) {
+			LOCK = false;
+			throw new NetworkException(function + " - Error: Could not connect to server!", e3);
 		}
 
 		// Tell how much data we're sending, connect, and send it
@@ -681,13 +556,8 @@ public class Client {
 			OutputStream os = con.getOutputStream();
 			os.write(data);
 		} catch (IOException ioex) {
-			System.err.println("Could not write data to server!");
-			ioex.printStackTrace();
-			JSONObject out = new JSONObject();
-			out.put("response", "Error: Could not write data to server!");
-			out.put("error", true);
 			LOCK = false;
-			return out;
+			throw new NetworkException(function + " - Error: Could not write data to server!", ioex);
 		}
 
 		// Read response into `builder`
@@ -695,13 +565,8 @@ public class Client {
 		try {
 			input = decrypt(con.getInputStream().readAllBytes());
 		} catch (Exception ex) {
-			System.err.println("Could not read server response!");
-			JSONObject out = new JSONObject();
-			out.put("response", "Unable to reach or communicate with the server!");
-			out.put("error", true);	
-			ex.printStackTrace();
 			LOCK = false;
-			return out;
+			throw new NetworkException(function + " - Error: Could not read server response!", ex);
 		}
 
 		// Try to parse as straight JSON Object,
@@ -710,34 +575,17 @@ public class Client {
 			return new JSONObject(input);
 		} catch (JSONException e) {
 			// If it's not a JSON Object, it probably contains error data
-			JSONObject jo = new JSONObject();
-			jo.put("error", true);
-			jo.put("response", input);
 			LOCK = false;
-			return jo;
+			throw new NetworkException(function + " - Could not parse response as JSON! \"" + input + "\"", e);
 		}
 	}
 
 	// Create a HTTPS connection based on a web API function, filling out the required headers
-	private static HttpsURLConnection getConnection(String function) {
-		try {
-			HttpsURLConnection con = (HttpsURLConnection)new URI("https://www.zandgall.com/chessbug/" + function).toURL().openConnection();
-			con.setRequestMethod("POST");
-			con.setDoOutput(true);
-			con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-			return con;
-		} catch (URISyntaxException e1) {
-			System.err.println("Could not make connection to function \"" + function + "\": Invalid URI Syntax!");
-			e1.printStackTrace();
-			return null;
-		} catch (MalformedURLException e2) {
-			System.err.println("Could not make connection to function \"" + function + "\": Malformed URL!");
-			e2.printStackTrace();
-			return null;
-		} catch (IOException e3) {
-			System.err.println("Could not make connection to function \"" + function + "\"!");
-			e3.printStackTrace();
-			return null;
-		}
+	private static HttpsURLConnection getConnection(String function) throws URISyntaxException, MalformedURLException, IOException {
+		HttpsURLConnection con = (HttpsURLConnection)new URI("https://www.zandgall.com/chessbug/" + function).toURL().openConnection();
+		con.setRequestMethod("POST");
+		con.setDoOutput(true);
+		con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+		return con;
 	}
 }

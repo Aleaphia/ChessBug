@@ -1,8 +1,10 @@
 package chessBug.profile;
 
 import java.io.File;
+import java.io.IOException;
 
 import chessBug.network.Client;
+import chessBug.network.NetworkException;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
@@ -201,8 +203,14 @@ public class ProfileView extends VBox {
         File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
             Image selectedImage = new Image("file:" + file.getAbsolutePath());
-            profileImageView.setImage(selectedImage);
-            client.uploadProfilePicture(file); // Ensure client method handles the file upload
+            try {
+                client.uploadProfilePicture(file); // Ensure client method handles the file upload
+                profileImageView.setImage(selectedImage);
+            } catch (NetworkException | IOException e) {
+                System.err.println("Unable to upload profile picture!");
+                showError("Unable to upload profile picture!");
+                e.printStackTrace();
+            }
         }
     }
 }
