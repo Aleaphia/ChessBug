@@ -28,21 +28,22 @@ public class PreferencesPage {
     }
     
     private void buildPage(){
-        //Set up page structure -> use region to push content to the left
+        // Set up page structure -> use region to push content to the left
         root = new HBox();
         
         VBox page = new VBox(20);
         Region rightRegion = new Region();
         
-        root.getChildren().addAll(page,rightRegion);
+        root.getChildren().addAll(page, rightRegion);
         
-        //Style and format
+        // Style and format
         page.getStyleClass().addAll("section", "padding");
         HBox.setHgrow(rightRegion, Priority.ALWAYS);
         
-        //Fill page
+        // Fill page
         Label title = new Label("Settings");
         title.getStyleClass().add("h1");
+
         // Save Preferences Button
         Button savePreferencesButton = new Button("Save Preferences");
         savePreferencesButton.setOnAction(event -> PreferencesController.savePreferences());
@@ -57,8 +58,8 @@ public class PreferencesPage {
             new Separator(),
             savePreferencesButton
         );
-        
     }
+    
     private VBox buildGameSettings(){
         VBox gameSettingsContainer = new VBox(20);
         
@@ -99,8 +100,10 @@ public class PreferencesPage {
         
         return gameSettingsContainer;
     }
+
     private VBox buildAppSettings(){
         VBox container = new VBox(20);
+        
         // App Settings Section
         Label header = new Label("Application Settings:");
         header.getStyleClass().addAll("label", "h2");
@@ -108,7 +111,7 @@ public class PreferencesPage {
         // Theme selection
         VBox themeContainer = new VBox(15);
         themeContainer.setPadding(new Insets(10));
-        Label themeLabel = new Label("theme:");
+        Label themeLabel = new Label("Theme:");
 
         ComboBox<String> themeComboBox = new ComboBox<>();
         themeComboBox.getItems().addAll("Light", "Dark");
@@ -129,9 +132,15 @@ public class PreferencesPage {
         autoSaveCheckBox.setOnAction(event -> PreferencesController.handleAutoSave(autoSaveCheckBox.isSelected()));
         autoSaveCheckBox.getStyleClass().add("label");
 
+        // 2FA Enable/Disable Checkbox
+        CheckBox enable2FACheckBox = new CheckBox("Enable Two-Factor Authentication");
+        enable2FACheckBox.setSelected(PreferencesController.is2FAEnabled());  // Check the current 2FA status
+        enable2FACheckBox.setOnAction(event -> PreferencesController.handleEnable2FA(enable2FACheckBox.isSelected()));
+        enable2FACheckBox.getStyleClass().add("label");
+
         // Add all components to the main layout
         container.getChildren().addAll(
-            header, themeContainer, stayLoggedInCheckBox, autoSaveCheckBox
+            header, themeContainer, stayLoggedInCheckBox, autoSaveCheckBox, enable2FACheckBox
         );
         return container;
     }

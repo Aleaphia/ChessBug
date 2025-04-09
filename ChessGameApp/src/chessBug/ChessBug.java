@@ -21,6 +21,8 @@ import java.util.ArrayList;
 
 import org.json.JSONObject;
 
+import com.warrenstrange.googleauth.GoogleAuthenticator;
+
 import chessBug.game.GameController;
 import chessBug.home.HomeController;
 import chessBug.login.LoginUI;
@@ -42,6 +44,7 @@ import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -114,83 +117,131 @@ public class ChessBug extends Application {
     }
     
     private LoginUI createLoginPage() {
-        loginPane = new GridPane();
-        loginPane.getStyleClass().addAll("background", "login");
-    
-        // Set up sizing constraints, middle is always 300x480, and everything else grows and shrinks around it
-        RowConstraints row = new RowConstraints(0, 0, Double.MAX_VALUE, Priority.ALWAYS, VPos.CENTER, true),
-                       rowMain = new RowConstraints(480, 480, 480);
-        loginPane.getRowConstraints().addAll(row, rowMain, row);
-        ColumnConstraints column = new ColumnConstraints(0, 0, Double.MAX_VALUE, Priority.ALWAYS, HPos.CENTER, true),
+    loginPane = new GridPane();
+    loginPane.getStyleClass().addAll("background", "login");
+
+    // Set up sizing constraints, middle is always 300x480, and everything else grows and shrinks around it
+    RowConstraints row = new RowConstraints(0, 0, Double.MAX_VALUE, Priority.ALWAYS, VPos.CENTER, true),
+                    rowMain = new RowConstraints(480, 480, 480);
+    loginPane.getRowConstraints().addAll(row, rowMain, row);
+    ColumnConstraints column = new ColumnConstraints(0, 0, Double.MAX_VALUE, Priority.ALWAYS, HPos.CENTER, true),
                           columnMain = new ColumnConstraints(300, 300, 300);
-        loginPane.getColumnConstraints().addAll(column, columnMain, column);
-    
-        LoginUI loginUI = new LoginUI(
-            (String username, String password) -> { // Handle login
-                JSONObject out = new JSONObject();
-                try {
-                    client = new Client(username, password);
-                    boolean is2FAEnabled = client.is2FAEnabled();  // Check if 2FA is enabled for the user
-                    if (is2FAEnabled) {
-                        String secretKey = client.get2FASecretKey();  // Get 2FA secret key
-                        out.put("error", false);
-                        out.put("2fa", true);        // 2FA enabled
-                        out.put("secretKey", secretKey);  // Include secret key in the response
-                    } else {
-                        out.put("error", false);
-                        out.put("2fa", false);       // 2FA not enabled
-                    }
-                    successfulLogin();
-                } catch (ClientAuthException e) {
-                    e.printStackTrace();
-                    out.put("error", true);
-                    out.put("response", e.getServerResponse());
-                }
-                return out;
-            },
-            (String username, String password) -> { // Handle account creation
-                JSONObject out = new JSONObject();
-                try {
-                    client = Client.createAccount(username, password, "placeholder@email.com");
+    loginPane.getColumnConstraints().addAll(column, columnMain, column);
+
+    // Create LoginUI instance with login, account creation, and saved login handlers
+    LoginUI loginUI = new LoginUI(
+        (String username, String password) -> { // Handle login
+            JSONObject out = new JSONObject();
+            try {
+                client = new Client(username, password);
+                boolean is2FAEnabled = client.is2FAEnabled();  // Check if 2FA is enabled for the user
+                if (is2FAEnabled) {
+                    String secretKey = client.get2FASecretKey();  // Get 2FA secret key
                     out.put("error", false);
-                    successfulLogin();
-                } catch(ClientAuthException e){
-                    e.printStackTrace();
-                    out.put("error", true);
-                    out.put("response", e.getServerResponse());
-                }
-    
-                return out;
-            },
-            (String username, String password) -> { // Handle saved login (pre-hashed)
-                JSONObject out = new JSONObject();
-                try {
-                    client = Client.loginPreHashed(username, password);
+                    out.put("2fa", true);        // 2FA enabled
+                    out.put("secretKey", secretKey);  // Include secret key in the response
+                } else {
                     out.put("error", false);
-                    successfulLogin();
-                } catch (ClientAuthException e) {
-                    e.printStackTrace();
-                    out.put("error", true);
-                    out.put("response", e.getServerResponse());
+                    out.put("2fa", false);       // 2FA not enabled
                 }
-                return out;
+                successfulLogin();
+            } catch (ClientAuthException e) {
+                e.printStackTrace();
+                out.put("error", true);
+                out.put("response", e.getServerResponse());
             }
-        );
-    
-        loginPane.add((Node) loginUI.getPage(), 1, 1);
-        return loginUI;
-    }
-    
-    
-    private void successfulLogin(){
-        //Create Menu
-        mainPane.getChildren().clear();
-        mainPane.getChildren().addAll(createSidebar(), page);
-        mainPane.getStyleClass().addAll("background");
-        mainScene.setRoot(mainPane);
-        //Open page
-        changePage(new HomeController(client,databaseCheckList).getPage(), "Styles", "Menu", "HomeView", "Game");
-    }
+            return out;
+        },
+        (String username, String password) -> { // Handle account creation
+            JSONObject out = new JSONObject();
+            try {
+                client = Client.createAccount(username, password, "placeholder@email.com");
+                out.put("error", false);
+                successfulLogin();
+            } catch(ClientAuthException e){
+                e.printStackTrace();
+                out.put("error", true);
+                out.put("response", e.getServerResponse());
+            }
+
+            return out;
+        },
+        (String username, String password) -> { // Handle saved login (pre-hashed)
+            JSONObject out = new JSONObject();
+            try {
+                client = Client.loginPreHashed(username, password);
+                out.put("error", false);
+                successfulLogin();
+            } catch (ClientAuthException e) {
+                e.printStackTrace();
+                out.put("error", true);
+                out.put("response", e.getServerResponse());
+            }
+            return out;
+        }
+    );
+
+    loginPane.add((Node) loginUI.getPage(), 1, 1);
+
+    // Add 2FA logic handling when 2FA is enabled
+    TextField otpField = new TextField();
+    otpField.setPromptText("Enter 2FA Code");
+    otpField.setVisible(false); // Hidden by default
+
+    Button verifyOTPButton = new Button("Verify 2FA");
+    verifyOTPButton.setStyle("-fx-background-color: #5865F2; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5px;");
+    verifyOTPButton.setVisible(false); // Hidden by default
+
+    verifyOTPButton.setOnAction(event -> {
+        // Assuming the user has entered an OTP
+        String otpText = otpField.getText().trim();
+        if (otpText.isEmpty()) {
+            // Show error message if OTP field is empty
+            showError("OTP is required", "Please enter your 2FA code.");
+            return;
+        }
+
+        try {
+            int otp = Integer.parseInt(otpText);
+            GoogleAuthenticator gAuth = new GoogleAuthenticator();
+            String secretKey = client.get2FASecretKey();  // Get the secret key from the server
+            boolean isValid = gAuth.authorize(secretKey, otp);
+
+            if (isValid) {
+                // If OTP is valid, proceed with successful login
+                successfulLogin();
+            } else {
+                // Show error if OTP is invalid
+                showError("Invalid 2FA Code", "Please enter the correct 2FA code.");
+            }
+        } catch (NumberFormatException e) {
+            // Show error if OTP is not a valid number
+            showError("Invalid Code", "2FA code must be a number.");
+        }
+    });
+
+    // Add OTP field and verify button to the login pane
+    loginPane.add(otpField, 1, 2);  // Add OTP input field
+    loginPane.add(verifyOTPButton, 1, 3);  // Add verify OTP button
+
+    return loginUI;
+}
+
+private void showError(String title, String description) {
+    // Show error messages in the UI
+    System.out.println(title + ": " + description);  // Or implement custom error display logic
+    // You can add error handling in your UI as needed
+}
+
+private void successfulLogin() {
+    // Create Menu
+    mainPane.getChildren().clear();
+    mainPane.getChildren().addAll(createSidebar(), page);
+    mainPane.getStyleClass().addAll("background");
+    mainScene.setRoot(mainPane);
+    // Open page
+    changePage(new HomeController(client, databaseCheckList).getPage(), "Styles", "Menu", "HomeView", "Game");
+}
 
     private VBox createSidebar() {
         VBox sidebar = new VBox(10); // Vertical layout for sidebar

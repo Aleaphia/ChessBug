@@ -4,16 +4,13 @@ import java.net.URL;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import chessBug.network.Client;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.layout.Pane;
 import javafx.scene.control.ButtonType;
-
-import javafx.scene.media.MediaPlayer;
+import javafx.scene.layout.Pane;
 import javafx.scene.media.Media;
-
-
-import chessBug.network.Client;
+import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 
 public class PreferencesController {
@@ -25,8 +22,10 @@ public class PreferencesController {
     private static MediaPlayer sound = new MediaPlayer( new Media(
             PreferencesController.class.getResource("/resources/sounds/test.wav").toString()));
     PreferencesPage view;
+    private Client client;
 
     public PreferencesController(Client client) {
+        this.client = client;
         view = new PreferencesPage(client);
         page = view.getPage();
     }
@@ -105,6 +104,24 @@ public class PreferencesController {
         alert.setContentText("Your preferences have been saved successfully.");
         alert.showAndWait();
     }
+
+
+    //private void update2FASetting(boolean isEnabled) {
+      //  if (client != null) { // Ensure client is not null
+        //    try {
+          //      client.update2FASetting(isEnabled);  // This will now work as client is available
+            //} catch (Exception e) {
+              //  e.printStackTrace();
+                //Alert alert = new Alert(Alert.AlertType.ERROR);
+                //alert.setTitle("Error");
+                //alert.setHeaderText(null);
+                //alert.setContentText("Failed to update Two-Factor Authentication settings.");
+                //alert.showAndWait();
+            //}
+        //} else {
+           // System.out.println("Error: Client instance is not initialized.");
+        //}
+    //}
     
     //Save login credentials
     public static void setLogginCredentials(String username, String password){

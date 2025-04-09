@@ -13,7 +13,6 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
 
 public class LoginUI {
     private Node page;
@@ -51,7 +50,7 @@ public class LoginUI {
         passwordField.setPromptText("Password");
         passwordField.getStyleClass().add("loginField");
 
-        //Jump from username to password filds
+        // Jump from username to password fields
         usernameField.setOnAction(event -> passwordField.requestFocus());
 
         // 2FA field (initially hidden)

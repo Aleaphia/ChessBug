@@ -628,7 +628,7 @@
 	 }
  
 	public static String decrypt(byte[] data) throws Exception {
-		byte[] base64Decoded;
+		byte[] base64Decoded = null;
 		try {
 			base64Decoded = Base64.getDecoder().decode(data);
 		} catch (IllegalArgumentException e) {
