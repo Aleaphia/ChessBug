@@ -233,7 +233,7 @@ public class Client {
 	}
 
 	public void updatePassword(String newPassword) throws NetworkException {
-		post("updatePassword", Map.of("newPassword", newPassword));
+		post("updatePassword", Map.of("newPassword", hashPassword(newPassword)));
 		profile.setPassword(hashPassword(newPassword));
 	}
 
