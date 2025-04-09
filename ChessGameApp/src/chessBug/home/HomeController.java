@@ -1,9 +1,7 @@
-
 package chessBug.home;
 
 import chessBug.controllerInterfaces.IGameSelectionController;
 import chessBug.controllerInterfaces.IFriendRequestController;
-import chessBug.misc.*;
 import chessBug.network.*;
 import chessBug.game.*;
 import java.util.List;
@@ -71,5 +69,4 @@ public class HomeController implements IGameSelectionController, IFriendRequestC
         page.getChildren().set(1, new GameController(client, databaseCheckList, match).getPage());
     }
     @Override public void forfeitMatch(Match match) throws NetworkException {client.forfeitMatch(match);}
-    
 }

@@ -18,8 +18,8 @@ import javafx.scene.layout.Region;
 
 
 public class GameCreationUI {
-    private GridPane page = new GridPane();
-    private IGameCreationController controller;
+    private final GridPane page = new GridPane();
+    private final IGameCreationController controller;
     
     public GameCreationUI(IGameCreationController controller){
         this.controller = controller;

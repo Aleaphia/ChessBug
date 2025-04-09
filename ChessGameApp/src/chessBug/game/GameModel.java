@@ -13,13 +13,10 @@ import java.util.*;
 public class GameModel {
     //Chess game state
     private int turnNum = 0;
-    private Boolean playerColor; //true is white; flase is black
+    private final Boolean playerColor; //true is white; flase is black
     //Promotion variables
     private char[] promotionChoice = new char[1]; //char reference that can be modified by event handling lambda functions
-    private PromotionSelection promotionLambda = (PromotionSelection & Serializable) pawn -> {
-        return promotionChoice[0];
-    };//Use promotionChoice to determine new piece
-    private ChessGame game = new ChessGame(promotionLambda);
+    private final ChessGame game = new ChessGame((PromotionSelection & Serializable) pawn -> {return promotionChoice[0];});
         
     //Constructors
     public GameModel(boolean playerColor) { //New game

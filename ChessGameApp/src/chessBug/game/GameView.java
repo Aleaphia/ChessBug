@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package chessBug.game;
 
 import chessGame.*;
@@ -177,8 +173,8 @@ public class GameView {
         chatSpace.getChildren().addAll(scroll, msgInput);
         
         //Styles ---------------------------------------------------------------
-        scroll.getStyleClass().add("chatBox");
-        chatContent.getStyleClass().add("chatBox");
+        scroll.getStyleClass().addAll("chatBox", "scrollBackground");
+        chatContent.getStyleClass().addAll("chatBox", "scrollBackground");
 
         // ---------------------------------------------------------------------
         //Function
@@ -413,7 +409,7 @@ public class GameView {
 
     public void addMessages(Stream<Message> messages) {
         messages.forEach(msg -> {
-            long time = System.currentTimeMillis(); //DEBUG
+            // long time = System.currentTimeMillis(); //DEBUG
             HBox messageContainer = new HBox();
             //System.out.println(System.currentTimeMillis() - time); //DEBUG
             //Build content
@@ -425,7 +421,7 @@ public class GameView {
             pfpView.setFitWidth(32);
             pfpView.setFitHeight(32);
             pfpViewContainer.getStyleClass().add("chatPfp");
-            //System.out.println(System.currentTimeMillis() - time);
+            //System.out.println("DEBUG: " + System.currentTimeMillis() - time);
             
             //Message
             Label label = new Label(msg.getAuthor().getUsername() + ": " + msg.getContent());
@@ -434,12 +430,12 @@ public class GameView {
                     //Test if the client player sent this message and add appropriate style class
                     (msg.getAuthor().equals(controller.getUsername()))? 
                             "thisPlayerMessage": "otherPlayerMessage");
-            System.out.println(System.currentTimeMillis() - time);
+            // System.out.println("DEBUG: " + System.currentTimeMillis() - time);
             
             //Add contents to chat container
             messageContainer.getChildren().addAll(pfpViewContainer, label);
             chatContent.getChildren().add(messageContainer);
-            System.out.println(System.currentTimeMillis() - time);
+            // System.out.println("DEBUG: " + System.currentTimeMillis() - time);
         });
     }
     
@@ -600,7 +596,6 @@ public class GameView {
         }
         else { //Black just moved
             notationContent.add(box, 2, notationMove); //Add black move
-
         }
         
         GridPane.setVgrow(newLabel, Priority.ALWAYS);

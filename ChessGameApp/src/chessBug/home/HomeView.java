@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package chessBug.home;
 
 import org.json.JSONObject;
@@ -26,16 +22,16 @@ import java.util.ArrayList;
 
 public class HomeView {
     
-    private HomeController controller;
+    private final HomeController controller;
     private BorderPane page = new BorderPane();
     private VBox currentContent;
     private VBox friendsListContent;
     
-    private Label gamesPlayed;
-    private Label currentGames;
-    private Label wins;
-    private Label losses;
-    private Label draws;
+    private Label gamesPlayed = new Label();
+    private Label currentGames = new Label();
+    private Label wins = new Label();
+    private Label losses = new Label();
+    private Label draws = new Label();
     
     boolean newStatsFlag = false;
     private JSONObject cachedStats = new JSONObject(Map.of("Won", 0, "Lost", 0, "Draw", 0, "Current", 0, "Total", 0));
@@ -78,7 +74,7 @@ public class HomeView {
                 }
             } catch (NetworkException ignored) {} // If there's an error while trying to get stats or friends, just ignore it, it'll try again soon
         }).start());
-    }
+    }  
     
     public BorderPane getPage(){return page;}
     public void setPage(BorderPane page){this.page = page;}
@@ -118,11 +114,6 @@ public class HomeView {
         Label statsTitle = new Label("Recent Game Statistics");
         statsTitle.getStyleClass().addAll("h3","section-title");
         
-        gamesPlayed = new Label();
-        currentGames = new Label();
-        wins = new Label();
-        losses = new Label();
-        draws = new Label();
         updateStatsLabels();
         
         statsSection.getChildren().addAll(statsTitle, currentGames, gamesPlayed, wins, losses, draws);

@@ -1,6 +1,5 @@
 package chessBug.preferences;
 
-import chessBug.home.HomeView;
 import chessBug.network.Client;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
@@ -11,9 +10,6 @@ import javafx.scene.control.Separator;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.beans.binding.Bindings;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;

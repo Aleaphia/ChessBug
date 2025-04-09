@@ -17,11 +17,11 @@ import javafx.scene.layout.Priority;
 public class GameSelectionUI {
     public enum GameStatus { REQUESTED, IN_PROGRESS, COMPLETE};
     
-    private VBox page = new VBox();
-    private VBox games = new VBox();
-    private IGameSelectionController controller;
-    private GameStatus status;
-    private GameList gameList;
+    private final VBox page = new VBox();
+    private final VBox games = new VBox();
+    private final IGameSelectionController controller;
+    private final GameStatus status;
+    private final GameList gameList;
     private boolean remakeListFlag = false;
     private List<Match> cachedGameList;
     
@@ -111,8 +111,6 @@ public class GameSelectionUI {
                 e.printStackTrace();
             }
         });
-        
-        
         
         //Noncomplete games have options for ending the game immediately
         if (status != GameStatus.COMPLETE){
