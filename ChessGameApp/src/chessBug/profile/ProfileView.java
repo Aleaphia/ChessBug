@@ -5,13 +5,18 @@ import java.io.IOException;
 
 import chessBug.network.Client;
 import chessBug.network.NetworkException;
+import javafx.animation.FadeTransition;
+import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -20,221 +25,239 @@ import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 public class ProfileView extends VBox {
     private Text usernameText, emailText, profileDescriptionText;
     private ImageView profileImageView;
     private ProfileController controller;
-    private TextField usernameField, emailField;
-    private Button changeProfilePicButton;
-    private TextField bioField;
-    private TextField oldPasswordField;
-    private TextField newPasswordField;
+    private TextField usernameField, emailField, bioField, oldPasswordField, newPasswordField;
 
     public ProfileView(ProfileController controller, Client client) {
         this.controller = controller;
 
-        // Set various styling things
         setSpacing(20);
-        setPadding(new Insets(20));
-        setStyle("-fx-background-color: rgb(212, 215, 223); -fx-border-radius: 10px;");
-        setPrefSize(3840, 2160);
-        setAlignment(Pos.CENTER);
+        setPadding(new Insets(50));
+        setAlignment(Pos.TOP_CENTER);
+        setStyle("-fx-background-color: #1a1a1a;");
+
         createProfileUI(client);
+
+        // Responsive width
+        prefWidthProperty().bind(Bindings.createDoubleBinding(() ->
+                getScene() != null ? getScene().getWidth() * 0.9 : 1000, sceneProperty()));
+
+        // Entry animation
+        FadeTransition fadeIn = new FadeTransition(Duration.seconds(1.0), this);
+        fadeIn.setFromValue(0);
+        fadeIn.setToValue(1);
+        fadeIn.play();
     }
 
     private void createProfileUI(Client client) {
-        // Profile Banner
-        Rectangle banner = new Rectangle(400, 100);
+        Rectangle banner = new Rectangle(500, 120);
+        banner.setArcWidth(20);
+        banner.setArcHeight(20);
         banner.setFill(new LinearGradient(0, 0, 1, 1, true, CycleMethod.NO_CYCLE,
-                new Stop(0, Color.DARKBLUE), new Stop(1, Color.PURPLE)));
+                new Stop(0, Color.DARKRED), new Stop(1, Color.CRIMSON)));
 
-        // Profile Picture
         profileImageView = new ImageView(client.getOwnUser().getProfilePicture());
-        profileImageView.setFitWidth(100);
-        profileImageView.setFitHeight(100);
-        profileImageView.setClip(new Circle(50, 50, 50)); // Circular profile picture
+        profileImageView.setFitWidth(120);
+        profileImageView.setFitHeight(120);
+        profileImageView.setClip(new Circle(60, 60, 60));
+        DropShadow glow = new DropShadow(15, Color.RED);
+        glow.setSpread(0.3);
+        profileImageView.setEffect(glow);
 
-        // Profile Description Text
-        profileDescriptionText = new Text("Add a brief description about yourself...");
-        profileDescriptionText.setText(controller.getModel().getBio());
-        profileDescriptionText.setStyle("-fx-font-size: 14px; -fx-fill: gray; -fx-font-style: italic;");
+        profileImageView.setOnMouseEntered(e -> glow.setColor(Color.ORANGERED));
+        profileImageView.setOnMouseExited(e -> glow.setColor(Color.RED));
 
-        // Username and Email Text
-        usernameText = new Text(controller.getModel().getUsername());
-        usernameText.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
-        
-        emailText = new Text(controller.getModel().getEmail());
-        emailText.setStyle("-fx-font-size: 16px; -fx-fill: gray;");
-        
-        // Editable Fields with Placeholder Texts
-        usernameField = new TextField(controller.getModel().getUsername());
-        usernameField.setMaxWidth(300);
-        usernameField.setPromptText("Enter your new username");
+        StackPane profileStack = new StackPane(banner, profileImageView);
+        profileStack.setAlignment(Pos.BOTTOM_CENTER);
+        profileImageView.setTranslateY(30);
 
-        emailField = new TextField(controller.getModel().getEmail());
-        emailField.setMaxWidth(300);
-        emailField.setPromptText("Enter your email address");
+        usernameText = createText(controller.getModel().getUsername(), 26, Color.WHITE, true);
+        emailText = createText(controller.getModel().getEmail(), 16, Color.LIGHTGRAY, false);
+        profileDescriptionText = createText(controller.getModel().getBio(), 14, Color.LIGHTGRAY, false);
+        profileDescriptionText.setWrappingWidth(400);
 
-        //Bio Field
-        bioField = new TextField(controller.getModel().getBio());
-        bioField.setMaxWidth(300);
-        bioField.setPromptText("Enter your bio");
+        usernameField = createField(controller.getModel().getUsername(), "Enter your new username");
+        emailField = createField(controller.getModel().getEmail(), "Enter your email address");
+        bioField = createField(controller.getModel().getBio(), "Enter your bio");
+        oldPasswordField = createField("", "Old Password");
+        newPasswordField = createField("", "New Password");
 
-        //Password Fields
-        oldPasswordField = new TextField();
-        oldPasswordField.setPromptText("Old Password");
-        oldPasswordField.setMaxWidth(300);
-
-        newPasswordField = new TextField();
-        newPasswordField.setPromptText("New Password");
-        newPasswordField.setMaxWidth(300);
-
-        // Buttons with Updated Styles
-        Button updateProfileButton = new Button("Update Profile");
-        updateProfileButton.setStyle("-fx-background-color: #4e8af3; -fx-text-fill: white;");
-        updateProfileButton.setOnAction(e -> updateProfile());
-
-        changeProfilePicButton = new Button("Change Picture");
-        changeProfilePicButton.setStyle("-fx-background-color: #4e8af3; -fx-text-fill: white;");
-        changeProfilePicButton.setOnAction(e -> openFileChooserForProfilePic(client));
-
-        Button updateBioButton = new Button("Update Bio");
-updateBioButton.setStyle("-fx-background-color: #4e8af3; -fx-text-fill: white;");
-updateBioButton.setOnAction(e -> {
-    String newBio = bioField.getText();
-    if (newBio == null || newBio.isBlank()) {
-        showError("Bio cannot be empty.");
-    } else {
-        controller.updateBio(newBio); // this calls into the ProfileController
-        showConfirmation();
-    }
-});
-
-        Button resetPasswordButton = new Button("Reset Password");
-        resetPasswordButton.setOnAction(e -> {
+        Button updateProfileButton = createButton("Update Profile", e -> updateProfile());
+        Button changeProfilePicButton = createButton("Change Picture", e -> openFileChooserForProfilePic(client));
+        Button updateBioButton = createButton("Update Bio", e -> {
+            String newBio = bioField.getText();
+            if (newBio == null || newBio.isBlank()) {
+                showError("Bio cannot be empty.");
+            } else {
+                controller.updateBio(newBio);
+                showConfirmation("Bio updated successfully.");
+            }
+        });
+        Button resetPasswordButton = createButton("Reset Password", e -> {
             String oldPass = oldPasswordField.getText();
             String newPass = newPasswordField.getText();
             if (oldPass.isEmpty() || newPass.isEmpty()) {
                 showError("Both password fields must be filled");
             } else {
                 controller.resetPassword(oldPass, newPass);
-                showConfirmation();
-            }           
+                showConfirmation("Password reset successfully.");
+            }
         });
-        
 
-        // Layout - Using VBox to stack profile image, text, fields, and buttons
-        StackPane profileStack = new StackPane(banner, profileImageView);
-        profileStack.setAlignment(Pos.CENTER);
-        profileImageView.setTranslateY(25);
+        HBox passwordBox = new HBox(10, oldPasswordField, newPasswordField);
+        passwordBox.setAlignment(Pos.CENTER);
+        passwordBox.setMaxWidth(500);
+        HBox.setHgrow(oldPasswordField, Priority.ALWAYS);
+        HBox.setHgrow(newPasswordField, Priority.ALWAYS);
 
-        // User Info Section
-        VBox userInfoSection = new VBox(10, profileStack, 
-        usernameText, 
-        emailText, 
-        profileDescriptionText, 
-        usernameField, 
-        emailField,
-        bioField, 
-        updateProfileButton, 
-        changeProfilePicButton,
-        updateBioButton,
-        oldPasswordField,
-        newPasswordField,
-        resetPasswordButton
+        VBox profileCard = new VBox(15,
+                profileStack,
+                usernameText,
+                emailText,
+                profileDescriptionText,
+                usernameField,
+                emailField,
+                bioField,
+                updateProfileButton,
+                changeProfilePicButton,
+                updateBioButton,
+                passwordBox,
+                resetPasswordButton
         );
-        userInfoSection.setAlignment(Pos.CENTER);
-        userInfoSection.setSpacing(15);
+        profileCard.setAlignment(Pos.CENTER);
+        profileCard.setPadding(new Insets(30));
+        profileCard.setMaxWidth(600);
+        profileCard.setStyle(
+            "-fx-background-color: rgba(40,40,40,0.8);" +
+            "-fx-background-radius: 15;" +
+            "-fx-border-color: darkred;" +
+            "-fx-border-width: 1;" +
+            "-fx-border-radius: 15;"
+        );
+        profileCard.setEffect(new DropShadow(30, Color.color(0.3, 0, 0, 0.8)));
 
-        // Center everything in the VBox and ensure responsiveness
-        getChildren().add(userInfoSection);
-        setAlignment(Pos.CENTER);
-        setPrefWidth(600);  // Set a responsive width
+        getChildren().add(profileCard);
     }
 
-    //Fetching user pofile data to update
+    private Text createText(String content, int size, Color color, boolean bold) {
+        Text text = new Text(content);
+        text.setFont(Font.font("Arial", bold ? javafx.scene.text.FontWeight.BOLD : javafx.scene.text.FontWeight.NORMAL, size));
+        text.setFill(color);
+        return text;
+    }
+
+    private TextField createField(String value, String prompt) {
+        TextField field = new TextField(value);
+        field.setPromptText(prompt);
+        field.setMaxWidth(500);
+        field.setStyle(
+            "-fx-background-color: #3c3c3c;" +
+            "-fx-text-fill: white;" +
+            "-fx-prompt-text-fill: gray;" +
+            "-fx-background-radius: 6;" +
+            "-fx-border-color: #880e4f;" +
+            "-fx-border-radius: 6;" +
+            "-fx-border-width: 1;"
+        );
+        return field;
+    }
+
+    private Button createButton(String label, javafx.event.EventHandler<javafx.event.ActionEvent> handler) {
+        Button btn = new Button(label);
+        btn.setOnAction(handler);
+        btn.setStyle(
+            "-fx-background-color: #c62828;" +
+            "-fx-text-fill: white;" +
+            "-fx-background-radius: 6;" +
+            "-fx-font-size: 14px;" +
+            "-fx-padding: 10 20 10 20;"
+        );
+        btn.setOnMouseEntered(e -> btn.setStyle(
+            "-fx-background-color: #e53935;" +
+            "-fx-text-fill: white;" +
+            "-fx-background-radius: 6;" +
+            "-fx-font-size: 14px;" +
+            "-fx-padding: 10 20 10 20;"
+        ));
+        btn.setOnMouseExited(e -> btn.setStyle(
+            "-fx-background-color: #c62828;" +
+            "-fx-text-fill: white;" +
+            "-fx-background-radius: 6;" +
+            "-fx-font-size: 14px;" +
+            "-fx-padding: 10 20 10 20;"
+        ));
+        btn.setMaxWidth(500);
+        return btn;
+    }
+
     private void updateProfile() {
         String newUsername = usernameField.getText();
         String newEmail = emailField.getText();
-        
         if (newUsername.isEmpty() || newEmail.isEmpty()) {
             showError("Username and Email cannot be empty");
             return;
         }
-        
         if (!newEmail.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
             showError("Invalid email format");
             return;
         }
-        
         controller.updateProfile(newUsername, newEmail);
-        showConfirmation();
+        showConfirmation("Profile updated successfully.");
     }
 
-    //Update profile view
     public void updateProfileView(ProfileModel updatedProfile) {
-        // Update username if it's changed
         if (!usernameText.getText().equals(updatedProfile.getUsername())) {
             usernameText.setText(updatedProfile.getUsername());
         }
-    
-        // Update email if it's changed
         if (!emailText.getText().equals(updatedProfile.getEmail())) {
             emailText.setText(updatedProfile.getEmail());
         }
-    
-        // Update profile picture if it's changed
         if (!profileImageView.getImage().getUrl().endsWith(updatedProfile.getProfilePicURL())) {
             profileImageView.setImage(new Image(updatedProfile.getProfilePicURL()));
         }
-    
-        // ✅ Update bio if it's changed
         String newBio = updatedProfile.getBio();
-        String currentBio = profileDescriptionText.getText();
-    
-        if (newBio != null && !newBio.equals(currentBio)) {
-            if (newBio.isBlank()) {
-                profileDescriptionText.setText("Add a brief description about yourself...");
-            } else {
-                profileDescriptionText.setText(newBio);
-            }
+        if (newBio != null && !newBio.equals(profileDescriptionText.getText())) {
+            profileDescriptionText.setText(newBio.isBlank()
+                    ? "Add a brief description about yourself..."
+                    : newBio);
         }
     }
-    
 
-    private void showError(String message) {
+    private void showError(String msg) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
+        alert.setContentText(msg);
         alert.showAndWait();
     }
 
-    private void showConfirmation() {
+    private void showConfirmation(String msg) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Profile Updated");
-        alert.setHeaderText(null);
-        alert.setContentText("Your profile has been successfully updated");
+        alert.setTitle("Success");
+        alert.setContentText(msg);
         alert.showAndWait();
     }
 
-    //Open files selector on system to upload new user profile picture
     private void openFileChooserForProfilePic(Client client) {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif"));
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif"));
         Stage stage = new Stage();
         File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
             Image selectedImage = new Image("file:" + file.getAbsolutePath());
             try {
-                client.uploadProfilePicture(file); // Ensure client method handles the file upload
+                client.uploadProfilePicture(file);
                 profileImageView.setImage(selectedImage);
             } catch (NetworkException | IOException e) {
-                System.err.println("Unable to upload profile picture!");
                 showError("Unable to upload profile picture!");
                 e.printStackTrace();
             }
