@@ -78,8 +78,9 @@ public class Client {
 	private Client() {}
 
 	public Client(String username, String password) throws ClientAuthException {
+		if(username.isEmpty() || password.isEmpty())
+			throw new ClientAuthException(ClientAuthException.TYPE_LOGIN, new IllegalArgumentException("Username and password can't be empty!"));
 		// Call "login" function from the server
-		System.out.println("Hashed password to: " + hashPassword(password));
 		profile = new ProfileModel(0, username, hashPassword(password), "", User.DEFAULT_PROFILE_PICTURE);
 
 		// Update profile data with email and any other data
@@ -92,6 +93,9 @@ public class Client {
 	}
 
 	public static Client loginPreHashed(String username, String password) throws ClientAuthException {
+		if(username.isEmpty() || password.isEmpty())
+			throw new ClientAuthException(ClientAuthException.TYPE_LOGIN, new IllegalArgumentException("Username and password can't be empty!"));
+		
 		Client c = new Client();
 		c.profile = new ProfileModel(0, username, password, "", User.DEFAULT_PROFILE_PICTURE);
 
@@ -106,6 +110,8 @@ public class Client {
 	}
 
 	public static Client createAccount(String username, String password, String email) throws ClientAuthException {
+		if(username.isEmpty() || password.isEmpty())
+			throw new ClientAuthException(ClientAuthException.TYPE_LOGIN, new IllegalArgumentException("Username and password can't be empty!"));
 		// Create a new blank Client, setting profile data
 		Client c = new Client();
 		c.profile = new ProfileModel(0, username, hashPassword(password), email, "");
