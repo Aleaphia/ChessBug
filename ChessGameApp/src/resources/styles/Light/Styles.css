@@ -10,6 +10,9 @@
 .label {
     -fx-text-fill: rgb(0, 0, 0);
 }
+Text {
+    -fx-fill: black;
+}
 .error {
     -fx-text-fill: #902929;
 }

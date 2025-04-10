@@ -42,6 +42,11 @@
     -fx-background-color: rgba(0, 0, 0, 0);
 }
 
+Text {
+    -fx-font: 14 Roboto;
+    -fx-fill: white;
+}
+
 .h1 {
     -fx-font-size: 20px;
     -fx-font-weight: bold;

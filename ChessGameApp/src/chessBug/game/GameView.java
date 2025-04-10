@@ -11,6 +11,8 @@ import javafx.geometry.*;
 import javafx.scene.layout.*;
 import javafx.scene.control.*;
 import javafx.scene.image.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.*;
 import javafx.scene.control.ScrollPane;
 
 public class GameView {
@@ -424,16 +426,17 @@ public class GameView {
             //System.out.println("DEBUG: " + System.currentTimeMillis() - time);
             
             //Message
-            Label label = new Label(msg.getAuthor().getUsername() + ": " + msg.getContent());
+            Text text = new Text(msg.getAuthor().getUsername() + ": " + msg.getContent());
+            TextFlow flow = new TextFlow(text);
             
-            label.getStyleClass().addAll("chatMessage",
+            text.getStyleClass().addAll("chatMessage",
                     //Test if the client player sent this message and add appropriate style class
                     (msg.getAuthor().equals(controller.getUsername()))? 
                             "thisPlayerMessage": "otherPlayerMessage");
             // System.out.println("DEBUG: " + System.currentTimeMillis() - time);
             
             //Add contents to chat container
-            messageContainer.getChildren().addAll(pfpViewContainer, label);
+            messageContainer.getChildren().addAll(pfpViewContainer, flow);
             chatContent.getChildren().add(messageContainer);
             // System.out.println("DEBUG: " + System.currentTimeMillis() - time);
         });
