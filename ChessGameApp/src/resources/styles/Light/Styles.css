@@ -19,3 +19,6 @@ Text {
 .scrollBackground{
     -fx-background-color: rgb(255, 255, 255);
 }
+.text-primary {
+    -fx-fill: #757575; /* Light gray color for username in light mode */
+}
