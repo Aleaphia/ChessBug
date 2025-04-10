@@ -1,0 +1,54 @@
+.root {
+    -fx-background-color: #f4f4f4;
+}
+
+.profile-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 15;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 20, 0.3, 0, 4);
+    -fx-padding: 30;
+}
+
+.profile-banner {
+    -fx-background-color: linear-gradient(to bottom right, #ff6f61, #ff5252);
+    -fx-background-radius: 20;
+}
+
+.profile-image {
+    -fx-effect: dropshadow(gaussian, rgba(255, 0, 0, 0.4), 15, 0.3, 0, 0);
+}
+
+.field {
+    -fx-background-color: #eeeeee;
+    -fx-text-fill: #333;
+    -fx-prompt-text-fill: #888;
+    -fx-background-radius: 6;
+    -fx-border-color: transparent;
+    -fx-padding: 8 12;
+}
+
+.button {
+    -fx-background-color: #ff5252;
+    -fx-text-fill: white;
+    -fx-background-radius: 6;
+}
+
+.button:hover {
+    -fx-background-color: #ff6f61;
+}
+
+.text-title {
+    -fx-font-size: 26px;
+    -fx-fill: #333;
+    -fx-font-weight: bold;
+}
+
+.text-subtitle {
+    -fx-font-size: 16px;
+    -fx-fill: #666;
+}
+
+.text-description {
+    -fx-font-size: 14px;
+    -fx-fill: #666;
+}
