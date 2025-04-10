@@ -4,12 +4,15 @@ import chessGame.*;
 import chessBug.network.*;
 import java.io.*;
 import java.util.*;
+import java.util.stream.Stream;
 
 import javafx.geometry.*;
 
 import javafx.scene.layout.*;
 import javafx.scene.control.*;
 import javafx.scene.image.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.*;
 import javafx.scene.control.ScrollPane;
 
 public class GameView {
@@ -405,41 +408,46 @@ public class GameView {
     public void refreshMessageBoard(Client client) {
         internalRefreshMessageBoard(client);
     }
+
+    public void addMessages(Stream<Message> messages) {
+        messages.forEach(msg -> {
+            // long time = System.currentTimeMillis(); //DEBUG
+            HBox messageContainer = new HBox();
+            //System.out.println(System.currentTimeMillis() - time); //DEBUG
+            //Build content
+            //profile picture
+            ImageView pfpView = new ImageView(msg.getAuthor().getProfilePicture());
+            //System.out.println(System.currentTimeMillis() - time); //DEBUG
+            StackPane pfpViewContainer = new StackPane(pfpView);
+            
+            pfpView.setFitWidth(32);
+            pfpView.setFitHeight(32);
+            pfpViewContainer.getStyleClass().add("chatPfp");
+            //System.out.println("DEBUG: " + System.currentTimeMillis() - time);
+            
+            //Message
+            Text text = new Text(msg.getAuthor().getUsername() + ": " + msg.getContent());
+            TextFlow flow = new TextFlow(text);
+            
+            text.getStyleClass().addAll("chatMessage",
+                    //Test if the client player sent this message and add appropriate style class
+                    (msg.getAuthor().equals(controller.getUsername()))? 
+                            "thisPlayerMessage": "otherPlayerMessage");
+            // System.out.println("DEBUG: " + System.currentTimeMillis() - time);
+            
+            //Add contents to chat container
+            messageContainer.getChildren().addAll(pfpViewContainer, flow);
+            chatContent.getChildren().add(messageContainer);
+            // System.out.println("DEBUG: " + System.currentTimeMillis() - time);
+        });
+    }
     
     //Private methdos
     private void internalRefreshMessageBoard(Client client) {
         
         //Get any new messages, add each message to the chat
         try {
-            controller.getChatMessages().forEach(msg -> {
-                //long time = System.currentTimeMillis(); //DEBUG
-                HBox messageContainer = new HBox();
-                //System.out.println("DEBUG: " + System.currentTimeMillis() - time); //DEBUG
-                //Build content
-                //profile picture
-                ImageView pfpView = new ImageView(msg.getAuthor().getProfilePicture());
-                //System.out.println("DEBUG: " + System.currentTimeMillis() - time); //DEBUG
-                StackPane pfpViewContainer = new StackPane(pfpView);
-                
-                pfpView.setFitWidth(32);
-                pfpView.setFitHeight(32);
-                pfpViewContainer.getStyleClass().add("chatPfp");
-                //System.out.println("DEBUG: " + System.currentTimeMillis() - time);
-                
-                //Message
-                Label label = new Label(msg.getAuthor().getUsername() + ": " + msg.getContent());
-                
-                label.getStyleClass().addAll("chatMessage",
-                        //Test if the client player sent this message and add appropriate style class
-                        (msg.getAuthor().equals(controller.getUsername()))? 
-                                "thisPlayerMessage": "otherPlayerMessage");
-                //System.out.println("DEBUG: " + System.currentTimeMillis() - time);
-                
-                //Add contents to chat container
-                messageContainer.getChildren().addAll(pfpViewContainer, label);
-                chatContent.getChildren().add(messageContainer);
-                //System.out.println("DEBUG: " + System.currentTimeMillis() - time);
-            });
+            addMessages(controller.getChatMessages());
         } catch (NetworkException e) {
             System.err.println("Failed to get chat messages!");
             e.printStackTrace();
