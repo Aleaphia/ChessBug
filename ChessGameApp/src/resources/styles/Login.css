@@ -21,6 +21,9 @@
     -fx-background-size: contain;
     -fx-background-position: center center;
 }
+.createAccountButton:hover {
+    -fx-cursor: hand;
+}
 .createAccountButton {
     -fx-background-color: transparent;
     -fx-text-fill: #4E8AF3;
