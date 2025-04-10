@@ -218,12 +218,12 @@ public class Client {
 	}
 
 	// Update profile with new data
-	public void updateProfile(String newUsername, String newEmail, String newPassword) throws NetworkException {
+	public void updateProfile(String newUsername, String newEmail, String newBio) throws NetworkException {
 		// Send to server to update profile data
-		post("updateProfile", Map.of("newUsername", newUsername, "newPassword", newPassword, "newEmail", newEmail));
+		post("updateProfile", Map.of("newUsername", newUsername, "newEmail", newEmail, "newBio", newBio));
 		profile.setUsername(newUsername);
 		profile.setEmail(newEmail);
-		profile.setPassword(hashPassword(newPassword));
+		profile.setBio(newBio);
 	}
 
 	// Returns {"Won": (int), "Lost": (int), "Draw": (int), "Current": (int), "Total": (int)}

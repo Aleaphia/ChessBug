@@ -89,15 +89,6 @@ public class ProfileView extends VBox {
 
         Button updateProfileButton = createButton("Update Profile", e -> updateProfile());
         Button changeProfilePicButton = createButton("Change Picture", e -> openFileChooserForProfilePic(client));
-        Button updateBioButton = createButton("Update Bio", e -> {
-            String newBio = bioField.getText();
-            if (newBio == null || newBio.isBlank()) {
-                showError("Bio cannot be empty.");
-            } else {
-                controller.updateBio(newBio);
-                showConfirmation("Bio updated successfully.");
-            }
-        });
         Button resetPasswordButton = createButton("Reset Password", e -> {
             String oldPass = oldPasswordField.getText();
             String newPass = newPasswordField.getText();
@@ -125,7 +116,6 @@ public class ProfileView extends VBox {
                 bioField,
                 updateProfileButton,
                 changeProfilePicButton,
-                updateBioButton,
                 passwordBox,
                 resetPasswordButton
         );
@@ -163,6 +153,7 @@ public class ProfileView extends VBox {
     private void updateProfile() {
         String newUsername = usernameField.getText();
         String newEmail = emailField.getText();
+        String newBio = bioField.getText();
         if (newUsername.isEmpty() || newEmail.isEmpty()) {
             showError("Username and Email cannot be empty");
             return;
@@ -171,7 +162,7 @@ public class ProfileView extends VBox {
             showError("Invalid email format");
             return;
         }
-        controller.updateProfile(newUsername, newEmail);
+        controller.updateProfile(newUsername, newEmail, newBio);
         showConfirmation("Profile updated successfully.");
     }
 

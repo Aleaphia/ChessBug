@@ -22,10 +22,10 @@ public class ProfileController {
     }
 
     // Update user profile data (username, password, email, profile picture)
-    public void updateProfile(String newUsername, String newEmail) {
+    public void updateProfile(String newUsername, String newEmail, String newBio) {
         try {
             // Update the profile on the server
-            client.updateProfile(newUsername, newEmail, getModel().getPassword());
+            client.updateProfile(newUsername, newEmail, newBio);
             
             // Refresh the view with the updated data
             if (view != null) {
