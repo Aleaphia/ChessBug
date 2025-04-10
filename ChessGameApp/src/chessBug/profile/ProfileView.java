@@ -20,9 +20,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
@@ -62,8 +59,7 @@ public class ProfileView extends VBox {
         Rectangle banner = new Rectangle(500, 120);
         banner.setArcWidth(20);
         banner.setArcHeight(20);
-        banner.setFill(new LinearGradient(0, 0, 1, 1, true, CycleMethod.NO_CYCLE,
-                new Stop(0, Color.DARKRED), new Stop(1, Color.CRIMSON)));
+        banner.getStyleClass().add("profile-banner");
 
         profileImageView = new ImageView(client.getOwnUser().getProfilePicture());
         profileImageView.setFitWidth(120);
@@ -80,9 +76,9 @@ public class ProfileView extends VBox {
         profileStack.setAlignment(Pos.BOTTOM_CENTER);
         profileImageView.setTranslateY(30);
 
-        usernameText = createText(controller.getModel().getUsername(), 26, Color.WHITE, true);
-        emailText = createText(controller.getModel().getEmail(), 16, Color.LIGHTGRAY, false);
-        profileDescriptionText = createText(controller.getModel().getBio(), 14, Color.LIGHTGRAY, false);
+        usernameText = createText(controller.getModel().getUsername(), 26, "text-primary", true);
+        emailText = createText(controller.getModel().getEmail(), 16, "text-secondary", false);
+        profileDescriptionText = createText(controller.getModel().getBio(), 14, "text-secondary", false);
         profileDescriptionText.setWrappingWidth(400);
 
         usernameField = createField(controller.getModel().getUsername(), "Enter your new username");
@@ -136,22 +132,15 @@ public class ProfileView extends VBox {
         profileCard.setAlignment(Pos.CENTER);
         profileCard.setPadding(new Insets(30));
         profileCard.setMaxWidth(600);
-        profileCard.setStyle(
-            "-fx-background-color: rgba(40,40,40,0.8);" +
-            "-fx-background-radius: 15;" +
-            "-fx-border-color: darkred;" +
-            "-fx-border-width: 1;" +
-            "-fx-border-radius: 15;"
-        );
-        profileCard.setEffect(new DropShadow(30, Color.color(0.3, 0, 0, 0.8)));
+        profileCard.getStyleClass().add("profile-card");
 
         getChildren().add(profileCard);
     }
 
-    private Text createText(String content, int size, Color color, boolean bold) {
+    private Text createText(String content, int size, String styleClass, boolean bold) {
         Text text = new Text(content);
         text.setFont(Font.font("Arial", bold ? javafx.scene.text.FontWeight.BOLD : javafx.scene.text.FontWeight.NORMAL, size));
-        text.setFill(color);
+        text.getStyleClass().add(styleClass);
         return text;
     }
 
@@ -159,42 +148,14 @@ public class ProfileView extends VBox {
         TextField field = new TextField(value);
         field.setPromptText(prompt);
         field.setMaxWidth(500);
-        field.setStyle(
-            "-fx-background-color: #3c3c3c;" +
-            "-fx-text-fill: white;" +
-            "-fx-prompt-text-fill: gray;" +
-            "-fx-background-radius: 6;" +
-            "-fx-border-color: #880e4f;" +
-            "-fx-border-radius: 6;" +
-            "-fx-border-width: 1;"
-        );
+        field.getStyleClass().add("field");
         return field;
     }
 
     private Button createButton(String label, javafx.event.EventHandler<javafx.event.ActionEvent> handler) {
         Button btn = new Button(label);
         btn.setOnAction(handler);
-        btn.setStyle(
-            "-fx-background-color: #c62828;" +
-            "-fx-text-fill: white;" +
-            "-fx-background-radius: 6;" +
-            "-fx-font-size: 14px;" +
-            "-fx-padding: 10 20 10 20;"
-        );
-        btn.setOnMouseEntered(e -> btn.setStyle(
-            "-fx-background-color: #e53935;" +
-            "-fx-text-fill: white;" +
-            "-fx-background-radius: 6;" +
-            "-fx-font-size: 14px;" +
-            "-fx-padding: 10 20 10 20;"
-        ));
-        btn.setOnMouseExited(e -> btn.setStyle(
-            "-fx-background-color: #c62828;" +
-            "-fx-text-fill: white;" +
-            "-fx-background-radius: 6;" +
-            "-fx-font-size: 14px;" +
-            "-fx-padding: 10 20 10 20;"
-        ));
+        btn.getStyleClass().add("button");
         btn.setMaxWidth(500);
         return btn;
     }

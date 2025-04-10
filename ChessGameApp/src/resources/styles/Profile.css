@@ -1,23 +1,65 @@
-/* ====================== PROFILE PAGE ====================== */
-
-.profilePage {
-    -fx-background-color: #f7f7f7;
-    -fx-padding: 20px;
+/* Background and general */
+.root {
+    -fx-background-color: #1a1a1a;
 }
 
-/* Profile Picture */
-.profile-picture {
-    -fx-border-radius: 50%;
-    -fx-border-color: #b0bec5;
-    -fx-border-width: 2px;
-    -fx-padding: 10px;
-    -fx-background-color: #ffffff;
+/* Profile Banner */
+.profile-banner {
+    -fx-background-color: linear-gradient(to bottom right, #d32f2f, #f44336);
+    -fx-background-radius: 20;
 }
 
-/* Username and Email */
-.usernameLabel, .emailLabel {
-    -fx-font-size: 16px;
+/* Profile Image and Drop Shadow */
+.profile-image {
+    -fx-effect: dropshadow(gaussian, rgba(255, 0, 0, 0.4), 15, 0.3, 0, 0);
+}
+
+.profile-card {
+    -fx-background-color: rgba(40,40,40,0.8);
+    -fx-background-radius: 15;
+    -fx-border-color: darkred;
+    -fx-border-width: 1;
+    -fx-border-radius: 15;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.8), 30, 0.3, 0, 0);
+}
+
+/* Text styles */
+.text-primary {
+    -fx-fill: white;
+    -fx-font-size: 26px;
     -fx-font-weight: bold;
-    -fx-text-fill: #333;
-    -fx-padding: 5px;
+}
+
+.text-secondary {
+    -fx-fill: lightgray;
+    -fx-font-size: 16px;
+}
+
+.text-description {
+    -fx-fill: lightgray;
+    -fx-font-size: 14px;
+}
+
+/* Input Fields */
+.field {
+    -fx-background-color: #3c3c3c;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: gray;
+    -fx-background-radius: 6;
+    -fx-border-color: #880e4f;
+    -fx-border-radius: 6;
+    -fx-border-width: 1;
+}
+
+/* Buttons */
+.button {
+    -fx-background-color: #c62828;
+    -fx-text-fill: white;
+    -fx-background-radius: 6;
+    -fx-font-size: 14px;
+    -fx-padding: 10 20;
+}
+
+.button:hover {
+    -fx-background-color: #e53935;
 }
