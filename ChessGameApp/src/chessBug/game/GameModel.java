@@ -17,10 +17,13 @@ public class GameModel {
     //Promotion variables
     private char[] promotionChoice = new char[1]; //char reference that can be modified by event handling lambda functions
     private final ChessGame game = new ChessGame((PromotionSelection & Serializable) pawn -> {return promotionChoice[0];});
+    
+    private ArrayList<String> positionList = new ArrayList<>();
         
     //Constructors
     public GameModel(boolean playerColor) { //New game
         this.playerColor = playerColor; //Determine player color
+        positionList.add(game.getPosition()); //Add starting position
     }
     
     //Getter/Setter Methods
@@ -32,7 +35,9 @@ public class GameModel {
     public Boolean getPlayerColor(){return playerColor;}
     public String getEndMessage(){return game.checkEnd();}
     public String getPosition(){return game.getPosition();}
-    public String getPostion(int index){return game.getPosition(index);}
+    public String getPosition(int index){
+        return positionList.get(index);
+    }
     public void endGame(){game.endGame();}
    
     //Other Methods
@@ -52,6 +57,7 @@ public class GameModel {
         //If the game move is valid
         if (game.gameTurn(startSquare, endSquare)){
             turnNum++;
+            positionList.add(game.getPosition());
             return true;
         }
         else 

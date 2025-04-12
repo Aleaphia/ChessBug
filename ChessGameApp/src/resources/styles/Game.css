@@ -44,6 +44,11 @@
     -fx-text-alignment: left;
     -fx-max-width: Infinity;
 }
+
+.notation .button {
+    -fx-font-size: 12px;
+    -fx-padding: 10px;
+}
 /* ====================== CHAT BOX STYLES ====================== */
 
 .chatBox {
