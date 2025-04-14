@@ -33,20 +33,51 @@
     -fx-font-weight: bold;
 }
 
+/* Buttons */
 .red-button {
     -fx-background-color: #e53935;
     -fx-text-fill: white;
     -fx-background-radius: 6;
     -fx-font-size: 14px;
     -fx-padding: 10 20 10 20;
+    -fx-cursor: hand;
 }
 
 .red-button:hover {
     -fx-background-color: #f44336;
 }
 
+/* ComboBox, CheckBox, Slider, Button Common */
 .combo-box, .check-box, .slider, .button {
     -fx-text-fill: #222;
     -fx-background-color: #f0f0f0;
     -fx-border-color: red;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-padding: 6 12 6 12;
+}
+
+/* Hover / Focus effects */
+.combo-box:hover, .check-box:hover, .slider:hover, .button:hover {
+    -fx-background-color: #eaeaea;
+    -fx-border-color: #ff5555;
+}
+
+.combo-box:focused, .check-box:focused, .slider:focused, .button:focused {
+    -fx-border-color: #ff3333;
+    -fx-effect: dropshadow(gaussian, red, 8, 0.3, 0, 0);
+}
+
+/* Slider styling */
+.slider .track {
+    -fx-background-color: #ccc;
+    -fx-background-radius: 5;
+    -fx-pref-height: 6px;
+}
+
+.slider .thumb {
+    -fx-background-color: red;
+    -fx-background-insets: 0;
+    -fx-padding: 8;
+    -fx-effect: dropshadow(gaussian, rgba(255,0,0,0.5), 5, 0.3, 0, 0);
 }

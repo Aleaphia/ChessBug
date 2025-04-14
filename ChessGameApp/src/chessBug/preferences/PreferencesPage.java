@@ -27,29 +27,37 @@ public class PreferencesPage {
 
     private void buildPage() {
         root = new HBox();
+        root.getStyleClass().add("preferences-page");
 
-        VBox page = new VBox(20);
-        Region rightRegion = new Region();
-        HBox.setHgrow(rightRegion, Priority.ALWAYS);
-        root.getChildren().addAll(page, rightRegion);
-
-        // Theme CSS
+        // Apply theme stylesheet
         applyThemeStylesheet(root);
 
-        // Style outer container
-        page.getStyleClass().add("settings-wrapper");
+        // Outer glowing card container
+        VBox settingsCard = new VBox();
+        settingsCard.getStyleClass().add("settings-card");
+
+        // Inner padded wrapper for content
+        VBox page = new VBox(20);
         page.setPadding(new Insets(30));
+        page.getStyleClass().add("settings-wrapper");
         page.setFillWidth(true);
+
+        Region rightRegion = new Region();
+        HBox.setHgrow(rightRegion, Priority.ALWAYS);
+
+        root.getChildren().addAll(settingsCard, rightRegion);
+        settingsCard.getChildren().add(page);
 
         // Title
         Label title = new Label("Settings");
         title.getStyleClass().add("h1");
 
-        // Save button
+        // Save Preferences Button
         Button savePreferencesButton = new Button("Save Preferences");
+        savePreferencesButton.getStyleClass().add("red-button");
         savePreferencesButton.setOnAction(event -> PreferencesController.savePreferences());
 
-        // Build sections
+        // Page Sections
         page.getChildren().addAll(
                 title,
                 new Separator(),
@@ -79,8 +87,10 @@ public class PreferencesPage {
 
         Slider volumeSlider = new Slider(0, 100, PreferencesController.getVolume() * 100);
         volumeSlider.setBlockIncrement(10);
+        volumeSlider.setShowTickMarks(true);
+        volumeSlider.setShowTickLabels(true);
         Label volumeLabel = new Label();
-        volumeLabel.textProperty().bind(Bindings.format("Volume: %.2f", volumeSlider.valueProperty()));
+        volumeLabel.textProperty().bind(Bindings.format("Volume: %.0f", volumeSlider.valueProperty()));
 
         volumeSlider.valueProperty().addListener((obs, oldVal, newVal) ->
                 PreferencesController.handleVolume(volumeSlider.getValue() / 100.0)
@@ -93,6 +103,7 @@ public class PreferencesPage {
                 volumeLabel,
                 volumeSlider
         );
+
         return gameSettingsContainer;
     }
 
