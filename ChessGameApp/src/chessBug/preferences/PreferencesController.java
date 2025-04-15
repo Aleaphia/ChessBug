@@ -4,16 +4,13 @@ import java.net.URL;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import chessBug.network.Client;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.layout.Pane;
 import javafx.scene.control.ButtonType;
-
-import javafx.scene.media.MediaPlayer;
+import javafx.scene.layout.Pane;
 import javafx.scene.media.Media;
-
-
-import chessBug.network.Client;
+import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 
 public class PreferencesController {
@@ -29,6 +26,13 @@ public class PreferencesController {
     public PreferencesController(Client client) {
         view = new PreferencesPage(client);
         page = view.getPage();
+    
+        // Apply styles once the scene is attached
+        page.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                applyStyles(newScene, "Styles", "Menu", "Preferences");
+            }
+        });
     }
 
     public Pane getPage() { return page; }
@@ -101,7 +105,7 @@ public class PreferencesController {
     }
     
     //Save login credentials
-    public static void setLogginCredentials(String username, String password){
+    public static void setLoginnCredentials(String username, String password){
         preferences.put("username", username);
         preferences.put("password", password);
     }
@@ -140,11 +144,27 @@ public class PreferencesController {
 
     public static void applyStyles(Scene scene, String... styles) {
         scene.getStylesheets().clear();
-        for(String style : styles) {
-            scene.getStylesheets().add(PreferencesController.class.getResource("/resources/styles/" + style + ".css").toExternalForm());
-            URL theme = PreferencesController.class.getResource("/resources/styles/" + getTheme() + "/" + style + ".css");
-            if(theme != null)
-                scene.getStylesheets().add(theme.toExternalForm());
+        for (String style : styles) {
+            // Always try to load the basic style first
+            String stylePath = "/resources/styles/" + style + ".css";
+            URL styleUrl = PreferencesController.class.getResource(stylePath);
+            
+            if (styleUrl != null) {
+                scene.getStylesheets().add(styleUrl.toExternalForm());
+            } else {
+                System.err.println("⚠️ Could not load CSS for: " + stylePath);
+            }
+    
+            // Try to apply theme-specific styles, if applicable
+            String theme = getTheme(); // Get the current theme (Light/Dark)
+            String themeStylePath = "/resources/styles/" + theme + "/" + style + ".css";
+            URL themeStyleUrl = PreferencesController.class.getResource(themeStylePath);
+            
+            if (themeStyleUrl != null) {
+                scene.getStylesheets().add(themeStyleUrl.toExternalForm());
+            } else {
+                System.err.println("⚠️ Could not load theme-specific CSS: " + themeStylePath);
+            }
             
             //For game page check if movehints are on
             if (style.equals("Game") && isShowMoveHintsEnabled())

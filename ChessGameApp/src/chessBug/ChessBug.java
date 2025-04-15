@@ -26,10 +26,10 @@ import chessBug.home.HomeController;
 import chessBug.login.LoginUI;
 import chessBug.network.Client;
 import chessBug.network.ClientAuthException;
+import chessBug.network.DatabaseCheckList;
 import chessBug.preferences.PreferencesController;
 import chessBug.preferences.PreferencesPage;
 import chessBug.profile.ProfileController;
-import chessBug.network.DatabaseCheckList;
 import javafx.animation.AnimationTimer;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -95,10 +95,10 @@ public class ChessBug extends Application {
     public void stop(){
         //Save credientials
         if (PreferencesController.isStayLoggedIn()){
-            PreferencesController.setLogginCredentials(client.getProfile().getUsername(), client.getProfile().getPassword());
+            PreferencesController.setLoginnCredentials(client.getProfile().getUsername(), client.getProfile().getPassword());
         }
         else{
-            PreferencesController.setLogginCredentials("", "");
+            PreferencesController.setLoginnCredentials("", "");
         }
     }
     

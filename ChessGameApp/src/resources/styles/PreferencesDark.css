@@ -8,6 +8,10 @@
     -fx-effect: dropshadow(gaussian, rgba(255, 0, 0, 0.6), 20, 0.3, 0, 0);
 }
 
+.preferences-page {
+    -fx-background-color: #121212; /* or rgba(10,10,10,0.9) for transparency */
+}
+
 .settings-wrapper {
     -fx-background-color: rgba(20, 20, 20, 0.7);
     -fx-border-color: red;
@@ -38,12 +42,15 @@
     -fx-text-fill: white;
     -fx-background-radius: 6;
     -fx-font-size: 14px;
-    -fx-padding: 10 20 10 20;
+    -fx-padding: 10 20;
     -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(255,0,0,0.5), 5, 0.2, 0, 0);
+    -fx-transition: all 0.2s ease-in-out; /* pseudo-transition */
 }
 
 .red-button:hover {
     -fx-background-color: #e53935;
+    -fx-translate-y: -2; /* subtle lift effect */
 }
 
 /* ComboBox, CheckBox, Slider, Button Common */

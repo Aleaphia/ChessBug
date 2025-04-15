@@ -3,6 +3,7 @@ package chessBug.preferences;
 import java.net.URL;
 
 import chessBug.network.Client;
+import javafx.animation.FadeTransition;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
@@ -15,6 +16,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
 public class PreferencesPage {
     private final Client client;
@@ -29,14 +31,11 @@ public class PreferencesPage {
         root = new HBox();
         root.getStyleClass().add("preferences-page");
 
-        // Apply theme stylesheet
         applyThemeStylesheet(root);
 
-        // Outer glowing card container
         VBox settingsCard = new VBox();
         settingsCard.getStyleClass().add("settings-card");
 
-        // Inner padded wrapper for content
         VBox page = new VBox(20);
         page.setPadding(new Insets(30));
         page.getStyleClass().add("settings-wrapper");
@@ -53,19 +52,17 @@ public class PreferencesPage {
         title.getStyleClass().add("h1");
 
         // Save Preferences Button
-        Button savePreferencesButton = new Button("Save Preferences");
-        savePreferencesButton.getStyleClass().add("red-button");
-        savePreferencesButton.setOnAction(event -> PreferencesController.savePreferences());
+        Button savePreferencesButton = createAnimatedButton("Save Preferences", () -> PreferencesController.savePreferences());
 
         // Page Sections
         page.getChildren().addAll(
-                title,
+                fadeIn(title),
                 new Separator(),
-                buildGameSettings(),
+                fadeIn(buildGameSettings()),
                 new Separator(),
-                buildAppSettings(),
+                fadeIn(buildAppSettings()),
                 new Separator(),
-                savePreferencesButton
+                fadeIn(savePreferencesButton)
         );
     }
 
@@ -89,6 +86,7 @@ public class PreferencesPage {
         volumeSlider.setBlockIncrement(10);
         volumeSlider.setShowTickMarks(true);
         volumeSlider.setShowTickLabels(true);
+
         Label volumeLabel = new Label();
         volumeLabel.textProperty().bind(Bindings.format("Volume: %.0f", volumeSlider.valueProperty()));
 
@@ -119,7 +117,9 @@ public class PreferencesPage {
         ComboBox<String> themeComboBox = new ComboBox<>();
         themeComboBox.getItems().addAll("Light", "Dark");
         themeComboBox.setValue(PreferencesController.getTheme());
-        themeComboBox.setOnAction(event -> PreferencesController.handleThemeChange(themeComboBox.getValue(), themeComboBox.getScene()));
+        themeComboBox.setOnAction(event ->
+                PreferencesController.handleThemeChange(themeComboBox.getValue(), themeComboBox.getScene())
+        );
 
         themeContainer.getChildren().addAll(themeLabel, themeComboBox);
 
@@ -134,7 +134,7 @@ public class PreferencesPage {
 
     private void applyThemeStylesheet(Region rootRegion) {
         String theme = PreferencesController.getTheme();
-        String cssFile = theme.equalsIgnoreCase("Dark") ? "/css/PreferencesDark.css" : "/css/PreferencesLight.css";
+        String cssFile = theme.equalsIgnoreCase("Dark") ? "resources/styles/PreferencesDark.css" : "resources/styles/Light/PreferencesLight.css";
         URL cssUrl = getClass().getResource(cssFile);
 
         if (cssUrl != null) {
@@ -142,6 +142,26 @@ public class PreferencesPage {
         } else {
             System.err.println("⚠️ Could not load CSS: " + cssFile);
         }
+    }
+
+    private Button createAnimatedButton(String text, Runnable action) {
+        Button button = new Button(text);
+        button.getStyleClass().add("red-button");
+        button.setOnAction(e -> action.run());
+
+        // Hover scale animation
+        button.setOnMouseEntered(e -> button.setScaleX(1.05));
+        button.setOnMouseExited(e -> button.setScaleX(1.0));
+
+        return button;
+    }
+
+    private <T extends Region> T fadeIn(T node) {
+        FadeTransition fade = new FadeTransition(Duration.millis(600), node);
+        fade.setFromValue(0);
+        fade.setToValue(1);
+        fade.play();
+        return node;
     }
 
     public HBox getPage() {
