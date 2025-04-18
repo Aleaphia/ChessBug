@@ -3,6 +3,9 @@ package chessBug.login;
 import org.json.JSONObject;
 
 import chessBug.preferences.PreferencesController;
+import javafx.animation.FadeTransition;
+import javafx.animation.ScaleTransition;
+import javafx.animation.SequentialTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -12,6 +15,8 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
+
 
 public class LoginUI {
     private Node page;
@@ -51,6 +56,25 @@ public class LoginUI {
 
         //Jump from username to password filds
         usernameField.setOnAction(event -> passwordField.requestFocus());
+
+        // Entry Animation
+        loginPage.setOpacity(0);
+        loginPage.setScaleX(0.95);
+        loginPage.setScaleY(0.95);
+
+        FadeTransition fadeIn = new FadeTransition(Duration.millis(500), loginPage);
+        fadeIn.setFromValue(0);
+        fadeIn.setToValue(1);
+
+        ScaleTransition scaleIn = new ScaleTransition(Duration.millis(500), loginPage);
+        scaleIn.setFromX(0.95);
+        scaleIn.setFromY(0.95);
+        scaleIn.setToX(1);
+        scaleIn.setToY(1);
+
+        SequentialTransition entryAnimation = new SequentialTransition(fadeIn, scaleIn);
+        entryAnimation.play();
+
         
         // Login Button
         Button loginButton = new Button("Login");
