@@ -52,6 +52,7 @@
 .h1 { -fx-font-size: 20px;}
 .h2 { -fx-font-size: 16px;}
 .h3 { -fx-font-size: 14px;}
+
 .error {
     -fx-text-fill: #FF5555;
 }
@@ -72,11 +73,11 @@
 }
 
 .button, .file-chooser-button {
-    -fx-background-color: #5c6bc0;
+    -fx-background-color: #af2323;
 }
 
 .button:hover, .file-chooser-button:hover {
-    -fx-background-color: #3f51b5;
+    -fx-background-color: rgb(237, 106, 106);
 }
 
 .change-password-button {
@@ -87,7 +88,7 @@
     -fx-background-color: #d32f2f;
 }
 .notYourMove {
-    -fx-background-color: #5b6186;
+    -fx-background-color: #865b5b;
 }
 
 /* ====================== FORM ELEMENTS ====================== */

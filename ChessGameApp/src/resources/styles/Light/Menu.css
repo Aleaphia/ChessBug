@@ -1,14 +1,10 @@
-.sideBar{
-    -fx-background-color: #ffffff;
-    -fx-text-fill: rgb(43, 43, 43);
-}
-.button, .file-chooser-button {
-    -fx-background-color: #af2323;
+.buttonIcon {
+    -fx-background-color: #d6d6d6;
     -fx-border-width: 0;
 }
 
-.button:hover, .file-chooser-button:hover {
-    -fx-background-color: #db3030;
+.buttonIcon:hover {
+    -fx-background-color: #ffffff;
 }
 
 /*Test*/
