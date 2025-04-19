@@ -235,7 +235,9 @@ public class Client {
 	// Returns {"Won": (int), "Lost": (int), "Draw": (int), "Current": (int), "Total": (int)}
 	public JSONObject getMatchStats() throws NetworkException {
 		JSONObject received = post("matchStats", new JSONObject());
-		return received.getJSONObject("response");
+		if(received.has("response"))
+			return received.getJSONObject("response");
+		else throw new NetworkException("Invalid response for getStats");
 	}
 
 	public void updatePassword(String newPassword) throws NetworkException {

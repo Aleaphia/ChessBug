@@ -37,7 +37,6 @@ public class PreferencesController {
     // Handle the theme change
     protected static void handleThemeChange(String theme, Scene scene) {
         preferences.put("theme", theme);
-        System.out.println("Theme changed to: " + theme);
         
         // Ensure the scene exists
         if (scene != null) {
@@ -142,9 +141,11 @@ public class PreferencesController {
         scene.getStylesheets().clear();
         for(String style : styles) {
             scene.getStylesheets().add(PreferencesController.class.getResource("/resources/styles/" + style + ".css").toExternalForm());
-            URL theme = PreferencesController.class.getResource("/resources/styles/" + getTheme() + "/" + style + ".css");
-            if(theme != null)
-                scene.getStylesheets().add(theme.toExternalForm());
+            try {
+                URL theme = PreferencesController.class.getResource("/resources/styles/" + getTheme() + "/" + style + ".css");
+                if(theme != null)
+                    scene.getStylesheets().add(theme.toExternalForm());
+            } catch (Exception ignored) {} // If we can't find a themed style then don't worry about it
             
             //For game page check if movehints are on
             if (style.equals("Game") && isShowMoveHintsEnabled())
