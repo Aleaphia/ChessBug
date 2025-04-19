@@ -12,6 +12,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.PasswordField;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
@@ -34,7 +35,8 @@ public class ProfileView extends VBox {
     private Text usernameText, emailText, profileDescriptionText;
     private ImageView profileImageView;
     private ProfileController controller;
-    private TextField usernameField, emailField, bioField;
+    private TextField usernameField, emailField;
+    private TextArea bioField;
     private PasswordField oldPasswordField, newPasswordField;
 
     public ProfileView(ProfileController controller, Client client) {
@@ -43,7 +45,6 @@ public class ProfileView extends VBox {
         setSpacing(20);
         setPadding(new Insets(50));
         setAlignment(Pos.TOP_CENTER);
-        setStyle("-fx-background-color: #1a1a1a;");
 
         createProfileUI(client);
 
@@ -86,7 +87,7 @@ public class ProfileView extends VBox {
 
         usernameField = createField(controller.getModel().getUsername(), "Enter your new username");
         emailField = createField(controller.getModel().getEmail(), "Enter your email address");
-        bioField = createField(controller.getModel().getBio(), "Enter your bio");
+        bioField = createArea(controller.getModel().getBio(), "Enter your bio");
         oldPasswordField = createPasswordField("Old Password");
         newPasswordField = createPasswordField("New Password");
 
@@ -108,6 +109,13 @@ public class ProfileView extends VBox {
         passwordBox.setMaxWidth(500);
         HBox.setHgrow(oldPasswordField, Priority.ALWAYS);
         HBox.setHgrow(newPasswordField, Priority.ALWAYS);
+        
+        //Focus changes
+        usernameField.setOnAction(event -> emailField.requestFocus());
+        emailField.setOnAction(event -> bioField.requestFocus());
+        
+        oldPasswordField.setOnAction(event -> newPasswordField.requestFocus());
+        newPasswordField.setOnAction(event -> resetPasswordButton.fire());
 
         VBox profileCard = new VBox(15,
                 profileStack,
@@ -141,6 +149,15 @@ public class ProfileView extends VBox {
         TextField field = new TextField(value);
         field.setPromptText(prompt);
         field.setMaxWidth(500);
+        field.getStyleClass().add("field");
+        return field;
+    }
+    
+    private TextArea createArea(String value, String prompt) {
+        TextArea field = new TextArea(value);
+        field.setPromptText(prompt);
+        field.setMaxWidth(500);
+        field.setWrapText(true);
         field.getStyleClass().add("field");
         return field;
     }

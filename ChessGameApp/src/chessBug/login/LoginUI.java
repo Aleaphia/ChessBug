@@ -90,6 +90,8 @@ public class LoginUI {
                 }
             }
         });
+        //Alternative login option (press enter from password)
+        passwordField.setOnAction(event -> loginButton.fire());
 
         // Create Account Button
         Label createAccountButton = new Label("Create an account");

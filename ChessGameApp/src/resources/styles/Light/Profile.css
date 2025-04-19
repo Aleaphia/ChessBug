@@ -1,41 +1,36 @@
+/* Background and general */
 .root {
     -fx-background-color: #f4f4f4;
 }
 
-.profile-card {
-    -fx-background-color: #ffffff;
-    -fx-background-radius: 15;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 20, 0.3, 0, 4);
-    -fx-padding: 30;
-}
-
+/* Profile Banner */
 .profile-banner {
     -fx-background-color: linear-gradient(to bottom right, #ff6f61, #ff5252);
-    -fx-background-radius: 20;
 }
 
-.profile-image {
-    -fx-effect: dropshadow(gaussian, rgba(255, 0, 0, 0.4), 15, 0.3, 0, 0);
+/* Profile Image and Drop Shadow */
+.profile-card {
+    -fx-background-color: #ffffff;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 20, 0.3, 0, 4);
 }
 
-.field {
+/* Input Fields */
+.field, .field .content{
     -fx-background-color: #eeeeee;
     -fx-text-fill: #333;
-    -fx-prompt-text-fill: #888;
-    -fx-background-radius: 6;
-    -fx-border-color: transparent;
-    -fx-padding: 8 12;
+    -fx-prompt-text-fill: #6b6b6b;
+    -fx-border-color: #dc868c;
 }
-
+s
+/* Buttons */
 .button {
     -fx-background-color: #ff5252;
-    -fx-text-fill: white;
-    -fx-background-radius: 6;
 }
 
 .button:hover {
     -fx-background-color: #ff6f61;
 }
+
 
 .text-title {
     -fx-font-size: 26px;

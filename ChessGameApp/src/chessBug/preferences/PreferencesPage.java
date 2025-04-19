@@ -29,16 +29,16 @@ public class PreferencesPage {
 
     private void buildPage() {
         root = new HBox();
-        root.getStyleClass().add("preferences-page");
+//        root.getStyleClass().add("preferences-page");
 
-        applyThemeStylesheet(root);
+//        applyThemeStylesheet(root);
 
         VBox settingsCard = new VBox();
-        settingsCard.getStyleClass().add("settings-card");
+//        settingsCard.getStyleClass().add("settings-card");
 
         VBox page = new VBox(20);
         page.setPadding(new Insets(30));
-        page.getStyleClass().addAll("settings-wrapper", "section");
+        page.getStyleClass().addAll(/*"settings-wrapper",*/ "section");
         page.setFillWidth(true);
 
         Region rightRegion = new Region();
@@ -132,17 +132,17 @@ public class PreferencesPage {
         return container;
     }
 
-    private void applyThemeStylesheet(Region rootRegion) {
-        String theme = PreferencesController.getTheme();
-        String cssFile = theme.equalsIgnoreCase("Dark") ? "resources/styles/PreferencesDark.css" : "resources/styles/Light/PreferencesLight.css";
-        URL cssUrl = getClass().getResource(cssFile);
-
-        if (cssUrl != null) {
-            rootRegion.getStylesheets().add(cssUrl.toExternalForm());
-        } else {
-            System.err.println("⚠️ Could not load CSS: " + cssFile);
-        }
-    }
+//    private void applyThemeStylesheet(Region rootRegion) {
+//        String theme = PreferencesController.getTheme();
+//        String cssFile = theme.equalsIgnoreCase("Dark") ? "resources/styles/PreferencesDark.css" : "resources/styles/Light/PreferencesLight.css";
+//        URL cssUrl = getClass().getResource(cssFile);
+//
+//        if (cssUrl != null) {
+//            rootRegion.getStylesheets().add(cssUrl.toExternalForm());
+//        } else {
+//            System.err.println("⚠️ Could not load CSS: " + cssFile);
+//        }
+//    }
 
     private Button createAnimatedButton(String text, Runnable action) {
         Button button = new Button(text);

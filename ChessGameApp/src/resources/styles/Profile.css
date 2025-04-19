@@ -41,12 +41,12 @@
 }
 
 /* Input Fields */
-.field {
+.field, .field .content{
     -fx-background-color: #3c3c3c;
     -fx-text-fill: white;
     -fx-prompt-text-fill: gray;
     -fx-background-radius: 6;
-    -fx-border-color: #880e4f;
+    -fx-border-color: #880e0e;
     -fx-border-radius: 6;
     -fx-border-width: 1;
 }

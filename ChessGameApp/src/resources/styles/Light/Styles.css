@@ -4,7 +4,7 @@
 }
 .section{
     -fx-background-color: rgba(255, 255, 255, 0.9);
-    -fx-effect: dropshadow(gaussian, #89898984, 10, 0, 0, 4); /* Added shadow for depth */
+    /*-fx-effect: dropshadow(gaussian, #89898984, 10, 0, 0, 4); /* Added shadow for depth */
 
 }
 .label {
