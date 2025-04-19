@@ -135,7 +135,7 @@ public class GameController implements IGameSelectionController, IGameCreationCo
     public Boolean getPlayerColor(){return model.getPlayerColor();}
     public User getPlayerTurnUser(){return (model.getPlayerTurn())? match.getWhite() : match.getBlack();}
     public String getPosition(){return model.getPosition();}
-    public String getPosition(int index){return model.getPostion(index);}
+    public String getPosition(int index){return model.getPosition(index);}
     public int getTurnNumber(){return model.getTurnNumber();}
     //public int getTurnCount(){return model.getTurnCount();}
 

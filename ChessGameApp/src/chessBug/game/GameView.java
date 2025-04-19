@@ -203,7 +203,7 @@ public class GameView {
         VBox notationSpace = new VBox();
         GridPane notationLabel = new GridPane();
         notationContent = new GridPane(); //global variable to allow direct and easy manipulation
-        HBox moveSliderBox = new HBox();
+        HBox moveSliderBox = new HBox(5);
         
         //ScrollPanes contain the chat contents to prevent page overflow
         ScrollPane scroll = new ScrollPane(notationContent);
@@ -219,9 +219,10 @@ public class GameView {
         notationContent.heightProperty().addListener(observable -> scroll.setVvalue(1D));
         
         notationContent.setAlignment(Pos.TOP_LEFT);
+        moveSliderBox.setAlignment(Pos.CENTER);
         
         //Style
-        notationSpace.getStyleClass().add("scrollBackground");
+        notationSpace.getStyleClass().addAll("scrollBackground", "notation");
         notationLabel.getStyleClass().addAll("notationGrid");
         notationContent.getStyleClass().addAll("notationGrid", "scrollBackground");
         
@@ -240,6 +241,7 @@ public class GameView {
         //Scan moves
         Button goBack = new Button("<");
         Button goForward = new Button(">");
+        Button jumpBackward = new Button("<<");
         Button jumpForward = new Button (">>");
         goBack.setOnAction(event -> {
             if (currTurnNumber > 0)
@@ -249,12 +251,16 @@ public class GameView {
             if (currTurnNumber < controller.getTurnNumber())
                 swapToPastGameDisplay(++currTurnNumber);
         });
+        jumpBackward.setOnAction(event -> {
+            currTurnNumber = 0;
+            swapToPastGameDisplay(currTurnNumber);
+                });
         jumpForward.setOnAction(event -> {
             currTurnNumber = controller.getTurnNumber();
             swapToPastGameDisplay(currTurnNumber);
                 });
         
-        moveSliderBox.getChildren().addAll(goBack, goForward, jumpForward);
+        moveSliderBox.getChildren().addAll(jumpBackward, goBack, goForward, jumpForward);
                
         //Style
         labelW.getStyleClass().addAll("notationLabel", "h2");

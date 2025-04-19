@@ -21,7 +21,6 @@ public class ChessGame implements Serializable{
     // Tracking variables for special rules
     private final int[] ghostPawn = {-1,-1}; //refers to a square jumped over by a pawn; used to determine legality of en passant.
     private int fiftyMoveRuleCounter = 0; // Move counter that ends game if it reaches 100 (50 moves per player)
-    private ArrayList<String> positionList = new ArrayList<>();
     private HashMap<String, Integer> positionCounter = new HashMap<>(); //Counts the number of times a position has occurred
     private boolean gameComplete = false; //Game completion status
     private PromotionSelection promotionMethod; //Determines how promotions should be dealt with
@@ -112,9 +111,6 @@ public class ChessGame implements Serializable{
                 */
                 //Check end states
                 gameComplete = checkEnd()!= null; //When checkEnd() returns a non-null value, the game has ended
-                if (!gameComplete && checkAttack()){
-                    System.out.println("Check!");
-                }
                 return true; //successful turn
             }
         }
@@ -244,7 +240,6 @@ public class ChessGame implements Serializable{
             occurrences = positionCounter.get(currPosition) + 1;
         }
         positionCounter.put(currPosition, occurrences);
-        positionList.add(currPosition);
     }
     public String getPosition(){
         //Include player turn
@@ -322,10 +317,6 @@ public class ChessGame implements Serializable{
     public boolean getGameComplete(){
         return gameComplete;
     } 
-    public String getPosition(int index){
-        return positionList.get(index);
-    }
-
     //Set methods
     public void setPromotionMethod(PromotionSelection promotionMethod){
         this.promotionMethod = promotionMethod;

@@ -12,6 +12,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.control.PasswordField;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -28,11 +29,13 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+
 public class ProfileView extends VBox {
     private Text usernameText, emailText, profileDescriptionText;
     private ImageView profileImageView;
     private ProfileController controller;
-    private TextField usernameField, emailField, bioField, oldPasswordField, newPasswordField;
+    private TextField usernameField, emailField, bioField;
+    private PasswordField oldPasswordField, newPasswordField;
 
     public ProfileView(ProfileController controller, Client client) {
         this.controller = controller;
@@ -84,8 +87,8 @@ public class ProfileView extends VBox {
         usernameField = createField(controller.getModel().getUsername(), "Enter your new username");
         emailField = createField(controller.getModel().getEmail(), "Enter your email address");
         bioField = createField(controller.getModel().getBio(), "Enter your bio");
-        oldPasswordField = createField("", "Old Password");
-        newPasswordField = createField("", "New Password");
+        oldPasswordField = createPasswordField("Old Password");
+        newPasswordField = createPasswordField("New Password");
 
         Button updateProfileButton = createButton("Update Profile", e -> updateProfile());
         Button changeProfilePicButton = createButton("Change Picture", e -> openFileChooserForProfilePic(client));
@@ -136,6 +139,14 @@ public class ProfileView extends VBox {
 
     private TextField createField(String value, String prompt) {
         TextField field = new TextField(value);
+        field.setPromptText(prompt);
+        field.setMaxWidth(500);
+        field.getStyleClass().add("field");
+        return field;
+    }
+    
+    private PasswordField createPasswordField(String prompt) {
+        PasswordField field = new PasswordField();
         field.setPromptText(prompt);
         field.setMaxWidth(500);
         field.getStyleClass().add("field");
