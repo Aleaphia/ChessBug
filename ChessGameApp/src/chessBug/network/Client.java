@@ -144,7 +144,7 @@ public class Client {
 		return userMap.get(id);
 	}
 
-	private User getOrCreateUser(JSONObject o) {
+	private User getOrCreateUser(JSONObject o) throws JSONException {
 		return getOrCreateUser(o.optInt("UserID", 0), o.optString("Name", "unknown"), o.optString("pfp", User.DEFAULT_PROFILE_PICTURE));
 	}
 
@@ -159,7 +159,7 @@ public class Client {
 		return (Friend)userMap.get(id);
 	}
 
-	private Friend getOrCreateFriend(JSONObject o) {
+	private Friend getOrCreateFriend(JSONObject o) throws JSONException {	
 		return getOrCreateFriend(o.optInt("UserID", 0), o.optString("Name", "unknown"), o.optString("pfp", User.DEFAULT_PROFILE_PICTURE), o.optInt("Chat", 0));
 	}
 
@@ -186,7 +186,7 @@ public class Client {
 		return m;
 	}
 
-	private Match getOrCreateMatch(JSONObject o) {
+	private Match getOrCreateMatch(JSONObject o) throws JSONException {	
 		User whitePlayer = getOrCreateUser(o.getInt("WhitePlayer"), o.getString("WhiteName"), o.isNull("WhitePfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("WhitePfp"));
 		User blackPlayer = getOrCreateUser(o.getInt("BlackPlayer"), o.getString("BlackName"), o.isNull("BlackPfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("BlackPfp"));
 		return getOrCreateMatch(o.getInt("MatchID"), o.getInt("Chat"), whitePlayer, blackPlayer, o.getString("Status"));
@@ -206,17 +206,21 @@ public class Client {
 	
 	// Update profile with server data
 	public ProfileModel syncProfile() throws NetworkException {
-		JSONObject profileData = post("getProfileData", new JSONObject());
-		
-		// We need to send correct username and password to retrieve information so no need to update those variables
-		profile.setEmail(profileData.getJSONObject("response").getString("EmailAddress"));
-		if(!profileData.getJSONObject("response").isNull("pfp"))
-			profile.setProfilePicURL(profileData.getJSONObject("response").getString("pfp"));
-		profile.setUserID(profileData.getJSONObject("response").getInt("UserID"));
+		try {
+			JSONObject profileData = post("getProfileData", new JSONObject());
+			
+			// We need to send correct username and password to retrieve information so no need to update those variables
+			profile.setEmail(profileData.getJSONObject("response").getString("EmailAddress"));
+			if(!profileData.getJSONObject("response").isNull("pfp"))
+				profile.setProfilePicURL(profileData.getJSONObject("response").getString("pfp"));
+			profile.setUserID(profileData.getJSONObject("response").getInt("UserID"));
 
-		profile.setBio(profileData.getJSONObject("response").optString("bio", ""));
+			profile.setBio(profileData.getJSONObject("response").optString("bio", ""));
 
-		return profile;
+			return profile;
+		} catch (JSONException | ClassCastException e) {
+			throw new NetworkException("Error in JSON structure", e);
+		}
 	}
 
 	public ProfileModel getProfile() {
@@ -235,7 +239,9 @@ public class Client {
 	// Returns {"Won": (int), "Lost": (int), "Draw": (int), "Current": (int), "Total": (int)}
 	public JSONObject getMatchStats() throws NetworkException {
 		JSONObject received = post("matchStats", new JSONObject());
-		return received.getJSONObject("response");
+		if(received.has("response") && received.opt("response") instanceof JSONObject)
+			return received.getJSONObject("response");
+		else throw new NetworkException("Invalid response for getStats");
 	}
 
 	public void updatePassword(String newPassword) throws NetworkException {
@@ -246,44 +252,60 @@ public class Client {
 	// Retrieve a list of all matches the user is a part of
 	public List<Match> getMatches() throws NetworkException {
 		// Call server and throw exception if error in response
-		JSONObject received = post("getMatches", new JSONObject());
-		if(received.getBoolean("error"))
-			throw new NetworkException("Could not retrieve matches for \"" + profile.getUsername() + "\" " + received.optString("response", ""));
+		try {
+			JSONObject received = post("getMatches", new JSONObject());
+			if(received.getBoolean("error"))
+				throw new NetworkException("Could not retrieve matches for \"" + profile.getUsername() + "\" " + received.optString("response", ""));
 
-		// Loop through all entries of received matches array, and make new Matches out of JSON representations
-		ArrayList<Match> matches = new ArrayList<>();
-		received.getJSONArray("response").iterator().forEachRemaining(o -> matches.add(getOrCreateMatch((JSONObject)o)));
-		return matches;
+			// Loop through all entries of received matches array, and make new Matches out of JSON representations
+			ArrayList<Match> matches = new ArrayList<>();
+			received.getJSONArray("response").iterator().forEachRemaining(o -> matches.add(getOrCreateMatch((JSONObject)o)));
+			return matches;
+		} catch (JSONException | ClassCastException e) {
+			throw new NetworkException("Error in JSON structure", e);
+		}
 	}
 
 	public List<Match> getOpenMatches() throws NetworkException {
 		// Call server and throw exception if error in response
-		JSONObject received = post("getOpenMatches", new JSONObject());
-		if(received.getBoolean("error"))
-			throw new NetworkException("Could not retrieve open matches for \"" + profile.getUsername() + "\" " + received.optString("response", ""));
-                
-		ArrayList<Match> matches = new ArrayList<>();
-		received.getJSONArray("response").iterator().forEachRemaining(o -> matches.add(getOrCreateMatch((JSONObject)o)));
-		return matches;
+		try {
+			JSONObject received = post("getOpenMatches", new JSONObject());
+			if(received.getBoolean("error"))
+				throw new NetworkException("Could not retrieve open matches for \"" + profile.getUsername() + "\" " + received.optString("response", ""));
+					
+			ArrayList<Match> matches = new ArrayList<>();
+			received.getJSONArray("response").iterator().forEachRemaining(o -> matches.add(getOrCreateMatch((JSONObject)o)));
+			return matches;
+		} catch (JSONException | ClassCastException e) {
+			throw new NetworkException("Error in JSON structure", e);
+		}
 	}
         
 	public List<Match> getClosedMatches() throws NetworkException {
 		// Call server and throw exception if error in response
-		JSONObject received = post("getClosedMatches", new JSONObject());
-		if(received.getBoolean("error"))
-			throw new NetworkException("Could not retrieve closed matches for \"" + profile.getUsername() + "\" " + received.optString("response", ""));
+		try {
+			JSONObject received = post("getClosedMatches", new JSONObject());
+			if(received.getBoolean("error"))
+				throw new NetworkException("Could not retrieve closed matches for \"" + profile.getUsername() + "\" " + received.optString("response", ""));
 
-		ArrayList<Match> matches = new ArrayList<>();
-		received.getJSONArray("response").iterator().forEachRemaining(o -> matches.add(getOrCreateMatch((JSONObject)o)));
-		return matches;
+			ArrayList<Match> matches = new ArrayList<>();
+			received.getJSONArray("response").iterator().forEachRemaining(o -> matches.add(getOrCreateMatch((JSONObject)o)));
+			return matches;
+		} catch (JSONException | ClassCastException e) {
+			throw new NetworkException("Error in JSON structure", e);
+		}
 	}
 
 	public List<Match> getMatchRequests() throws NetworkException {
-		JSONObject received = post("getMatchRequests", new JSONObject());
+		try {
+			JSONObject received = post("getMatchRequests", new JSONObject());
 
-		ArrayList<Match> matches = new ArrayList<>();
-		received.getJSONArray("response").iterator().forEachRemaining(o -> matches.add(getOrCreateMatch((JSONObject)o)));
-		return matches;
+			ArrayList<Match> matches = new ArrayList<>();
+			received.getJSONArray("response").iterator().forEachRemaining(o -> matches.add(getOrCreateMatch((JSONObject)o)));
+			return matches;
+		} catch (JSONException | ClassCastException e) {
+			throw new NetworkException("Error in JSON structure", e);
+		}
 	}
 
 	public void sendMatchRequest(String username, boolean playingAsWhite) throws NetworkException {
@@ -305,34 +327,49 @@ public class Client {
 	}
 
 	public void updateBio(String newBio) throws NetworkException {
-		JSONObject response = post("updateBio", Map.of("bio", newBio));
-		if (response.getBoolean("error")) {
-			throw new NetworkException(response.opt("response").toString());
+		try {
+			JSONObject response = post("updateBio", Map.of("bio", newBio));
+			if (response.getBoolean("error")) {
+				throw new NetworkException(response.opt("response").toString());
+			}
+			profile.setBio(newBio);
+		} catch (JSONException e) {
+			throw new NetworkException("Error in JSON structure", e);
 		}
-		profile.setBio(newBio);
+
 	}
 
 	public void changePassword(String oldPassword, String newPassword) throws NetworkException {
-		JSONObject response = post("changePassword", Map.of(
-			"oldPassword", oldPassword,
-			"newPassword", newPassword
-		));
+		try {
+			JSONObject response = post("changePassword", Map.of(
+				"oldPassword", oldPassword,
+				"newPassword", newPassword
+			));
+			
+			if (response.getBoolean("error"))
+				throw new NetworkException(response.opt("response").toString());
 		
-		if (response.getBoolean("error"))
-			throw new NetworkException(response.opt("response").toString());
-	
-		profile.setPassword(hashPassword(newPassword));
+			profile.setPassword(hashPassword(newPassword));
+		} catch (JSONException e) {
+			throw new NetworkException("Error in JSON structure", e);
+		}
+
 	}
 	
 
 	// Retrieve all of user's friends
 	public List<Friend> getFriends() throws NetworkException {
-		JSONObject friendsResponse = post("getFriends", new JSONObject());
+		try {
+			JSONObject friendsResponse = post("getFriends", new JSONObject());
 
-		// Create new friend for every JSON representation received
-		ArrayList<Friend> friends = new ArrayList<>();
-		friendsResponse.getJSONArray("response").iterator().forEachRemaining(o -> friends.add(getOrCreateFriend((JSONObject) o)));
-		return friends;
+			// Create new friend for every JSON representation received
+			ArrayList<Friend> friends = new ArrayList<>();
+			friendsResponse.getJSONArray("response").iterator().forEachRemaining(o -> friends.add(getOrCreateFriend((JSONObject) o)));
+			return friends;
+		} catch (JSONException | ClassCastException e) {
+			throw new NetworkException("Error in JSON structure", e);
+		}
+
 	}
 
 	/* Returns true if successfully sent a friend request 
@@ -376,12 +413,17 @@ public class Client {
 
 	// Retrieve all friend requests
 	public List<User> getFriendRequests() throws NetworkException {
-		JSONObject received = post("getFriendRequests", new JSONObject());
-		
-		// Create new user for every JSON representation received
-		ArrayList<User> result = new ArrayList<>();
-		received.getJSONArray("response").iterator().forEachRemaining(o -> { result.add(getOrCreateUser((JSONObject)o)); });
-		return result;
+		try {
+			JSONObject received = post("getFriendRequests", new JSONObject());
+			
+			// Create new user for every JSON representation received
+			ArrayList<User> result = new ArrayList<>();
+			received.getJSONArray("response").iterator().forEachRemaining(o -> { result.add(getOrCreateUser((JSONObject)o)); });
+			return result;
+		} catch (JSONException e) {
+			throw new NetworkException("Error in JSON structure", e);
+		}
+
 	}
 
 	/* Update Match Status based on function name */
@@ -422,17 +464,25 @@ public class Client {
 
 	// Retrieve new match status from server
 	public String syncMatchStatus(Match match) throws NetworkException {
-		JSONObject response = post("getMatchStatus", Map.of("match", match.getID()));
-		match.setStatus(response.getString("response"));
-		return response.getString("response");
+		try {
+			JSONObject response = post("getMatchStatus", Map.of("match", match.getID()));
+			match.setStatus(response.getString("response"));
+			return response.getString("response");
+		} catch (JSONException e) {
+			throw new NetworkException("Error in JSON structure", e);
+		}
 	}
 
 	// Upload profile picture to server, using a Base64 representation
 	public void uploadProfilePicture(File file) throws NetworkException, IOException {
-		JSONObject send = new JSONObject();
-		send.put("image", Base64.getEncoder().encodeToString(Files.readAllBytes(file.toPath())));
-		JSONObject received = post("uploadProfilePicture", send);
-		profile.setProfilePicURL(received.getString("response"));
+		try {
+			JSONObject send = new JSONObject();
+			send.put("image", Base64.getEncoder().encodeToString(Files.readAllBytes(file.toPath())));
+			JSONObject received = post("uploadProfilePicture", send);
+			profile.setProfilePicURL(received.getString("response"));
+		} catch (JSONException e) {
+			throw new NetworkException("Error in JSON structure", e);
+		}
 	}
 
 	// Send a message to the server based on a Map representation of JSON data, (appends login details) and return the result
@@ -530,7 +580,7 @@ public class Client {
 		try {
 			base64Decoded = Base64.getDecoder().decode(data);
 		} catch (IllegalArgumentException e) {
-			System.out.println("Could not decode with base64, must be raw: " + new String(data));
+			// Could not decode with base64, must be raw
 			return new String(data);
 		}
 		return new String(CLIENT_DECRYPT.doFinal(base64Decoded));
