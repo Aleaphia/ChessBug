@@ -111,9 +111,6 @@ public class ChessGame implements Serializable{
                 */
                 //Check end states
                 gameComplete = checkEnd()!= null; //When checkEnd() returns a non-null value, the game has ended
-                if (!gameComplete && checkAttack()){
-                    System.out.println("Check!");
-                }
                 return true; //successful turn
             }
         }
