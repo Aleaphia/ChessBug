@@ -57,13 +57,18 @@ import javafx.util.Duration;
 
 public class ChessBug extends Application {
     //Global variables
+    
+    //View
     private Scene mainScene;
     final private StackPane page = new StackPane(); // space to change with page details
     private HBox mainPane = new HBox();
     private GridPane loginPane;
+    
+    //Database Connections
     private Client client;
     private DatabaseCheckList databaseCheckList = new DatabaseCheckList(); 
-    private String settingsFile = "settings.dat";
+    //Model
+    private boolean isLoggedIn = false;
     
     @Override
     public void start(Stage primaryStage) {
@@ -94,7 +99,7 @@ public class ChessBug extends Application {
     @Override
     public void stop(){
         //Save credientials
-        if (PreferencesController.isStayLoggedIn()){
+        if (isLoggedIn && PreferencesController.isStayLoggedIn()){
             PreferencesController.setLoginnCredentials(client.getProfile().getUsername(), client.getProfile().getPassword());
         }
         else{
@@ -173,6 +178,7 @@ public class ChessBug extends Application {
     }
     
     private void successfulLogin(){
+        isLoggedIn = true; //Login
         //Create Menu
         mainPane.getChildren().clear();
         mainPane.getChildren().addAll(createSidebar(), page);
@@ -217,6 +223,7 @@ public class ChessBug extends Application {
                 }),
                 createSideBarButton("logout", event -> {
                     databaseCheckList.clear();
+                    isLoggedIn = false; // Log out
                     mainScene.setRoot(loginPane);
                     PreferencesController.applyStyles(mainScene, "Styles", "Menu", "Login");
                 }));
@@ -241,7 +248,7 @@ public class ChessBug extends Application {
         }
 
         Image[] out = new Image[list.size()];
-        if(list.size() == 0)
+        if(list.isEmpty())
             return new Image[]{new Image(getClass().getResourceAsStream("/resources/images/GoldCrown.png"))};
         return list.toArray(out);
     }
@@ -267,7 +274,7 @@ public class ChessBug extends Application {
                 super.start();
             }
 
-            public void handle(long now) {
+            @Override public void handle(long now) {
                 if((now - prev) > 50_000_000l) {
                     prev = now;
                     imageView.setImage(images[frame]);
