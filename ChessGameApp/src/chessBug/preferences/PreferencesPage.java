@@ -38,7 +38,7 @@ public class PreferencesPage {
 
         VBox page = new VBox(20);
         page.setPadding(new Insets(30));
-        page.getStyleClass().add("settings-wrapper");
+        page.getStyleClass().addAll("settings-wrapper", "section");
         page.setFillWidth(true);
 
         Region rightRegion = new Region();
