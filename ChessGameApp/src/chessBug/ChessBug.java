@@ -215,7 +215,7 @@ public class ChessBug extends Application {
                 }),
                 createSideBarButton("gear", event -> {
                     databaseCheckList.clear();
-                    changePage(new PreferencesPage(client).getPage(), "Styles", "Menu");
+                    changePage(new PreferencesPage(client).getPage(), "Styles", "Menu", "Preferences");
                 }),
                 createSideBarButton("user", event -> {
                     databaseCheckList.clear();

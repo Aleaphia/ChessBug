@@ -31,8 +31,6 @@ public class PreferencesPage {
         root = new HBox();
         root.getStyleClass().add("preferences-page");
 
-        applyThemeStylesheet(root);
-
         VBox settingsCard = new VBox();
         settingsCard.getStyleClass().add("settings-card");
 
@@ -130,18 +128,6 @@ public class PreferencesPage {
 
         container.getChildren().addAll(header, themeContainer, stayLoggedInCheckBox);
         return container;
-    }
-
-    private void applyThemeStylesheet(Region rootRegion) {
-        String theme = PreferencesController.getTheme();
-        String cssFile = theme.equalsIgnoreCase("Dark") ? "resources/styles/PreferencesDark.css" : "resources/styles/Light/PreferencesLight.css";
-        URL cssUrl = getClass().getResource(cssFile);
-
-        if (cssUrl != null) {
-            rootRegion.getStylesheets().add(cssUrl.toExternalForm());
-        } else {
-            System.err.println("⚠️ Could not load CSS: " + cssFile);
-        }
     }
 
     private Button createAnimatedButton(String text, Runnable action) {
