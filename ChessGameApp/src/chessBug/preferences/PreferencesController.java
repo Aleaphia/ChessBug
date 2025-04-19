@@ -156,16 +156,18 @@ public class PreferencesController {
     
             // Try to apply theme-specific styles, if applicable
             String theme = getTheme(); // Get the current theme (Light/Dark)
-            String themeStylePath = "/resources/styles/" + theme + "/" + style + ".css";
-            URL themeStyleUrl = PreferencesController.class.getResource(themeStylePath);
-            
-            if (themeStyleUrl != null)
-                scene.getStylesheets().add(themeStyleUrl.toExternalForm());
-            // No need to print, if a theme stylesheet is 'missing', that's okay
-            
-            //For game page check if movehints are on
-            if (style.equals("Game") && isShowMoveHintsEnabled())
-                scene.getStylesheets().add(PreferencesController.class.getResource("/resources/styles/MoveHints.css").toExternalForm());
+            if (!theme.equals("Dark")){ //Dark is default
+                String themeStylePath = "/resources/styles/" + theme + "/" + style + ".css";
+                URL themeStyleUrl = PreferencesController.class.getResource(themeStylePath);
+
+                if (themeStyleUrl != null)
+                    scene.getStylesheets().add(themeStyleUrl.toExternalForm());
+                // No need to print, if a theme stylesheet is 'missing', that's okay
+
+                //For game page check if movehints are on
+                if (style.equals("Game") && isShowMoveHintsEnabled())
+                    scene.getStylesheets().add(PreferencesController.class.getResource("/resources/styles/MoveHints.css").toExternalForm());
+            }
         }
     }
     
