@@ -377,19 +377,22 @@ public class GameView {
                 //Style image
                 icon.setFitHeight(square.getMinHeight() - 6); //Set Height of image. Note x - 6 allows for insets of 3px
                 icon.setPreserveRatio(true); //Maintain ratio
-                //Add function
-                icon.setOnMouseClicked(event -> {
+
+                //Add to pane
+                BorderPane squarePane = getBorderPaneFromId("" + col + row);
+                squarePane.setCenter(icon);
+                
+                squarePane.setOnMouseClicked(event -> {
                     try {
                         char promotionChoice = (piece.charAt(0) == 'K') ? 'N' : piece.charAt(0); //user the first letter of each peice (but knights use N instead of K)
+                        System.out.println("promotion type: " + promotionChoice);
                         controller.playerMove(potentialMove + promotionChoice);
                     } catch (NetworkException e) {
                         System.err.println("Failed to promote piece!");
                         e.printStackTrace();
                     }
                 });
-
-                //Add to pane
-                getBorderPaneFromId("" + col + row).setCenter(icon);
+                
                 row += dir;
             }
         } catch (Exception e) {
