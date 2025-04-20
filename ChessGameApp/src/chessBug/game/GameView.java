@@ -278,6 +278,7 @@ public class GameView {
     private void boardInteraction(BorderPane square) {
         if (!controller.isGameComplete() && controller.isThisPlayersTurn()  //correct color turn
                 && currTurnNumber == controller.getTurnNumber()){
+            refreshGameDisplay(); //Makes sure game display is upto date -> closes promotion selection menu
             /*
             One of two valid actions may occur when a user selects a square:
                 1) The user selects a peice to move
