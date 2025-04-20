@@ -7,7 +7,6 @@ import chessBug.network.Client;
 import chessBug.network.NetworkException;
 import java.util.List;
 import java.util.Arrays;
-import javafx.animation.FadeTransition;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -53,12 +52,6 @@ public class ProfileView extends VBox {
         // Responsive width
         prefWidthProperty().bind(Bindings.createDoubleBinding(() ->
                 getScene() != null ? getScene().getWidth() * 0.9 : 1000, sceneProperty()));
-
-        // Entry animation
-        FadeTransition fadeIn = new FadeTransition(Duration.seconds(1.0), this);
-        fadeIn.setFromValue(0);
-        fadeIn.setToValue(1);
-        fadeIn.play();
     }
 
     private void createProfileUI(Client client) {

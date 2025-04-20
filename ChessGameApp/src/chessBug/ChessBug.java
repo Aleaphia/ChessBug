@@ -31,6 +31,7 @@ import chessBug.preferences.PreferencesController;
 import chessBug.preferences.PreferencesPage;
 import chessBug.profile.ProfileController;
 import javafx.animation.AnimationTimer;
+import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
@@ -49,6 +50,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -234,8 +236,16 @@ public class ChessBug extends Application {
      private void changePage(Pane newPage, String... stylePage){
         //Clear and add new page
         page.getChildren().clear();
-        page.getChildren().add(newPage);
+        page.getChildren().add(fadeIn(newPage));
         PreferencesController.applyStyles(mainScene, stylePage); 
+    }
+     
+    private <T extends Region> T fadeIn(T node) {
+        FadeTransition fade = new FadeTransition(Duration.millis(600), node);
+        fade.setFromValue(0);
+        fade.setToValue(1);
+        fade.play();
+        return node;
     }
 
     private Image[] loadAnimation(String animDirectory) {

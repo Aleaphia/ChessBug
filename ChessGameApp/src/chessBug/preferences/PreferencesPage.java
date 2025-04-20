@@ -54,13 +54,13 @@ public class PreferencesPage {
 
         // Page Sections
         page.getChildren().addAll(
-                fadeIn(title),
+                title,
                 new Separator(),
-                fadeIn(buildGameSettings()),
+                buildGameSettings(),
                 new Separator(),
-                fadeIn(buildAppSettings()),
+                buildAppSettings(),
                 new Separator(),
-                fadeIn(savePreferencesButton)
+                savePreferencesButton
         );
     }
 
@@ -140,14 +140,6 @@ public class PreferencesPage {
         button.setOnMouseExited(e -> button.setScaleX(1.0));
 
         return button;
-    }
-
-    private <T extends Region> T fadeIn(T node) {
-        FadeTransition fade = new FadeTransition(Duration.millis(600), node);
-        fade.setFromValue(0);
-        fade.setToValue(1);
-        fade.play();
-        return node;
     }
 
     public HBox getPage() {
