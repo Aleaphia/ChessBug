@@ -76,7 +76,8 @@ public class ChessBug extends Application {
         
         //Scene and Stage
         primaryStage.setTitle("ChessBug"); //Name for application stage
-        mainScene = new Scene(loginPane, 1600, 800); //Add loginPane to the mainScene
+        primaryStage.setMaximized(true); //Makes the stage full screne while leaving the exit buttons
+        mainScene = new Scene(loginPane, 1200, 600); //Add loginPane to the mainScene
         primaryStage.setScene(mainScene);//Add mainScene to primaryStage
         
         //Style
