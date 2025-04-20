@@ -1,24 +1,33 @@
 /*Only include things that change*/
+/*Background*/
 .background {
     -fx-background-color: rgb(212, 215, 223);
 }
 .section{
     -fx-background-color: rgba(255, 255, 255, 0.9);
     /*-fx-effect: dropshadow(gaussian, #89898984, 10, 0, 0, 4); /* Added shadow for depth */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 20, 0.3, 0, 4);
 
 }
-.label {
-    -fx-text-fill: rgb(0, 0, 0);
+
+/*Scroll panes*/
+.scrollBackground{
+    -fx-background-color: rgb(255, 255, 255);
 }
-Text {
-    -fx-fill: black;
+
+/*Lable*/
+.label, Text {
+    -fx-text-fill: rgb(0, 0, 0);/*Used by labels*/
+    -fx-fill: rgb(0, 0, 0);/*Used by Text*/
 }
 .error {
     -fx-text-fill: #902929;
 }
-.scrollBackground{
-    -fx-background-color: rgb(255, 255, 255);
-}
-.text-primary {
-    -fx-fill: #757575; /* Light gray color for username in light mode */
+
+/*Form elements*/
+.field, .field .content{
+    -fx-background-color: #eeeeee;
+    -fx-text-fill: #333;
+    -fx-prompt-text-fill: #6b6b6b;
+    -fx-border-color: #dc868c;
 }

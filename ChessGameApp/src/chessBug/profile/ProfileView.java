@@ -5,6 +5,8 @@ import java.io.IOException;
 
 import chessBug.network.Client;
 import chessBug.network.NetworkException;
+import java.util.List;
+import java.util.Arrays;
 import javafx.animation.FadeTransition;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
@@ -80,9 +82,9 @@ public class ProfileView extends VBox {
         profileStack.setAlignment(Pos.BOTTOM_CENTER);
         profileImageView.setTranslateY(30);
 
-        usernameText = createText(controller.getModel().getUsername(), 26, "text-primary", true);
-        emailText = createText(controller.getModel().getEmail(), 16, "text-secondary", false);
-        profileDescriptionText = createText(controller.getModel().getBio(), 14, "text-secondary", false);
+        usernameText = createText(controller.getModel().getUsername(), "h1", "biggerText");
+        emailText = createText(controller.getModel().getEmail(), "h2");
+        profileDescriptionText = createText(controller.getModel().getBio());
         profileDescriptionText.setWrappingWidth(400);
 
         usernameField = createField(controller.getModel().getUsername(), "Enter your new username");
@@ -133,15 +135,15 @@ public class ProfileView extends VBox {
         profileCard.setAlignment(Pos.CENTER);
         profileCard.setPadding(new Insets(30));
         profileCard.setMaxWidth(600);
-        profileCard.getStyleClass().add("profile-card");
+        profileCard.getStyleClass().addAll("profile-card", "section");
 
         getChildren().add(profileCard);
     }
 
-    private Text createText(String content, int size, String styleClass, boolean bold) {
+    private Text createText(String content, String... styleClass) {
         Text text = new Text(content);
-        text.setFont(Font.font("Arial", bold ? javafx.scene.text.FontWeight.BOLD : javafx.scene.text.FontWeight.NORMAL, size));
-        text.getStyleClass().add(styleClass);
+        text.getStyleClass().add("label");
+        text.getStyleClass().addAll(Arrays.asList(styleClass));
         return text;
     }
 
@@ -173,7 +175,6 @@ public class ProfileView extends VBox {
     private Button createButton(String label, javafx.event.EventHandler<javafx.event.ActionEvent> handler) {
         Button btn = new Button(label);
         btn.setOnAction(handler);
-        btn.getStyleClass().add("button");
         btn.setMaxWidth(500);
         return btn;
     }
