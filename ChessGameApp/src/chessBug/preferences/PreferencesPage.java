@@ -76,6 +76,7 @@ public class PreferencesPage {
         moveHintsCheckBox.getStyleClass().add("label");
 
         CheckBox confirmMovesCheckBox = new CheckBox("Confirm Moves Before Playing");
+        confirmMovesCheckBox.setWrapText(true);
         confirmMovesCheckBox.setSelected(PreferencesController.isConfirmMovesEnabled());
         confirmMovesCheckBox.setOnAction(event -> PreferencesController.handleConfirmMoves(confirmMovesCheckBox.isSelected()));
         confirmMovesCheckBox.getStyleClass().add("label");
