@@ -404,17 +404,15 @@ public class GameView {
      */
     public void displayCurrentState(Client client){
         refreshGameDisplay();
-        internalRefreshMessageBoard(client);
+        refreshMessageBoard(client);
     }
     
-    /**refresh - reloads entire page - refreshes game board and chat at appropriate times
-     * @param client - database connection needed to update the message board
+    /**refresh - reloads entire page - refreshes game board  at appropriate times
      */
-    public void refresh(Client client) {        
+    public void refresh() {        
         if (currTurnNumber == controller.getTurnNumber()){
             refreshGameDisplay();
         }
-        internalRefreshMessageBoard(client);
     }
 
     /**addMessages - adds a stream of messages to the message container
@@ -454,7 +452,7 @@ public class GameView {
     }
     
     //Private methdos
-    private void internalRefreshMessageBoard(Client client) {
+    public void refreshMessageBoard(Client client) {
         
         //Get any new messages, add each message to the chat
         try {

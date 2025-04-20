@@ -115,10 +115,14 @@ public class GameController implements IGameSelectionController, IGameCreationCo
     private void databaseChecks(){
         //System.out.println("Debug: GameController DatabaseCheck" );
         try {
+            //Chat updates
+            view.refreshMessageBoard(client);
+            //ChessBoard updates
             newMatchMovesFromDatabase = false;
             match.poll(client).forEach((move) -> internalPlayerMove(move));
             if (newMatchMovesFromDatabase)
-                view.refresh(client);
+                view.refresh();
+            
         } catch (NetworkException ignored) {} // We'll try again in a moment
     }
     
