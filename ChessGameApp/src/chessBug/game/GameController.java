@@ -29,6 +29,8 @@ public class GameController implements IGameSelectionController, IGameCreationCo
     private GameModel model;
     private GameView view;
     
+    private boolean newMatchMovesFromDatabase = false;
+    
     //Constructors
     public GameController(Client player, DatabaseCheckList databaseCheckList){ //No selected match
         //Connect to database
@@ -113,8 +115,10 @@ public class GameController implements IGameSelectionController, IGameCreationCo
     private void databaseChecks(){
         //System.out.println("Debug: GameController DatabaseCheck" );
         try {
+            newMatchMovesFromDatabase = false;
             match.poll(client).forEach((move) -> internalPlayerMove(move));
-            view.refresh(client);
+            if (newMatchMovesFromDatabase)
+                view.refresh(client);
         } catch (NetworkException ignored) {} // We'll try again in a moment
     }
     
@@ -186,7 +190,7 @@ public class GameController implements IGameSelectionController, IGameCreationCo
             
             //Update view
             view.deselectSquare();
-            view.refresh(client);
+            view.displayCurrentState(client);
             
             //Check for game end
             if (model.getGameComplete()){
@@ -209,6 +213,7 @@ public class GameController implements IGameSelectionController, IGameCreationCo
      *  @return true if the move was successfully made, false otherwise
      */
     private boolean internalPlayerMove(String notation){
+        newMatchMovesFromDatabase = true; //A move was found
         //Handle end of game
         if (notation.equals("end")){
             String endMsg = model.getEndMessage();
@@ -273,7 +278,7 @@ public class GameController implements IGameSelectionController, IGameCreationCo
                 view.displayBotMessage(this.match.getStatus().substring(0,5) + " won by forfeit");
         }
         view.addMessages(chat.getAllMessages().stream());
-        view.refresh(client);
+        view.displayCurrentState(client);
         //Check database
         addToDatabaseCheckList(()->databaseChecks());
     }

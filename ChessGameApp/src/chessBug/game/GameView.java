@@ -398,23 +398,27 @@ public class GameView {
     
     //Refresher methods --------------------------------------------------------
     //Public methods
-    /**refresh - reloads entire page - refreshes game board and chat
+    /**displayCurrentState - reloads entire page without reference to game application state
      * @param client - database connection needed to update the message board
      */
-    public void refresh(Client client) {
+    public void displayCurrentState(Client client){
+        refreshGameDisplay();
+        internalRefreshMessageBoard(client);
+    }
+    
+    /**refresh - reloads entire page - refreshes game board and chat at appropriate times
+     * @param client - database connection needed to update the message board
+     */
+    public void refresh(Client client) {        
         if (currTurnNumber == controller.getTurnNumber()){
             refreshGameDisplay();
         }
         internalRefreshMessageBoard(client);
     }
 
-    /** refreshMessageBoard - checks database for new messages - only refreshes chat
-     * @param client - database connection
+    /**addMessages - adds a stream of messages to the message container
+     * @param messages - a stream of messages
      */
-    public void refreshMessageBoard(Client client) {
-        internalRefreshMessageBoard(client);
-    }
-
     public void addMessages(Stream<Message> messages) {
         messages.forEach(msg -> {
             // long time = System.currentTimeMillis(); //DEBUG
