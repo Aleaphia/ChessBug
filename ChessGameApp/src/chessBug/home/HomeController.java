@@ -47,7 +47,6 @@ public class HomeController implements IGameSelectionController, IFriendRequestC
     //Getter/Setter methods
     public Pane getPage(){ return page;}
     public String getUserName(){return client.getOwnUser().getUsername();}
-    public List<Friend> getFriends() throws NetworkException {return client.getFriends();}
     public List<Match> getOpenMatchList() throws NetworkException {return client.getOpenMatches();}
     public List<Match> receiveMatchRequest() throws NetworkException {return client.getMatchRequests();}
     public JSONObject getGameStats() throws NetworkException { return client.getMatchStats(); }
@@ -58,6 +57,7 @@ public class HomeController implements IGameSelectionController, IFriendRequestC
     //IFriendRequestController methods
     @Override public void sendFriendRequest(String username) throws NetworkException {client.sendFriendRequest(username);}
     @Override public List<User> receiveFriendRequest() throws NetworkException {return client.getFriendRequests();}
+    @Override public List<Friend> getFriends() throws NetworkException {return client.getFriends();}
     @Override public void acceptFriendRequest(String user) throws NetworkException {client.acceptFriendRequest(user);}
     @Override public void denyFriendRequest(String user) throws NetworkException {client.denyFriendRequest(user);}
     
