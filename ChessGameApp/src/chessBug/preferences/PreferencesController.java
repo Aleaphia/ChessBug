@@ -163,11 +163,11 @@ public class PreferencesController {
                 if (themeStyleUrl != null)
                     scene.getStylesheets().add(themeStyleUrl.toExternalForm());
                 // No need to print, if a theme stylesheet is 'missing', that's okay
-
-                //For game page check if movehints are on
-                if (style.equals("Game") && isShowMoveHintsEnabled())
-                    scene.getStylesheets().add(PreferencesController.class.getResource("/resources/styles/MoveHints.css").toExternalForm());
             }
+            
+            //For game page check if movehints are on add extra style sheet
+            if (style.equals("Game") && isShowMoveHintsEnabled())
+                scene.getStylesheets().add(PreferencesController.class.getResource("/resources/styles/MoveHints.css").toExternalForm());
         }
     }
     
