@@ -2,20 +2,12 @@
 
 .login-error { 
     -fx-border-color: #ff4b5c;
-    -fx-border-width: 2px;
     -fx-background-color: rgba(255, 75, 92, 0.08);
     -fx-text-fill: #ff4b5c;
-    -fx-border-radius: 5px;
-    -fx-padding: 8px;
-    -fx-font-size: 13px;
-    -fx-font-weight: bold;
 }
 
 .loginPane {
     -fx-background-color: #ffffffee;
-    -fx-border-radius: 12px;
-    -fx-padding: 40px;
-    -fx-spacing: 12px;
     -fx-effect: dropshadow(gaussian, rgba(255, 75, 92, 0.2), 20, 0.2, 0, 5);
 }
 
@@ -23,11 +15,7 @@
     -fx-background-color: #f2f2f2;
     -fx-text-fill: black;
     -fx-border-color: #cccccc;
-    -fx-border-radius: 8px;
-    -fx-background-radius: 8px;
-    -fx-padding: 12px;
     -fx-prompt-text-fill: #999;
-    -fx-font-size: 14px;
 }
 
 .loginField:focused {
@@ -39,31 +27,12 @@
     -fx-background-color: #f9f9f9;
 }
 
-.createAccountButton {
-    -fx-background-color: transparent;
-    -fx-text-fill: #ff4b5c;
-    -fx-font-weight: bold;
-    -fx-font-size: 13px;
-    -fx-underline: true;
-    -fx-padding: 5px;
-    -fx-cursor: hand;
-}
-
-.createAccountButton:hover {
-    -fx-text-fill: #d93047;
-}
 
 .loginButton {
     -fx-background-color: linear-gradient(to right, #ff4b5c, #e6364d);
     -fx-text-fill: white;
-    -fx-font-weight: bold;
-    -fx-background-radius: 8px;
-    -fx-padding: 12px 24px;
-    -fx-cursor: hand;
 }
 
 .loginButton:hover {
     -fx-background-color: linear-gradient(to right, #ff758f, #ff4b5c);
-    -fx-scale-x: 1.02;
-    -fx-scale-y: 1.02;
 }

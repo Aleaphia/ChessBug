@@ -34,16 +34,9 @@
     -fx-effect: dropshadow(gaussian, #ff4b5c, 8, 0.3, 0, 0);
 }
 
-.background.login {
-    -fx-background-image: url("../images/BugBackground.png");
-    -fx-background-repeat: no-repeat;
-    -fx-background-size: cover;
-    -fx-background-position: center center;
-}
-
 .createAccountButton {
     -fx-background-color: transparent;
-    -fx-text-fill: #ff4b5c;
+    -fx-text-fill: #6868ff;
     -fx-font-weight: bold;
     -fx-font-size: 13px;
     -fx-underline: true;
@@ -52,20 +45,5 @@
 }
 
 .createAccountButton:hover {
-    -fx-text-fill: #ff758f;
-}
-
-.loginButton {
-    -fx-background-color: linear-gradient(to right, #ff4b5c, #e6364d);
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
-    -fx-background-radius: 8px;
-    -fx-padding: 12px 24px;
-    -fx-cursor: hand;
-}
-
-.loginButton:hover {
-    -fx-background-color: linear-gradient(to right, #ff758f, #ff4b5c);
-    -fx-scale-x: 1.02;
-    -fx-scale-y: 1.02;
+    -fx-text-fill: #acacff;
 }

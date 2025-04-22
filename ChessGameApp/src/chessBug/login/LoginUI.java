@@ -78,16 +78,19 @@ public class LoginUI {
         
         // Login Button
         Button loginButton = new Button("Login");
-        loginButton.setStyle("-fx-background-color: #5865F2; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5px;");
         loginButton.setDefaultButton(true);
         loginButton.setOnAction(event -> {
+            if (loginPage.getChildren().contains(errorTitle)){
+                //Remove the last two children (errorTitle and errorDescription)
+                loginPage.getChildren().remove(loginPage.getChildren().size() - 1);
+                loginPage.getChildren().remove(loginPage.getChildren().size() - 1);
+            }
             JSONObject response = handleLogin.handle(usernameField.getText(), passwordField.getText());
             if (response.getBoolean("error")) {
                 errorTitle.setText("Login Failed");
-                errorDescription.setText(response.getString("response"));
-                if (!loginPage.getChildren().contains(errorTitle)) {
-                    loginPage.getChildren().addAll(errorTitle, errorDescription);
-                }
+                errorDescription.setText("Incorrect username or password");
+                System.out.println(!loginPage.getChildren().contains(errorTitle));
+                loginPage.getChildren().addAll(errorTitle, errorDescription);
             }
         });
         //Alternative login option (press enter from password)
@@ -97,13 +100,16 @@ public class LoginUI {
         Label createAccountButton = new Label("Create an account");
         createAccountButton.getStyleClass().add("createAccountButton");
         createAccountButton.setOnMouseClicked(event -> {
+            if (loginPage.getChildren().contains(errorTitle)){
+                //Remove the last two children (errorTitle and errorDescription)
+                loginPage.getChildren().remove(loginPage.getChildren().size() - 1);
+                loginPage.getChildren().remove(loginPage.getChildren().size() - 1);
+            }
             JSONObject response = handleAccountCreation.handle(usernameField.getText(), passwordField.getText());
             if (response.getBoolean("error")) {
                 errorTitle.setText("Account Creation Failed");
-                errorDescription.setText(response.getString("response"));
-                if (!loginPage.getChildren().contains(errorTitle)) {
-                    loginPage.getChildren().addAll(errorTitle, errorDescription);
-                }
+                errorDescription.setText("Invalid account credentials");
+                loginPage.getChildren().addAll(errorTitle, errorDescription);
             }
         });
 

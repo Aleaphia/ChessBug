@@ -108,6 +108,8 @@
 
 .combo-box:hover, .check-box:hover {
     -fx-border-color: #ff5555;
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
 }
 
 .combo-box:active, .check-box:active{
