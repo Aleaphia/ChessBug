@@ -28,6 +28,7 @@ public class GameView {
     private VBox msgBoard = new VBox();
 
     private String selectedSquare = null;
+    private BorderPane[] lastMove = new BorderPane[2];
     private int currTurnNumber; //Used to prevent moves when players are looking at previous position
 
     //Constructors
@@ -53,6 +54,18 @@ public class GameView {
     
     //Setter Methods
     public void deselectSquare() {selectedSquare = null;}
+    public void setLastMove(String fromSquare, String toSquare){
+        if (lastMove[0] != null){
+            //Remove last set
+            lastMove[0].getStyleClass().remove("lastMoveFrom");
+            lastMove[1].getStyleClass().remove("lastMoveTo");
+        }
+        //add new set and save the squares
+        lastMove[0] = getBorderPaneFromId(fromSquare);
+        lastMove[0].getStyleClass().add("lastMoveFrom");
+        lastMove[1] = getBorderPaneFromId(toSquare);
+        lastMove[1].getStyleClass().add("lastMoveTo");
+    }
     
     //Other Methods ============================================================
     //Builder methods ----------------------------------------------------------

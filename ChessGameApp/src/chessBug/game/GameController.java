@@ -235,6 +235,9 @@ public class GameController implements IGameSelectionController, IGameCreationCo
             //Add notation to view
             view.addToNotationBoard(notation, !model.getPlayerTurn(), (model.getTurnNumber() - 1)/2);
             
+            //Display last move
+            view.setLastMove(notation.substring(0, 2),notation.substring(2, 4));
+            
             //Display player turn
             String msg = ((getPlayerTurnBoolean())? "White" : "Black") + "'s turn: " +
                 ((isThisPlayersTurn())? "Your move!" : "Waiting on " + getPlayerTurnUser().getUsername());
