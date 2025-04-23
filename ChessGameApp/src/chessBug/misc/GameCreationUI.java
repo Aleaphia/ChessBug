@@ -36,7 +36,10 @@ public class GameCreationUI {
         //New game button
         Button newGame = new Button("New Game");
         VBox buttonBox = new VBox(newGame);
-        newGame.setOnMouseClicked(event -> buildGameCreationPrompt());
+        newGame.setOnAction(event -> {
+            PreferencesController.playButtonSound();
+            buildGameCreationPrompt();
+        });
         page.add(buttonBox, 0, 0);
         
         //Style
@@ -111,7 +114,8 @@ public class GameCreationUI {
         
         //Create game button
         Button createGame = new Button("Request Game");
-        createGame.setOnMouseClicked(event -> {
+        createGame.setOnAction(event -> {
+            PreferencesController.playButtonSound();
             if (colorSelection[0] != '0' && friendSelection[0] != null){
                 //Determine color
                 boolean playerColor;
@@ -138,7 +142,10 @@ public class GameCreationUI {
         
         //Create close menu button
         Button closeNewGameMenu = new Button("Close");
-        closeNewGameMenu.setOnMouseClicked(event -> addNewGameButton());
+        closeNewGameMenu.setOnAction(event -> {
+            PreferencesController.playButtonSound();
+            addNewGameButton();
+        });
         page.add(closeNewGameMenu, 2 , row++ );
         
         //Style

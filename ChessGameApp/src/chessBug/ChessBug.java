@@ -85,6 +85,7 @@ public class ChessBug extends Application {
         //Style
         PreferencesController.applyStyles(mainScene, "Styles", "Login");
         HBox.setHgrow(page, Priority.ALWAYS); //Makes page take up all avaiable space
+        PreferencesController.setVolume();
         
         if (PreferencesController.isStayLoggedIn()){
             //Check for credentials

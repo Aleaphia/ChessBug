@@ -83,6 +83,11 @@ public class PreferencesController {
         gameSound.setVolume(volume);
         buttonSound.setVolume(volume);
     }
+    
+    public static void setVolume(){
+        gameSound.setVolume(getVolume());
+        buttonSound.setVolume(getVolume());
+    }
 
     // Handle language change
     protected static void handleLanguageChange(String language) {
