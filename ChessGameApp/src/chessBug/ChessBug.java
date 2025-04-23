@@ -74,6 +74,8 @@ public class ChessBug extends Application {
     
     @Override
     public void start(Stage primaryStage) {
+        primaryStage.getIcons().add(new Image(ChessBug.class.getResourceAsStream("/resources/images/Crown.png")));
+
         LoginUI loginUI = createLoginPage(); //Set up loginPane
         
         //Scene and Stage
@@ -200,7 +202,7 @@ public class ChessBug extends Application {
 
     
         // Add logo or image to the sidebar
-        ImageView logo = new ImageView(new Image(ChessBug.class.getResourceAsStream("/resources/images/GoldCrown.png"))); // Will need to be replaced
+        ImageView logo = new ImageView(new Image(ChessBug.class.getResourceAsStream("/resources/images/Crown.png")));
         logo.setFitHeight(53);
         logo.setFitWidth(60);
         StackPane logoHolder = new StackPane(logo);
