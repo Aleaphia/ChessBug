@@ -133,9 +133,18 @@
     -fx-background-color: #b71c1c
 }
 
+.button:hover, .file-chooser-button:hover {
+    -fx-background-color: #d64848;
+}
+
 .notYourMove {
     -fx-background-color: #865b5b;
 }
+
+.notYourMove:hover {
+    -fx-background-color: #885f5f;
+}
+
 
 /* ====================== FORM ELEMENTS ====================== */
 
