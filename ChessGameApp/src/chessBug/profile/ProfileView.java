@@ -26,7 +26,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -55,9 +54,8 @@ public class ProfileView extends VBox {
     }
 
     private void createProfileUI(Client client) {
-        Rectangle banner = new Rectangle(500, 120);
-        banner.setArcWidth(20);
-        banner.setArcHeight(20);
+        Region banner = new Region();
+        banner.setPrefSize(500, 100);
         banner.getStyleClass().add("profile-banner");
 
         profileImageView = new ImageView(client.getOwnUser().getProfilePicture());
