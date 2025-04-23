@@ -1,6 +1,5 @@
 /* ====================== GLOBAL STYLES ====================== */
 
-/* Background */
 .background {
     -fx-background-color: #404040;
     -fx-background-image: url("../images/BugBackground.png");
@@ -8,101 +7,88 @@
     -fx-background-size: contain;
     -fx-background-position: center center;
 }
-.section{
-    /*-fx-background-color: rgba(54, 57, 63, 0.8);*/
+
+.section {
     -fx-background-color: rgba(40, 40, 40, 0.9);
     -fx-border-color: darkred;
     -fx-border-width: 3;
-
-    -fx-padding: 30px;
-    -fx-border-radius: 15;
-    -fx-background-radius: 15;
-    /*-fx-effect: dropshadow(gaussian, #000000, 10, 0, 0, 4); /* Added shadow for depth 
-    -fx-effect: dropshadow(gaussian, rgba(255, 0, 0, 0.6), 20, 0.3, 0, 0);*/
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.8), 30, 0.3, 0, 0);
+    -fx-padding: 25px;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.85), 20, 0.4, 0, 2);
 }
 
-
-
-.padding{
-    -fx-padding: 30px;
+.padding {
+    -fx-padding: 25px;
 }
 
-/* Scroll Panes*/
-.scroll-pane{
+/* ====================== SCROLL PANES ====================== */
+
+.scroll-pane {
     -fx-fit-to-width: true;
     -fx-fit-to-height: true;
     -fx-hbar-policy: never;
     -fx-vbar-policy: as-needed;
-    -fx-border-radius: 0px;
-    -fx-background-radius: 8px;
-    -fx-min-height: 100px;
+    -fx-background-radius: 8;
     -fx-background-color: transparent;
+    -fx-border-radius: 8;
 }
-.scrollBackground{
+
+.scrollBackground {
     -fx-background-color: rgb(41, 39, 42);
-    -fx-fill: transparent;
     -fx-padding: 10px;
 }
 
 .scroll-pane .scroll-bar {
-    -fx-background-color: transparent; 
+    -fx-background-color: transparent;
     -fx-background-insets: 0;
-    -fx-border-radius: 5px;
-}
-
-
-.scroll-pane .scroll-bar .increment-button,
-.scroll-pane .scroll-bar .decrement-button {
-    -fx-background-color: transparent; 
-    -fx-padding: 0;
-    -fx-background-insets: 0;
-    -fx-border-width: 0;
+    -fx-border-radius: 6px;
 }
 
 .scroll-pane .scroll-bar .track {
-    -fx-background-color: rgba(255,255,255, 0.2);
-    -fx-background-radius: 10px;
-    -fx-border-radius: 10px;
+    -fx-background-color: rgba(255, 255, 255, 0.15);
+    -fx-background-radius: 10;
 }
 
 .scroll-pane .scroll-bar .thumb {
-    -fx-background-color: #c62828; 
-    -fx-background-radius: 5px; 
-    -fx-min-height: 20px;
-    -fx-pref-height: 20px; 
-    -fx-max-height: 30px;
+    -fx-background-color: #c62828;
+    -fx-background-radius: 6;
+    -fx-min-height: 20;
+    -fx-max-height: 30;
 }
-
 
 .scroll-pane .scroll-bar .thumb:hover {
-    -fx-background-color: #e53935; 
+    -fx-background-color: #e53935;
+    -fx-effect: dropshadow(gaussian, rgba(255, 0, 0, 0.6), 6, 0.4, 0, 0);
 }
 
+.scroll-pane .increment-button,
+.scroll-pane .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
 
 .scroll-pane .corner {
-    -fx-background-color: transparent; 
+    -fx-background-color: transparent;
 }
 
+/* ====================== LABELS & TEXT ====================== */
 
-.scroll-pane .scroll-bar .thumb:hover {
-    -fx-effect: dropshadow(gaussian, rgba(255, 0, 0, 0.7), 5, 0.3, 0, 0);
-}
-
-/* Labels */
 .label, Text {
-    -fx-font: 14 Arial;/*Roboto;*/
-    -fx-text-fill: white; /*Used by labels*/
-    -fx-fill: white;/*Used by Text*/
-    -fx-background-color: rgba(0, 0, 0, 0);
+    -fx-font-family: "Arial";
+    -fx-font-size: 14px;
+    -fx-text-fill: white;
+    -fx-fill: white;
+    -fx-background-color: transparent;
 }
 
-.h1, .h2, .h3{
+.h1, .h2, .h3 {
     -fx-font-weight: bold;
     -fx-text-alignment: center;
 }
-.h1 { -fx-font-size: 20px;}
-.h2 { -fx-font-size: 16px;}
+
+.h1 { -fx-font-size: 20px; }
+.h2 { -fx-font-size: 16px; }
 
 .error {
     -fx-text-fill: #FF5555;
@@ -112,29 +98,26 @@
     -fx-padding-left: 15px;
 }
 
-/* ====================== BUTTON STYLES ====================== */
+/* ====================== BUTTONS ====================== */
 
 .button, .file-chooser-button, .change-password-button {
     -fx-font-size: 14px;
     -fx-padding: 10px 20px;
-    -fx-border-radius: 5px;
+    -fx-border-radius: 6;
     -fx-background-radius: 6;
     -fx-text-fill: white;
     -fx-cursor: hand;
-    -fx-transition: background-color 0.3s ease;
-}
-
-.button, .file-chooser-button {
     -fx-background-color: #c62828;
-}
-
-.button:pressed {
-    -fx-translate-y: 2px;
-    -fx-background-color: #b71c1c
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 2, 0.3, 0, 1);
 }
 
 .button:hover, .file-chooser-button:hover {
     -fx-background-color: #d64848;
+}
+
+.button:pressed {
+    -fx-translate-y: 1;
+    -fx-background-color: #b71c1c;
 }
 
 .notYourMove {
@@ -145,12 +128,11 @@
     -fx-background-color: #885f5f;
 }
 
-
 /* ====================== FORM ELEMENTS ====================== */
 
 .combo-box, .check-box {
     -fx-font-size: 14px;
-    -fx-pref-width: 200px;
+    -fx-pref-width: 200;
     -fx-padding: 10px;
 }
 
@@ -158,7 +140,6 @@
     -fx-background-color: #ffffff;
     -fx-border-color: #ccc;
     -fx-border-width: 1;
-    -fx-background-insets: 0;
     -fx-text-fill: #333;
 }
 
@@ -166,12 +147,12 @@
     -fx-border-color: #ff5555;
 }
 
-.combo-box:active, .check-box:active{
+.combo-box:focused, .check-box:focused {
     -fx-border-color: #ff3333;
-    -fx-effect: dropshadow(gaussian, red, 8, 0.3, 0, 0);
+    -fx-effect: dropshadow(gaussian, red, 6, 0.3, 0, 0);
 }
 
-.field, .field .content{
+.field, .field .content {
     -fx-background-color: #3c3c3c;
     -fx-text-fill: white;
     -fx-prompt-text-fill: gray;
@@ -181,34 +162,34 @@
     -fx-border-width: 1;
 }
 
-/* Slider styling */
+/* ====================== SLIDER ====================== */
+
 .slider .track {
     -fx-background-color: #333;
     -fx-background-radius: 5;
-    -fx-pref-height: 6px;
+    -fx-pref-height: 6;
 }
 
 .slider .thumb {
     -fx-background-color: red;
-    -fx-background-insets: 0;
     -fx-padding: 8;
 }
 
-/* ====================== GENERAL LAYOUT ====================== */
+/* ====================== LAYOUT ====================== */
 
 .layout, .profile-layout {
-    -fx-spacing: 15px;
+    -fx-spacing: 15;
     -fx-alignment: center;
-    -fx-padding: 10px;
+    -fx-padding: 10;
 }
 
-/* ====================== RESPONSIVE DESIGN ====================== */
+/* ====================== RESPONSIVE ====================== */
 
 @media screen and (max-width: 800px) {
     .background {
         -fx-background-color: #2f3136;
     }
     .sidebar {
-        -fx-width: 150px;
+        -fx-width: 150;
     }
 }

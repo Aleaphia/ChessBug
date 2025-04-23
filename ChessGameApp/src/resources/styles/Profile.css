@@ -1,14 +1,32 @@
-/* Profile Banner */
+/* ====================== PROFILE BANNER ====================== */
+
 .profile-banner {
     -fx-background-color: linear-gradient(to bottom right, #d32f2f, #f44336);
     -fx-background-radius: 20;
+    -fx-padding: 20px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 20, 0.4, 0, 2);
+    -fx-border-radius: 20;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-width: 1;
 }
 
-/* Profile Image and Drop Shadow */
+/* ====================== PROFILE IMAGE ====================== */
+
 .profile-image {
-    -fx-effect: dropshadow(gaussian, rgba(255, 0, 0, 0.4), 15, 0.3, 0, 0);
+    -fx-background-radius: 100%;
+    -fx-border-radius: 100%;
+    -fx-effect: dropshadow(gaussian, rgba(255, 0, 0, 0.45), 18, 0.5, 0, 2);
+    -fx-border-color: #ffffff30;
+    -fx-border-width: 2;
+    -fx-padding: 5px;
+    -fx-background-insets: 2;
+    -fx-scale-x: 1;
+    -fx-scale-y: 1;
+    -fx-transition: all 0.3s ease-in-out;
 }
-/*
 
-/*Overriden */
-.biggerText { -fx-font-size: 26px;}
+.profile-image:hover {
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-effect: dropshadow(gaussian, rgba(255, 60, 60, 0.6), 22, 0.5, 0, 2);
+}
