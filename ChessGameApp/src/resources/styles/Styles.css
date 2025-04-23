@@ -133,11 +133,6 @@
     -fx-background-color: #b71c1c
 }
 
-.button:hover, .file-chooser-button:hover {
-    -fx-background-color: #e53935;
-    -fx-scale-x: 1.05;
-    -fx-scale-y: 1.5;
-}
 .notYourMove {
     -fx-background-color: #865b5b;
 }
