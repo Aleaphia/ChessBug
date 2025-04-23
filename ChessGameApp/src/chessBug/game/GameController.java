@@ -291,6 +291,6 @@ public class GameController implements IGameSelectionController, IGameCreationCo
         view.addMessages(chat.getAllMessages().stream());
         view.displayCurrentState(client);
         //Check database
-        addToDatabaseCheckList(()->databaseChecks());
+        addToDatabaseCheckList(()->new Thread(() -> databaseChecks()).start());
     }
 }
