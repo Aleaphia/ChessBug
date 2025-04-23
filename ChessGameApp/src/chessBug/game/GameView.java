@@ -480,8 +480,8 @@ public class GameView {
         try {
             addMessages(controller.getChatMessages());
         } catch (NetworkException e) {
-            System.err.println("Failed to get chat messages!");
-            e.printStackTrace();
+            /* System.err.println("Failed to get chat messages!");
+            e.printStackTrace(); */
         }
     }
     private void refreshGameDisplay() {

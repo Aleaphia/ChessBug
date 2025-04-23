@@ -279,6 +279,7 @@ public class GameController implements IGameSelectionController, IGameCreationCo
         HBox.setHgrow(rightRegion, Priority.ALWAYS);
                 
         //Update chat/match status
+        this.match.getAllMoves().stream().forEach((move) -> internalPlayerMove(move));
         try {
             this.match.poll(client).forEach((move) -> internalPlayerMove(move));
         } catch(NetworkException ignored) {} // We'll try again soon
