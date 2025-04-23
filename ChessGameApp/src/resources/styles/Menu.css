@@ -3,12 +3,12 @@
     -fx-text-fill: white;
 }
 .buttonIcon {
-    -fx-background-color: #323232;
+    -fx-background-color: #460005;
     -fx-border-width: 0;
 }
 
 .buttonIcon:hover {
-    -fx-background-color: #959595;
+    -fx-background-color: #562023;
 }
 
 .buttonIcon {
