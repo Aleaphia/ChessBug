@@ -98,13 +98,15 @@ public class ProfileView extends VBox {
             PreferencesController.playButtonSound();
             String oldPass = oldPasswordField.getText();
             String newPass = newPasswordField.getText();
+                    
             if (oldPass.isEmpty() || newPass.isEmpty()) {
                 showError("Both password fields must be filled");
-            } else {
-                controller.resetPassword(oldPass, newPass);
-                showConfirmation("Password reset successfully.");
+                return;
             }
+                
+            controller.resetPassword(oldPass, newPass);
         });
+                
 
         HBox passwordBox = new HBox(10, oldPasswordField, newPasswordField);
         passwordBox.setAlignment(Pos.CENTER);
@@ -225,14 +227,14 @@ public class ProfileView extends VBox {
         }
     }
 
-    private void showError(String msg) {
+    public void showError(String msg) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
         alert.setContentText(msg);
         alert.showAndWait();
     }
 
-    private void showConfirmation(String msg) {
+    public void showConfirmation(String msg) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Success");
         alert.setContentText(msg);

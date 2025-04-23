@@ -58,11 +58,12 @@ public class ProfileController {
 
     public void resetPassword(String oldPassword, String newPassword) {
         try {
-            // TODO: will make it require old password
-            client.updatePassword(/*oldPassword,*/ newPassword);
+            client.changePassword(oldPassword, newPassword);  // Call the validated method
+            view.showConfirmation("Password updated successfully.");
         } catch (NetworkException e) {
-            System.err.println("Password reset failed.");
+            view.showError("Password reset failed: " + e.getMessage());
             e.printStackTrace();
         }
     }
+    
 }
