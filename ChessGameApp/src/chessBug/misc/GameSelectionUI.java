@@ -3,6 +3,7 @@ package chessBug.misc;
 import chessBug.controllerInterfaces.IGameSelectionController;
 import chessBug.network.Match;
 import chessBug.network.NetworkException;
+import chessBug.preferences.PreferencesController;
 
 import java.util.List;
 import javafx.geometry.Pos;
@@ -98,6 +99,7 @@ public class GameSelectionUI {
         hbox.getChildren().add(matchButton);
         
          matchButton.setOnAction(event -> {
+             PreferencesController.playButtonSound();
             //If the match is requested, accept the Match
             try {
                 if(status == GameStatus.REQUESTED)

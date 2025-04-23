@@ -2,6 +2,7 @@ package chessBug.misc;
 
 import chessBug.controllerInterfaces.IFriendRequestController;
 import chessBug.network.*;
+import chessBug.preferences.PreferencesController;
 import java.util.List;
 import java.util.ArrayList;
 import javafx.geometry.Pos;
@@ -70,6 +71,7 @@ public class ReceiveFriendRequestUI {
 
             //Function
             accept.setOnAction(event -> {
+                PreferencesController.playButtonSound();
                 try {
                     controller.acceptFriendRequest(user.getUsername());
                     curr.getChildren().clear();
@@ -79,6 +81,7 @@ public class ReceiveFriendRequestUI {
                 }
             });
             deny.setOnAction(event -> {
+                PreferencesController.playButtonSound();
                 try {
                     controller.denyFriendRequest(user.getUsername());
                     curr.getChildren().clear();

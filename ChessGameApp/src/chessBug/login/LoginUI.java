@@ -55,7 +55,9 @@ public class LoginUI {
         passwordField.getStyleClass().add("loginField");
 
         //Jump from username to password filds
-        usernameField.setOnAction(event -> passwordField.requestFocus());
+        usernameField.setOnAction(event -> {
+            passwordField.requestFocus();
+        });
 
         // Entry Animation
         loginPage.setOpacity(0);

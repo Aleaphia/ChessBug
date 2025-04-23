@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import chessBug.network.Client;
 import chessBug.network.NetworkException;
+import chessBug.preferences.PreferencesController;
 import java.util.List;
 import java.util.Arrays;
 import javafx.beans.binding.Bindings;
@@ -86,9 +87,16 @@ public class ProfileView extends VBox {
         oldPasswordField = createPasswordField("Old Password");
         newPasswordField = createPasswordField("New Password");
 
-        Button updateProfileButton = createButton("Update Profile", e -> updateProfile());
-        Button changeProfilePicButton = createButton("Change Picture", e -> openFileChooserForProfilePic(client));
+        Button updateProfileButton = createButton("Update Profile", e -> {
+            PreferencesController.playButtonSound();
+            updateProfile();
+                });
+        Button changeProfilePicButton = createButton("Change Picture", e -> {
+            PreferencesController.playButtonSound();
+            openFileChooserForProfilePic(client);
+                });
         Button resetPasswordButton = createButton("Reset Password", e -> {
+            PreferencesController.playButtonSound();
             String oldPass = oldPasswordField.getText();
             String newPass = newPasswordField.getText();
             if (oldPass.isEmpty() || newPass.isEmpty()) {

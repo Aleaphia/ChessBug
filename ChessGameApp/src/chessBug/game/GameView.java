@@ -2,6 +2,7 @@ package chessBug.game;
 
 import chessGame.*;
 import chessBug.network.*;
+import chessBug.preferences.PreferencesController;
 import java.io.*;
 import java.util.*;
 import java.util.stream.Stream;
@@ -84,6 +85,7 @@ public class GameView {
         gameBoard.add(msgBoard, 0, 9, 9, 1); //Add msgBoard to center
         Button forfeit = new Button("Forfeit");
         forfeit.setOnAction(event -> {
+            PreferencesController.playButtonSound();
             try {
                 controller.forfeitMatch();
                 displayBotMessage(controller.getUsername() + " forfeits.");
@@ -257,18 +259,22 @@ public class GameView {
         Button jumpBackward = new Button("<<");
         Button jumpForward = new Button (">>");
         goBack.setOnAction(event -> {
+            PreferencesController.playButtonSound();
             if (currTurnNumber > 0)
                 swapToPastGameDisplay(--currTurnNumber);
         });
         goForward.setOnAction(event -> {
+            PreferencesController.playButtonSound();
             if (currTurnNumber < controller.getTurnNumber())
                 swapToPastGameDisplay(++currTurnNumber);
         });
         jumpBackward.setOnAction(event -> {
+            PreferencesController.playButtonSound();
             currTurnNumber = 0;
             swapToPastGameDisplay(currTurnNumber);
                 });
         jumpForward.setOnAction(event -> {
+            PreferencesController.playButtonSound();
             currTurnNumber = controller.getTurnNumber();
             swapToPastGameDisplay(currTurnNumber);
                 });

@@ -3,6 +3,7 @@ package chessBug.misc;
 import chessBug.controllerInterfaces.IGameCreationController;
 import chessBug.network.Friend;
 import chessBug.network.NetworkException;
+import chessBug.preferences.PreferencesController;
 
 import java.util.Random;
 import javafx.geometry.Pos;
@@ -68,7 +69,10 @@ public class GameCreationUI {
         String[] colorOptionList = {"white", "black", "random"};
         for (String option : colorOptionList) {
             RadioButton curr = new RadioButton(option);
-            curr.setOnAction(event -> colorSelection[0] = option.charAt(0));
+            curr.setOnAction(event -> {
+                PreferencesController.playButtonSound();
+                colorSelection[0] = option.charAt(0);
+            });
             curr.setToggleGroup(colorOptions);
             page.add(curr, 1, row++, 2, 1);
             
@@ -92,7 +96,10 @@ public class GameCreationUI {
         try {
             for(Friend friend : controller.getFriendList()){
                 RadioButton curr = new RadioButton(friend.getUsername());
-                curr.setOnAction(event -> friendSelection[0] = friend);
+                curr.setOnAction(event -> {
+                    PreferencesController.playButtonSound();
+                    friendSelection[0] = friend;
+                });
                 curr.setToggleGroup(friendOptions);
                 friendBox.getChildren().add(curr);//add(curr, 1, row++, 2, 1);
                 

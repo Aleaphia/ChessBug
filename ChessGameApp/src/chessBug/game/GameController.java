@@ -62,6 +62,7 @@ public class GameController implements IGameSelectionController, IGameCreationCo
         
         //Menu funtionality
         newGame.setOnAction(event -> {
+            PreferencesController.playButtonSound();
             gameDisplayNode.getChildren().clear();
             gameDisplayNode.getChildren().addAll(
                     new GameSelectionUI(
@@ -72,6 +73,7 @@ public class GameController implements IGameSelectionController, IGameCreationCo
         });
         
         currGames.setOnAction(event -> {
+            PreferencesController.playButtonSound();
             gameDisplayNode.getChildren().clear();
             gameDisplayNode.getChildren().add(
                     new GameSelectionUI(
@@ -81,6 +83,7 @@ public class GameController implements IGameSelectionController, IGameCreationCo
         });
         
         oldGames.setOnAction(event -> {
+            PreferencesController.playButtonSound();
             gameDisplayNode.getChildren().clear();
             gameDisplayNode.getChildren().add(
                     new GameSelectionUI(
@@ -230,7 +233,7 @@ public class GameController implements IGameSelectionController, IGameCreationCo
         //Attempt to make player move, will return true on success
         else if (model.makePlayerMove(notation)){
             //Sound
-            PreferencesController.playSound();
+            PreferencesController.playGameSound();
             
             //Add notation to view
             view.addToNotationBoard(notation, !model.getPlayerTurn(), (model.getTurnNumber() - 1)/2);

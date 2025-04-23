@@ -228,12 +228,14 @@ public class ChessBug extends Application {
                     databaseCheckList.clear();
                     isLoggedIn = false; // Log out
                     mainScene.setRoot(loginPane);
+                    PreferencesController.playButtonSound();
                     PreferencesController.applyStyles(mainScene, "Styles", "Menu", "Login");
                 }));
     
         return sidebar;
     }
      private void changePage(Pane newPage, String... stylePage){
+        PreferencesController.playButtonSound();
         //Clear and add new page
         page.getChildren().clear();
         page.getChildren().add(fadeIn(newPage));

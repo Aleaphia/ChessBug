@@ -2,6 +2,7 @@ package chessBug.misc;
 
 import chessBug.controllerInterfaces.IFriendRequestController;
 import chessBug.network.NetworkException;
+import chessBug.preferences.PreferencesController;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Button;
@@ -26,7 +27,10 @@ public class SendFriendRequestUI {
         page.getChildren().add(newFriend);
         
         //Function
-        newFriend.setOnAction(event -> buildFriendRequest());
+        newFriend.setOnAction(event -> {
+            PreferencesController.playButtonSound();
+            buildFriendRequest();
+                });
     }
     private void buildFriendRequest(){
         //Clear page
@@ -38,8 +42,14 @@ public class SendFriendRequestUI {
         page.getChildren().addAll(new Label("Search by Username:"), input, btnSearch, errorMsgSpace);
         
         //Add functionality
-        input.setOnAction(event -> sendFriendRequest(input.getText()));
-        btnSearch.setOnAction(event -> sendFriendRequest(input.getText()));
+        input.setOnAction(event -> {
+            PreferencesController.playButtonSound();
+            sendFriendRequest(input.getText());
+        });
+        btnSearch.setOnAction(event -> {
+            PreferencesController.playButtonSound();
+            sendFriendRequest(input.getText());
+        });
     }
     
     

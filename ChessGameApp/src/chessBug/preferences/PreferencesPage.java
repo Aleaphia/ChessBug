@@ -50,7 +50,10 @@ public class PreferencesPage {
         title.getStyleClass().add("h1");
 
         // Save Preferences Button
-        Button savePreferencesButton = createAnimatedButton("Save Preferences", () -> PreferencesController.savePreferences());
+        Button savePreferencesButton = createAnimatedButton("Save Preferences", () -> {
+            PreferencesController.playButtonSound();
+            PreferencesController.savePreferences();
+        });
 
         // Page Sections
         page.getChildren().addAll(
@@ -72,13 +75,19 @@ public class PreferencesPage {
 
         CheckBox moveHintsCheckBox = new CheckBox("Show Move Hints");
         moveHintsCheckBox.setSelected(PreferencesController.isShowMoveHintsEnabled());
-        moveHintsCheckBox.setOnAction(event -> PreferencesController.handleShowMoveHints(moveHintsCheckBox.isSelected()));
+        moveHintsCheckBox.setOnAction(event -> {
+            PreferencesController.playButtonSound();
+            PreferencesController.handleShowMoveHints(moveHintsCheckBox.isSelected());
+                });
         moveHintsCheckBox.getStyleClass().add("label");
 
         CheckBox confirmMovesCheckBox = new CheckBox("Confirm Moves Before Playing");
         confirmMovesCheckBox.setWrapText(true);
         confirmMovesCheckBox.setSelected(PreferencesController.isConfirmMovesEnabled());
-        confirmMovesCheckBox.setOnAction(event -> PreferencesController.handleConfirmMoves(confirmMovesCheckBox.isSelected()));
+        confirmMovesCheckBox.setOnAction(event -> {
+            PreferencesController.playButtonSound();
+            PreferencesController.handleConfirmMoves(confirmMovesCheckBox.isSelected());
+                });
         confirmMovesCheckBox.getStyleClass().add("label");
 
         Slider volumeSlider = new Slider(0, 100, PreferencesController.getVolume() * 100);
@@ -116,15 +125,19 @@ public class PreferencesPage {
         ComboBox<String> themeComboBox = new ComboBox<>();
         themeComboBox.getItems().addAll("Light", "Dark");
         themeComboBox.setValue(PreferencesController.getTheme());
-        themeComboBox.setOnAction(event ->
-                PreferencesController.handleThemeChange(themeComboBox.getValue(), themeComboBox.getScene())
-        );
+        themeComboBox.setOnAction(event ->{
+            PreferencesController.playButtonSound();
+            PreferencesController.handleThemeChange(themeComboBox.getValue(), themeComboBox.getScene());
+        });
 
         themeContainer.getChildren().addAll(themeLabel, themeComboBox);
 
         CheckBox stayLoggedInCheckBox = new CheckBox("Stay logged in");
         stayLoggedInCheckBox.setSelected(PreferencesController.isStayLoggedIn());
-        stayLoggedInCheckBox.setOnAction(event -> PreferencesController.handleStayLoggedIn(stayLoggedInCheckBox.isSelected()));
+        stayLoggedInCheckBox.setOnAction(event -> {
+            PreferencesController.playButtonSound();
+            PreferencesController.handleStayLoggedIn(stayLoggedInCheckBox.isSelected());
+        });
         stayLoggedInCheckBox.getStyleClass().add("label");
 
         container.getChildren().addAll(header, themeContainer, stayLoggedInCheckBox);

@@ -19,8 +19,10 @@ public class PreferencesController {
     private static Preferences preferences = Preferences.userNodeForPackage(PreferencesController.class);
 
     private Pane page;
-    private static MediaPlayer sound = new MediaPlayer( new Media(
-            PreferencesController.class.getResource("/resources/sounds/test.wav").toString()));
+    private static MediaPlayer gameSound = new MediaPlayer( new Media(
+            PreferencesController.class.getResource("/resources/sounds/gameMove.wav").toString()));
+    private static MediaPlayer buttonSound = new MediaPlayer( new Media(
+            PreferencesController.class.getResource("/resources/sounds/buttonClick.wav").toString()));
     PreferencesPage view;
 
     public PreferencesController(Client client) {
@@ -78,7 +80,8 @@ public class PreferencesController {
     
     protected static void handleVolume(Double volume){
         preferences.putDouble("volume", volume);
-        sound.setVolume(volume);
+        gameSound.setVolume(volume);
+        buttonSound.setVolume(volume);
     }
 
     // Handle language change
@@ -171,11 +174,17 @@ public class PreferencesController {
         }
     }
     
-    public static void playSound(){
+    public static void playGameSound(){
         //System.out.println("DEBUG: " + sound.getVolume());
-        sound.seek(Duration.ZERO);
-        sound.play();
+        gameSound.seek(Duration.ZERO);
+        gameSound.play();
     }
+    
+      public static void playButtonSound(){
+        buttonSound.seek(Duration.ZERO);
+        buttonSound.play();
+    }
+    
     
     public static boolean confirmMove(){
         //Skip confirmation dialog if confirm moves is off
