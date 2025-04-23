@@ -1,5 +1,5 @@
 .sideBar{
-    -fx-background-color: #af2323;;
+    -fx-background-color: #af2323;
     -fx-text-fill: white;
 }
 .buttonIcon {
@@ -8,7 +8,7 @@
 }
 
 .buttonIcon:hover {
-    -fx-background-color: #562023;
+    -fx-background-color: #8c1e1e;
 }
 
 .buttonIcon {
