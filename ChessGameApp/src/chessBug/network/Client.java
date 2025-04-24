@@ -244,8 +244,10 @@ public class Client {
 		else throw new NetworkException("Invalid response for getStats");
 	}
 
-	public void updatePassword(String newPassword) throws NetworkException {
-		post("updatePassword", Map.of("newPassword", hashPassword(newPassword)));
+	public void updatePassword(String oldPassword, String newPassword) throws NetworkException {
+		JSONObject received = post("updatePassword", Map.of("oldPassword", hashPassword(oldPassword), "newPassword", hashPassword(newPassword)));
+		if(!received.has("error") || received.getBoolean("error"))
+			throw new NetworkException(received.getJSONArray("response").getString(0));
 		profile.setPassword(hashPassword(newPassword));
 	}
 
@@ -336,26 +338,7 @@ public class Client {
 		} catch (JSONException e) {
 			throw new NetworkException("Error in JSON structure", e);
 		}
-
 	}
-
-	public void changePassword(String oldPassword, String newPassword) throws NetworkException {
-		try {
-			JSONObject response = post("changePassword", Map.of(
-				"oldPassword", oldPassword,
-				"newPassword", newPassword
-			));
-			
-			if (response.getBoolean("error"))
-				throw new NetworkException(response.opt("response").toString());
-		
-			profile.setPassword(hashPassword(newPassword));
-		} catch (JSONException e) {
-			throw new NetworkException("Error in JSON structure", e);
-		}
-
-	}
-	
 
 	// Retrieve all of user's friends
 	public List<Friend> getFriends() throws NetworkException {
