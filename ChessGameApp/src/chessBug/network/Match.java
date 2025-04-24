@@ -28,12 +28,10 @@ public class Match {
 	}
 
 	private int matchID;
+	private User white, black;
+	private String status;
 
 	private Chat chat;
-
-	private User white, black;
-
-	private String status;
 
 	private int movesNumber = 0;
 	private ArrayList<String> moves;
@@ -83,33 +81,13 @@ public class Match {
 		this.status = status;
 	}
 
-	public String getStatus() {
-		return status;
-	}
-
-	public ArrayList<String> getAllMoves() {
-		return moves;
-	}
-
-	public Chat getChat() {
-		return chat;
-	}
-
-	public int getID() {
-		return matchID;
-	}
-
-	public User getWhite() {
-		return white;
-	}
-
-	public User getBlack() {
-		return black;
-	}
-        
-        public int getMoveNumber(){
-            return movesNumber;
-        }
+	public String getStatus() { return status; }
+	public ArrayList<String> getAllMoves() { return moves; }
+	public Chat getChat() { return chat; }
+	public int getID() { return matchID; }
+	public User getWhite() { return white; }
+	public User getBlack() { return black; }
+	public int getMoveNumber(){ return movesNumber; }
 
 	// Make a move, update client side moves and moveNumber while also updating the server
 	public void makeMove(Client from, String move) throws NetworkException {
@@ -120,9 +98,9 @@ public class Match {
                 movesNumber++; //Iterate move count
                 moves.add(move); //Add new move to the list
 	}
-        
-        @Override
-        public String toString(){
-            return white.getUsername() + " vs. " + black.getUsername();
-        }
+
+	@Override
+	public String toString(){
+		return white.getUsername() + " vs. " + black.getUsername();
+	}
 }

@@ -19,18 +19,15 @@ public class User {
 		this.profilePicURL = PFP_URL_PREFIX + profilePicName;
 	}
 
-	public String getUsername() {
-		return username;
-	}
+	public int getID() { return id; }
+	public String getUsername() { return username; }
+	public void setUsername(String username) { this.username = username; }
+	public String getProfilePictureURL() { return profilePicURL; }
 
 	public Image getProfilePicture() {
 		if(profilePic == null) // lazy.... *yawn*  ..loading..
 			profilePic = new Image(profilePicURL);
 		return profilePic;
-	}
-
-	public String getProfilePictureURL() {
-		return profilePicURL;
 	}
 
 	public void setProfilePicture(String newProfilePicture) {
@@ -39,18 +36,11 @@ public class User {
 		this.profilePicURL = PFP_URL_PREFIX + newProfilePicture;
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof User user2) {
+			return user2.getID() == id;
+		}
+		return false;
 	}
-
-	public int getID() {
-		return id;
-	}
-        @Override
-        public boolean equals(Object o){
-            if (o instanceof User user2){
-                return user2.getID() == id;
-            }
-            return false;
-        }
 }

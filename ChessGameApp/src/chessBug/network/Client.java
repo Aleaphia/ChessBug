@@ -6,10 +6,9 @@
 
 package chessBug.network;
 
-import java.io.BufferedReader;
+import chessBug.profile.ProfileModel;
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.File;
 import java.net.MalformedURLException;
@@ -17,29 +16,22 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Base64;
 import java.util.Map;
 import java.util.HashMap;
 
 import java.nio.file.Files;
-import java.nio.charset.StandardCharsets;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.KeyGenerator;
 
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
 import java.security.KeyFactory;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.spec.KeySpec;
@@ -48,18 +40,15 @@ import java.security.spec.InvalidKeySpecException;
 
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.SecretKeySpec;
 
 import org.json.JSONObject;
-
-import chessBug.profile.ProfileModel;
-
-import org.json.JSONArray;
 import org.json.JSONException;
 
 public class Client {
 	// "Salt" used to hash passwords
 	private static final byte[] SALT = "chessbug!(%*¡ºªħéñ€óßáñåçœø’ħ‘ºº".getBytes(StandardCharsets.UTF_8);
+
+	// Public key used to make handshake with server
 	private static final byte[] PUBLIC_KEY = Base64.getDecoder().decode("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqAwpV8rPgnN1yaWTBpPqctTIXCJCu80pbA0jUtug7WVTq0hrKIjZD7VkwSPWBAu/SQaT31Rrcfo2X4wdQiPT4mnncyE5gHgpTZFOLtiTMOEjJmtcF6JW7nzp7c1//NKagP/1gdom3Xrnyr91qsiyMWIij69proLcv1gnQV0pPFifjBNBqMC3czG6bbyhYAWZMgWNODwegYd6DrZ1qqRvVgb5F2qdpdySNVpqERMIXhT0AJnL6IbjA1kB4lq6m6fnB6lU8hSatguH0mRP5HSgg/fhNnu26ajJkxr9BrikJyEk9fOhjp2besWlMhuq8eO4VIRAa2KLwWTTg1NM3i6+3QIDAQAB");
 
 	private static Cipher CLIENT_ENCRYPT = null, CLIENT_DECRYPT = null;	
@@ -92,6 +81,7 @@ public class Client {
 		}
 	}
 
+	// Login with a provided password that's already hashed
 	public static Client loginPreHashed(String username, String password) throws ClientAuthException {
 		if(username.isEmpty() || password.isEmpty())
 			throw new ClientAuthException(ClientAuthException.TYPE_LOGIN, new IllegalArgumentException("Username and password can't be empty!"));
@@ -159,7 +149,8 @@ public class Client {
 		return (Friend)userMap.get(id);
 	}
 
-	private Friend getOrCreateFriend(JSONObject o) throws JSONException {	
+	// Wraps above function with JSON input
+	private Friend getOrCreateFriend(JSONObject o) throws JSONException {
 		return getOrCreateFriend(o.optInt("UserID", 0), o.optString("Name", "unknown"), o.optString("pfp", User.DEFAULT_PROFILE_PICTURE), o.optInt("Chat", 0));
 	}
 
@@ -174,6 +165,7 @@ public class Client {
 		return Match.NO_MATCH;
 	}
 
+	// Retrieve a match from cache if exists, if not, creates a new one and puts it in cache
 	private Match getOrCreateMatch(int id, int chatID, User white, User black, String status) {
 		Match m;
 		if(!matchMap.containsKey(id)) {
@@ -186,6 +178,7 @@ public class Client {
 		return m;
 	}
 
+	// Wraps above function with JSON input
 	private Match getOrCreateMatch(JSONObject o) throws JSONException {	
 		User whitePlayer = getOrCreateUser(o.getInt("WhitePlayer"), o.getString("WhiteName"), o.isNull("WhitePfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("WhitePfp"));
 		User blackPlayer = getOrCreateUser(o.getInt("BlackPlayer"), o.getString("BlackName"), o.isNull("BlackPfp") ? User.DEFAULT_PROFILE_PICTURE : o.getString("BlackPfp"));
@@ -208,7 +201,7 @@ public class Client {
 	public ProfileModel syncProfile() throws NetworkException {
 		try {
 			JSONObject profileData = post("getProfileData", new JSONObject());
-			
+
 			// We need to send correct username and password to retrieve information so no need to update those variables
 			profile.setEmail(profileData.getJSONObject("response").getString("EmailAddress"));
 			if(!profileData.getJSONObject("response").isNull("pfp"))
@@ -223,9 +216,7 @@ public class Client {
 		}
 	}
 
-	public ProfileModel getProfile() {
-		return profile;
-	}
+	public ProfileModel getProfile() { return profile; }
 
 	// Update profile with new data
 	public void updateProfile(String newUsername, String newEmail, String newBio) throws NetworkException {
@@ -355,7 +346,7 @@ public class Client {
 
 	}
 
-	/* Returns true if successfully sent a friend request 
+	/* Returns true if successfully sent a friend request
 	 * Prints error if received error
 	 * Prints nothing and returns false on no friend request for "normal" reasons (i.e. already friended or sent/received friend request)
 	 * TODO: Print more information regarding false returns
@@ -437,7 +428,6 @@ public class Client {
 		setMatchStatus(match, Match.Status.DRAW.toString());
 		match.makeMove(this, "end");
 	}
-	/* ~~~~ */
 
 	// Set match status on server
 	private void setMatchStatus(Match match, String status) throws NetworkException {
@@ -499,8 +489,8 @@ public class Client {
 		return post(function, message.toString());
 	}
 
-
 	public static byte[] encrypt(String input) {
+		// If encryption is not set up, then set it up
 		if(CLIENT_ENCRYPT == null) {
 			try {
 				// Create a public key out of stored PUBLIC_KEY data
@@ -576,8 +566,7 @@ public class Client {
 		LOCK = true;
 
 		// Send arbitrary string as bytes
-
-		// byte[] data = message.getBytes(StandardCharsets.UTF_8);
+	
 		byte[] data = encrypt(message);
 
 		// Set up a connection to the server
