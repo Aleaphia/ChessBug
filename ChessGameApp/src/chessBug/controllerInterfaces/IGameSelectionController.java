@@ -8,12 +8,12 @@ public interface IGameSelectionController extends IDatabaseCheckController{
     * @return - String username
     */
     public String getUsername();
-    /** getOpenMatchList - get a list of all open matches the current user is participating in
-    * @return - a list of all open matches containing the current user
+    /** selectGame - open a game
+    * @param - match : a match to start playing
     */
     public void selectGame(Match match);
-    /** receiveMatchRequest - get a list of all requested matches sent to the current player
-    * @return - a list of all requested matches sent to the current player
+    /** acceptMatchRequest - accepts a match 
+    * @param - match : a match to accept and start playing
     */
     public void acceptMatchRequest(Match match) throws NetworkException;
     /** denyMatchRequest - denies an existing match request and updates database

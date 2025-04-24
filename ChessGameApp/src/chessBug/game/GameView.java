@@ -6,19 +6,17 @@ import chessBug.preferences.PreferencesController;
 import java.io.*;
 import java.util.*;
 import java.util.stream.Stream;
-
 import javafx.geometry.*;
-
 import javafx.scene.layout.*;
 import javafx.scene.control.*;
 import javafx.scene.image.*;
-import javafx.scene.paint.Color;
 import javafx.scene.text.*;
 import javafx.scene.control.ScrollPane;
 
 public class GameView {
     private double sectionWidth = 225;
 
+    //MVC
     private final GameController controller;
 
     //Page state

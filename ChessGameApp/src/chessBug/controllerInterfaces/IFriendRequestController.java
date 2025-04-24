@@ -14,7 +14,7 @@ public interface IFriendRequestController extends IDatabaseCheckController {
     * @return - a list of users that have requested a friend status with the current user
     */
     public List<User> receiveFriendRequest() throws NetworkException;
-     /** getFriendList - get a list of accepted friends
+     /** getFriends - get a list of accepted friends
     * @return - a list of users that are friends with the current user
     */
     public List<Friend> getFriends() throws NetworkException;

@@ -3,14 +3,13 @@ package chessBug.game;
 import chessBug.controllerInterfaces.IGameSelectionController;
 import chessBug.controllerInterfaces.IGameCreationController;
 import chessBug.misc.*;
-import chessGame.*;
 import chessBug.network.*;
 import chessBug.preferences.PreferencesController;
+import chessGame.*;
 import java.util.*;
 import java.util.stream.Stream;
 import javafx.scene.control.Button;
 import javafx.scene.control.Separator;
-
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;

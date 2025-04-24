@@ -4,7 +4,6 @@ import chessBug.controllerInterfaces.IGameSelectionController;
 import chessBug.network.Match;
 import chessBug.network.NetworkException;
 import chessBug.preferences.PreferencesController;
-
 import java.util.List;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;

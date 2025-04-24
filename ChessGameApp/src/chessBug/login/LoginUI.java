@@ -1,7 +1,6 @@
 package chessBug.login;
 
 import org.json.JSONObject;
-
 import chessBug.preferences.PreferencesController;
 import javafx.animation.FadeTransition;
 import javafx.animation.ScaleTransition;
@@ -16,7 +15,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
-
 
 public class LoginUI {
     private Node page;
