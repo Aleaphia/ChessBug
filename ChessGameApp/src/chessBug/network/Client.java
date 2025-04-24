@@ -11,6 +11,7 @@ import chessBug.profile.ProfileModel;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.File;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -77,6 +78,7 @@ public class Client {
 			post("login", new JSONObject());
 			syncProfile();
 		} catch(NetworkException e) {
+			e.printStackTrace();
 			throw new ClientAuthException(ClientAuthException.TYPE_LOGIN, e);
 		}
 	}
@@ -570,7 +572,7 @@ public class Client {
 		byte[] data = encrypt(message);
 
 		// Set up a connection to the server
-		HttpsURLConnection con;
+		HttpURLConnection con;
 		try {
 			con = getConnection(function);
 		} catch (URISyntaxException e1) {
@@ -592,6 +594,7 @@ public class Client {
 			os.write(data);
 		} catch (IOException ioex) {
 			LOCK = false;
+			ioex.printStackTrace();
 			throw new NetworkException(function + " - Error: Could not write data to server!", ioex);
 		}
 
@@ -616,8 +619,8 @@ public class Client {
 	}
 
 	// Create a HTTPS connection based on a web API function, filling out the required headers
-	private static HttpsURLConnection getConnection(String function) throws URISyntaxException, MalformedURLException, IOException {
-		HttpsURLConnection con = (HttpsURLConnection)new URI("https://www.zandgall.com/chessbug/" + function).toURL().openConnection();
+	private static HttpURLConnection getConnection(String function) throws URISyntaxException, MalformedURLException, IOException {
+		HttpURLConnection con = (HttpURLConnection)new URI("http://www.zandgall.com/chessbug/" + function).toURL().openConnection();
 		con.setRequestMethod("POST");
 		con.setDoOutput(true);
 		con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
