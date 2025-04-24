@@ -561,6 +561,15 @@ public class GameView {
         children of chessBoard.
          */
         deselectSquare();
+        //Only show 'last' move if we are on the current turn
+        if (currTurnNumber == controller.getTurnNumber()){
+            lastMove[0].getStyleClass().add("lastMoveFrom");
+            lastMove[1].getStyleClass().add("lastMoveTo");
+        }
+        else{
+            lastMove[0].getStyleClass().remove("lastMoveFrom");
+            lastMove[1].getStyleClass().remove("lastMoveTo");
+        }
         gameBoard.getChildren().forEach(child -> {
             if (child instanceof BorderPane square) {
                 //System.out.println("Debug: Board id: " + board.getParent().getId() + ", game list size: " + gameList.size());
