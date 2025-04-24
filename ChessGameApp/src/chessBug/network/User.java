@@ -4,7 +4,7 @@ package chessBug.network;
 import javafx.scene.image.Image;
 
 public class User {
-	public static final String PFP_URL_PREFIX = "https://www.zandgall.com/chessbug/content/";
+	public static final String PFP_URL_PREFIX = "http://www.zandgall.com/chessbug/content/";
 	public static final String DEFAULT_PROFILE_PICTURE = "chessbug";
 	public static final User NO_USER = new User(0, "unknown", DEFAULT_PROFILE_PICTURE);
 
