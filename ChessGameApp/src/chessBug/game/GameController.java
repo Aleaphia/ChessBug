@@ -29,6 +29,9 @@ public class GameController implements IGameSelectionController, IGameCreationCo
     private GameView view;
     
     private boolean newMatchMovesFromDatabase = false;
+
+    private ArrayList<Message> newMessages = new ArrayList<>();
+    private ArrayList<String> newMoves = new ArrayList<>();
     
     //Constructors
     public GameController(Client player, DatabaseCheckList databaseCheckList){ //No selected match
@@ -115,17 +118,17 @@ public class GameController implements IGameSelectionController, IGameCreationCo
     }
     
     private void databaseChecks(){
-        //System.out.println("Debug: GameController DatabaseCheck" );
-        try {
-            //Chat updates
-            view.refreshMessageBoard(client);
-            //ChessBoard updates
-            newMatchMovesFromDatabase = false;
-            match.poll(client).forEach((move) -> internalPlayerMove(move));
-            if (newMatchMovesFromDatabase)
-                view.refresh();
-            
-        } catch (NetworkException ignored) {} // We'll try again in a moment
+        //Chat updates
+        if(!newMessages.isEmpty()) {
+            view.addMessages(newMessages.stream());
+            newMessages.clear();
+        }
+        //ChessBoard updates
+        if(!newMoves.isEmpty()) {
+            newMoves.stream().forEach((move) -> internalPlayerMove(move));
+            view.refresh();
+            newMoves.clear();
+        } 
     }
     
     //Getter Methods ===========================================================
@@ -290,6 +293,15 @@ public class GameController implements IGameSelectionController, IGameCreationCo
         view.addMessages(chat.getAllMessages().stream());
         view.displayCurrentState(client);
         //Check database
-        addToDatabaseCheckList(()->new Thread(() -> databaseChecks()).start());
+        addToDatabaseCheckList(()->new Thread(() -> {
+            try {
+                getChatMessages().forEach(msg -> newMessages.add(msg));
+                match.poll(client).forEach(move -> newMoves.add(move));
+            } catch (NetworkException ignored) {
+                ignored.printStackTrace();
+                // We'll try again in a moment!
+            }
+        }).start());
+        addToDatabaseCheckList(()->databaseChecks());
     }
 }
