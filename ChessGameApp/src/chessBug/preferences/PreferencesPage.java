@@ -1,9 +1,6 @@
 package chessBug.preferences;
 
-import java.net.URL;
-
 import chessBug.network.Client;
-import javafx.animation.FadeTransition;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
@@ -16,7 +13,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.util.Duration;
 
 public class PreferencesPage {
     private final Client client;
