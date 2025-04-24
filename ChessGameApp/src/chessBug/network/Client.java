@@ -24,7 +24,6 @@ import java.util.HashMap;
 
 import java.nio.file.Files;
 
-import javax.net.ssl.HttpsURLConnection;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
