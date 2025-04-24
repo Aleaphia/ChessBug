@@ -112,7 +112,7 @@ public class PreferencesController {
     }
     
     //Save login credentials
-    public static void setLoginnCredentials(String username, String password){
+    public static void setLoginCredentials(String username, String password){
         preferences.put("username", username);
         preferences.put("password", password);
     }
