@@ -4,6 +4,7 @@ package chessBug.network;
 import java.sql.Timestamp;
 
 public class Message {
+	// IGNORE UNUSED VALUES
 	private int id;
 	private String content;
 	private int senderID; // A little redundant when you have 'author', but can rethink and remove at a later date
@@ -19,9 +20,10 @@ public class Message {
 		this.chat = chat;
 		this.author = author;
 	}
-        protected Message(String content){
-            this.content = content;
-        }
+
+	protected Message(String content){
+		this.content = content;
+	}
 
 	public String getContent() {
 		return content;
