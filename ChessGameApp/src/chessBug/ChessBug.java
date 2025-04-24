@@ -1,20 +1,24 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+/**  ___  _                    _
+ *  / _ \| |    ___   __   __  ||_   _ _   __-,
+ * | |__,| = \ //_\\ //_\ //_\ |[]\ ||_|| //\ |
+ *  \___/|_||| \\_// \_// \_// |[]/  \_/  \\/_|
+ *                                       \\_//
+ *
+ *    |\  /\  /\  /|
+ *    | \/  \/  \/ |
+ *    |            |
+ *    | _.------._ |
+ *   ./^ O  ||   0^\.
+ * ./    _.----._    \.
+ * | O  / _    _ \   C|
+ *  \__|_/_\__/_\_|__/
+ *  /  /  |    |  \  \
+ * _| -   ^    ^   - |_
+ *
+ * A project by Shoshana Altman, Robert Epps, and Zander Gall
  */
-package chessBug;
-/*
 
-//Loop to recheck the database for updates
-Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (ActionEvent event) -> {
-            //Add repeated database checks here ================================
-            updateMsgBoard();
-            
-            // =================================================================
-        }));
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
-*/
+package chessBug;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -58,18 +62,22 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class ChessBug extends Application {
-    //Global variables
-    
+
+    private static final int DATABASE_CHECK_INTERVAL = 1;
+
     //View
     private Scene mainScene;
-    final private StackPane page = new StackPane(); // space to change with page details
+    final private StackPane mainPage = new StackPane();
     private HBox mainPane = new HBox();
     private GridPane loginPane;
-    
+
     //Database Connections
     private Client client;
-    private DatabaseCheckList databaseCheckList = new DatabaseCheckList(); 
-    //Model
+
+    // A list of database checking tasks to run in the background every once in a while
+    private DatabaseCheckList databaseCheckList = new DatabaseCheckList();
+
+    // Determine whether currently logged in, for "stay logged in"
     private boolean isLoggedIn = false;
     
     @Override
@@ -77,52 +85,48 @@ public class ChessBug extends Application {
         primaryStage.getIcons().add(new Image(ChessBug.class.getResourceAsStream("/resources/images/Crown.png")));
 
         LoginUI loginUI = createLoginPage(); //Set up loginPane
-        
+
         //Scene and Stage
         primaryStage.setTitle("ChessBug"); //Name for application stage
         primaryStage.setMaximized(true); //Makes the stage full screne while leaving the exit buttons
         mainScene = new Scene(loginPane, 1200, 600); //Add loginPane to the mainScene
         primaryStage.setScene(mainScene);//Add mainScene to primaryStage
-        
+
         //Style
         PreferencesController.applyStyles(mainScene, "Styles", "Login");
-        HBox.setHgrow(page, Priority.ALWAYS); //Makes page take up all avaiable space
+        HBox.setHgrow(mainPage, Priority.ALWAYS); //Makes page take up all avaiable space
         PreferencesController.setVolume();
-        
+
         if (PreferencesController.isStayLoggedIn()){
             //Check for credentials
             try{loginUI.savedLogin();}
             catch(Exception e){}
         }
-        
-        
+
         //Display
         primaryStage.show();
-        
-        continueDatabaseChecks();
+
+        startDatabaseChecks();
     }
-    
+
     @Override
     public void stop(){
         //Save credientials
-        if (isLoggedIn && PreferencesController.isStayLoggedIn()){
-            PreferencesController.setLoginnCredentials(client.getProfile().getUsername(), client.getProfile().getPassword());
-        }
-        else{
-            PreferencesController.setLoginnCredentials("", "");
+        if (isLoggedIn && PreferencesController.isStayLoggedIn()) {
+            PreferencesController.setLoginCredentials(client.getProfile().getUsername(), client.getProfile().getPassword());
+        } else {
+            PreferencesController.setLoginCredentials("", "");
         }
     }
-    
-    private void continueDatabaseChecks(){
+
+    // Run a series of server calls to ensure the client has up to date information
+    private void startDatabaseChecks(){
         //Check database
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), (ActionEvent event) -> {
-            //System.out.println("DEBUG: " + databaseCheckList.size() + "--------------" + databaseCheckList);
-            databaseCheckList.preformChecks();
-        }));
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(DATABASE_CHECK_INTERVAL), (e) -> databaseCheckList.preformChecks()));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
     }
-    
+
     private LoginUI createLoginPage(){
         loginPane = new GridPane();
         loginPane.getStyleClass().addAll("background", "login");
@@ -178,16 +182,15 @@ public class ChessBug extends Application {
             }
         );
 
-        // mainPane.getChildren().add(loginUI.getPage());
         loginPane.add(loginUI.getPage(), 1, 1);
         return loginUI;
     }
-    
-    private void successfulLogin(){
-        isLoggedIn = true; //Login
+
+    private void successfulLogin() {
+        isLoggedIn = true;
         //Create Menu
         mainPane.getChildren().clear();
-        mainPane.getChildren().addAll(createSidebar(), page);
+        mainPane.getChildren().addAll(createSidebar(), mainPage);
         mainPane.getStyleClass().addAll("background");
         mainScene.setRoot(mainPane);
         //Open page
@@ -197,10 +200,8 @@ public class ChessBug extends Application {
     private VBox createSidebar() {
         VBox sidebar = new VBox(10); // Vertical layout for sidebar
         sidebar.setPadding(new Insets(10, 10, 10, 10));        
-        // sidebar.getStylesheets().add(getClass().getResource("/menu.css").toExternalForm());
         sidebar.getStyleClass().add("sideBar");
 
-    
         // Add logo or image to the sidebar
         ImageView logo = new ImageView(new Image(ChessBug.class.getResourceAsStream("/resources/images/Crown.png")));
         logo.setFitHeight(53);
@@ -209,6 +210,7 @@ public class ChessBug extends Application {
         logoHolder.getStyleClass().add("logoImage");
 
         // Add items to the sidebar
+        // Every item comes with a page, and a list of stylesheet names, every page uses "Styles" and "Menu", and can choose its own set of stylesheets
         sidebar.getChildren().addAll(
                 logoHolder,
                 createSideBarButton("home", event -> {
@@ -234,17 +236,19 @@ public class ChessBug extends Application {
                     PreferencesController.playButtonSound();
                     PreferencesController.applyStyles(mainScene, "Styles", "Menu", "Login");
                 }));
-    
+
         return sidebar;
     }
      private void changePage(Pane newPage, String... stylePage){
         PreferencesController.playButtonSound();
+
         //Clear and add new page
-        page.getChildren().clear();
-        page.getChildren().add(fadeIn(newPage));
+        mainPage.getChildren().clear();
+        mainPage.getChildren().add(fadeIn(newPage));
         PreferencesController.applyStyles(mainScene, stylePage); 
     }
-     
+
+    // A function to fade in pages
     private <T extends Region> T fadeIn(T node) {
         FadeTransition fade = new FadeTransition(Duration.millis(600), node);
         fade.setFromValue(0);
@@ -253,9 +257,12 @@ public class ChessBug extends Application {
         return node;
     }
 
+    // A function to load animated icons
     private Image[] loadAnimation(String animDirectory) {
+        // A list of stored images
         ArrayList<Image> list = new ArrayList<>();
 
+        // Load as many frames as we can find from the given directory (0.png, 1.png, 2.png, 3.png...)
         for(int i = 0; true; i++) {
             InputStream s = getClass().getResourceAsStream(animDirectory + i + ".png");
             if(s == null)
@@ -263,9 +270,10 @@ public class ChessBug extends Application {
             list.add(new Image(s));
         }
 
+        // Return just an array of images rather than an arraylist, with a default value if no frames were found
         Image[] out = new Image[list.size()];
         if(list.isEmpty())
-            return new Image[]{new Image(getClass().getResourceAsStream("/resources/images/GoldCrown.png"))};
+            return new Image[]{new Image(getClass().getResourceAsStream("/resources/images/Crown.png"))};
         return list.toArray(out);
     }
 
@@ -280,6 +288,9 @@ public class ChessBug extends Application {
 
         // Create an animation that loops through all the animation images for this icon
         AnimationTimer animateHover = new AnimationTimer() {
+
+            private final long FRAME_INTERVAL_NS = 50_000_000l;
+
             long prev = 0;
             int frame = 0;
             
@@ -291,7 +302,7 @@ public class ChessBug extends Application {
             }
 
             @Override public void handle(long now) {
-                if((now - prev) > 50_000_000l) {
+                if((now - prev) > FRAME_INTERVAL_NS) {
                     prev = now;
                     imageView.setImage(images[frame]);
                     frame++;
@@ -314,8 +325,9 @@ public class ChessBug extends Application {
         button.setOnAction(eventHandler);
 
         return button;
-    }    
-    
+    }
+
+    // Default main function
     public static void main(String[] args) {
         Application.launch(args);
     }
