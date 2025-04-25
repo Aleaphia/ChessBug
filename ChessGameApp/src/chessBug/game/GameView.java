@@ -352,7 +352,8 @@ public class GameView {
             /*Qualifications:
                 - A 'mover' piece has been selected
                     (i.e., the corresponding entry in selectedSquareList is set)
-             */ else if (selectedSquare != null) { //There is a selected piece
+             */ 
+            else if (selectedSquare != null) { //There is a selected piece
                 String potentialMove = selectedSquare + square.getId();
                 //Check for promotion move (promotions require an extra prompt for piece selection)
                 if (controller.getLocalPiece(selectedSquare) instanceof Pawn pawn //'mover' piece is a pawn
@@ -364,10 +365,13 @@ public class GameView {
                     just like the else's statement, but it first requires for the
                     selection of a piece.*/
                     promote(square, potentialMove);
-                } else {
+                }
+                else if (controller.getLocalPiece(selectedSquare) instanceof Piece){
                     try {
                         controller.playerMove(potentialMove);
-                    } catch (NetworkException e) {
+                        deselectSquare();
+                    }
+                    catch (NetworkException e) {
                         System.err.println("Could not make move!");
                         e.printStackTrace();
                     }
@@ -408,6 +412,10 @@ public class GameView {
                         System.err.println("Failed to promote piece!");
                         e.printStackTrace();
                     }
+                    
+                    //Reset .setOnMouseClicked
+                    ((BorderPane) event.getSource()).setOnMouseClicked(
+                            event2 -> boardInteraction((BorderPane) event2.getSource()));
                 });
                 
                 row += dir;
@@ -495,6 +503,8 @@ public class GameView {
 
                 //Clear the square's display content
                 square.getChildren().clear();
+                //Add functionality to pressing a square
+                square.setOnMouseClicked(event -> boardInteraction((BorderPane) event.getSource()));
 
                 //Get the piece inhabiting the corresponding location in the game
                 Piece piece = controller.getLocalPiece(square.getId());
