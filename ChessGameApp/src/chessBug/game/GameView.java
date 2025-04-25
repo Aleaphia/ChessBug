@@ -293,8 +293,10 @@ public class GameView {
     
     //Board interactions -------------------------------------------------------
     private void boardInteraction(BorderPane square) {
+        System.out.println("attempt board interaction");
         if (!controller.isGameComplete() && controller.isThisPlayersTurn()  //correct color turn
                 && currTurnNumber == controller.getTurnNumber()){
+            System.out.println("board interaction");
             refreshGameDisplay(); //Makes sure game display is upto date -> closes promotion selection menu
             /*
             One of two valid actions may occur when a user selects a square:
@@ -332,6 +334,8 @@ public class GameView {
             if (localPiece != null //A piece has been selected
                     && localPiece.getColor() == controller.getPlayerTurnBoolean() //Check that piece color matches players turn's color
                     ) {
+                System.out.println("select piece");
+
                 //Select Square
                 //Add square to selectedSquareList at the corresponding index
                 selectedSquare = square.getId();
@@ -354,27 +358,31 @@ public class GameView {
                     (i.e., the corresponding entry in selectedSquareList is set)
              */ 
             else if (selectedSquare != null) { //There is a selected piece
+                System.out.println("move?");
+
                 String potentialMove = selectedSquare + square.getId();
                 //Check for promotion move (promotions require an extra prompt for piece selection)
-                if (controller.getLocalPiece(selectedSquare) instanceof Pawn pawn //'mover' piece is a pawn
+                if (controller.getLocalPiece(selectedSquare) instanceof Pawn //'mover' piece is a pawn
                         && (square.getId().contains("1") || square.getId().contains("8")) //pawn is moving to 1st or 8th rank
                         && validMove //the move is valid (this prevents prompt display for illegal promotion moves)
                         ) {
+                    System.out.println("promote move");
                     //Handle promotion details
                     /*Note: promote calls playerMove(square)
                     just like the else's statement, but it first requires for the
                     selection of a piece.*/
                     promote(square, potentialMove);
                 }
-                else if (controller.getLocalPiece(selectedSquare) instanceof Piece){
+                else{
+                    System.out.println("non promote move");
                     try {
                         controller.playerMove(potentialMove);
-                        deselectSquare();
                     }
                     catch (NetworkException e) {
                         System.err.println("Could not make move!");
                         e.printStackTrace();
                     }
+                    deselectSquare();
                 }
             }
             //==================================================================
