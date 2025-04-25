@@ -401,7 +401,7 @@ public class GameView {
         //Display promotion prompt
         try {
             for (String piece : choices) {
-                ImageView icon = new ImageView(new Image(new FileInputStream("pieceImages/" + color + piece + ".png")));
+                ImageView icon = new ImageView(new Image(GameView.class.getResourceAsStream("/resources/images/pieces/" + color + piece + ".png")));
                 icon.getStyleClass().add("promotionChoice");
                 //Style image
                 icon.setFitHeight(square.getMinHeight() - 6); //Set Height of image. Note x - 6 allows for insets of 3px
@@ -413,11 +413,9 @@ public class GameView {
                 
                 squarePane.setOnMouseClicked(event -> {
                     try {
-                        char promotionChoice = (piece.charAt(0) == 'K') ? 'N' : piece.charAt(0); //user the first letter of each peice (but knights use N instead of K)
-                        System.out.println("promotion type: " + promotionChoice);
+                        char promotionChoice = (piece.charAt(0) == 'K') ? 'N' : piece.charAt(0); //user the first letter of each peice (but knights use N instead of K) 
                         controller.playerMove(potentialMove + promotionChoice);
-                    } catch (NetworkException e) {
-                        System.err.println("Failed to promote piece!");
+                    } catch (NetworkException e) { 
                         e.printStackTrace();
                     }
                     
